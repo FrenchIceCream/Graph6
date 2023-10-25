@@ -22,7 +22,7 @@ namespace Graph6
             }
 
         }
-        public MyMatrix(int m, int n, List<float> vals)
+        public MyMatrix(int m, int n, IEnumerable<float> vals)
         {
 
             this.m = m;
@@ -30,7 +30,7 @@ namespace Graph6
             matrix = new float[m, n];
             for (int i = 0; i < m * n; i++)
             {
-                matrix[i / n, i % n] = vals[i];
+                matrix[i / n, i % n] = vals.ElementAt(i);
             }
         }
 
