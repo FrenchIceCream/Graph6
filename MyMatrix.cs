@@ -18,7 +18,9 @@ namespace Graph6
             for (int i = 0; i < m; i++)
             {
                 for (int j = 0; j < n; j++)
-                { matrix[i, j] = 0; }
+                { 
+                    matrix[i, j] = 0;
+                }
             }
 
         }
@@ -36,8 +38,8 @@ namespace Graph6
 
         public float this[int i, int j]
         {
-            get { return matrix[i, j]; }
-            set { matrix[i, j] = value; }
+            get => matrix[i, j];
+            set => matrix[i, j] = value;
         }
 
         public static MyMatrix operator *(MyMatrix lhs, MyMatrix rhs)
@@ -74,7 +76,6 @@ namespace Graph6
             {
                 for (int j = 0; j < rhs.n; j++)
                 {
-
 
                     res[i, j] = lhs[i, j] + rhs[i, j];
                 }
