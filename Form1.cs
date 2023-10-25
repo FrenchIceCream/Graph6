@@ -5,6 +5,9 @@ namespace Graph6
         public Form1()
         {
             InitializeComponent();
+            MyMatrix a = new(3, 4);
         }
     }
+
+    
 }
