@@ -1,7 +1,8 @@
 ﻿namespace Graph6
 {
-    public enum Perspective
+    public enum Projection
     {
+        Perspective,
         Isometric,
         Axonometry,
     }
@@ -23,44 +24,46 @@
         }
     }
 
+    //public class Edge
+    //{
+    //    private readonly Point _start;
+    //    private readonly Point _end;
 
-    public class Edge
-    {
-        private readonly Point _start;
-        private readonly Point _end;
+    //    public Point Start => _start;
+    //    public Point End => _end;
 
-        public Point Start => _start;
-        public Point End => _end;
-
-        public Edge(Point start, Point end)
-        {
-            _start = start;
-            _end = end;
-        }
-    }
+    //    public Edge(Point start, Point end)
+    //    {
+    //        _start = start;
+    //        _end = end;
+    //    }
+    //}
 
 
     public class Face
     {
-        private readonly List<Edge> _edges = new();
-        public IReadOnlyList<Edge> Edges => _edges;
+        private readonly List<Point> _points = new();
+        public IReadOnlyList<Point> Point => _points;
 
 
-        public Face(IEnumerable<Edge> edges)
+        public Face(IEnumerable<Point> points)
         {
-            _edges.AddRange(edges);
+            _points.AddRange(points);
         }
     }
 
+
+    //"Форма" для сохранения и загрузки в файд
     public class Shape
     {
-        private readonly List<Face> _faces = new();
-        public IReadOnlyList<Face> Faces => _faces;
+        private readonly List<Point> _points = new();
 
-        public Shape(IEnumerable<Face> faces)
+        private readonly Dictionary<int, List<int>> _faces = new Dictionary<int, List<int>>();
+
+        public Shape(List<Point> point, Dictionary<int, List<int>> faces)
         {
-            _faces.AddRange(faces);
+            _points = point;
+            _faces = faces;
         }
     }
-
 }

@@ -13,10 +13,6 @@ namespace Graph6
             _pen = new Pen(Color.Black, 1);
         }
 
-        public void DrawEdge(Edge edge)
-        {
-            
-        }
 
         public void DrawFace(Face face)
         {
