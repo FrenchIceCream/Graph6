@@ -7,7 +7,7 @@
         Axonometry,
     }
 
-    public class Point
+    public class MyPoint
     {
         private readonly float _x;
         private readonly float _y;
@@ -16,7 +16,7 @@
         public float Y => _y;
         public float Z => _z;
 
-        public Point(float x, float y, float z)
+        public MyPoint(float x, float y, float z)
         {
             _x = x;
             _y = y;
@@ -42,11 +42,11 @@
 
     public class Face
     {
-        private readonly List<Point> _points = new();
-        public IReadOnlyList<Point> Point => _points;
+        private readonly List<MyPoint> _points = new();
+        public IReadOnlyList<MyPoint> MyPoint => _points;
 
 
-        public Face(IEnumerable<Point> points)
+        public Face(IEnumerable<MyPoint> points)
         {
             _points.AddRange(points);
         }
@@ -56,11 +56,11 @@
     //"Форма" для сохранения и загрузки в файд
     public class Shape
     {
-        private readonly List<Point> _points = new();
+        private readonly List<MyPoint> _points = new();
 
         private readonly Dictionary<int, List<int>> _faces = new Dictionary<int, List<int>>();
 
-        public Shape(List<Point> point, Dictionary<int, List<int>> faces)
+        public Shape(List<MyPoint> point, Dictionary<int, List<int>> faces)
         {
             _points = point;
             _faces = faces;
