@@ -18,7 +18,7 @@ namespace Graph6
     {
         private readonly MyMatrix projectionMatrix = new(4, 4, new float[] { 1,0,0,0,
         0,1,0,0,
-        0,0,0, -1/150,
+        0,0,0, -1f/-200,
         0,0,0,1});
 
         private Graphics _graphics;
@@ -38,12 +38,15 @@ namespace Graph6
 
         public void View(Shape shape)
         {
+            _graphics.Clear(Color.White);
+
             switch (_projection)
             {
                 case Projection.Perspective:
                     Perspective(Scale(shape));
                     break;
                 case Projection.Isometric:
+                    Isometric(shape);
                     break;
                 case Projection.Axonometry:
                     break;
@@ -63,21 +66,26 @@ namespace Graph6
 
         }
 
+        private void Isometric(Shape shape)
+        {
+            foreach (var (a, b) in shape.edges)
+            {
+
+                _graphics.DrawLine(_p, shape.points[a].X, shape.points[a].Y, shape.points[b].X, shape.points[b].Y);
+
+            }
+        }
         private void Perspective(Shape shape)
         {
 
 
 
-            foreach (var v in shape._faces)
+            foreach (var (a, b) in shape.edges)
             {
-                MyMatrix t = new MyMatrix(1, 4, new float[] { shape._points[v.Key].X, shape._points[v.Key].Y, shape._points[v.Key].Z, 1 }) * projectionMatrix;
+                MyMatrix t = new MyMatrix(1, 4, new float[] { shape.points[a].X, shape.points[a].Y, shape.points[a].Z, 1 }) * projectionMatrix;
+                MyMatrix r = new MyMatrix(1, 4, new float[] { shape.points[b].X, shape.points[b].Y, shape.points[b].Z, 1 })* projectionMatrix;
+                _graphics.DrawLine(_p, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
 
-
-                foreach (var e in v.Value)
-                {
-                    MyMatrix r = new MyMatrix(1, 4, new float[] { shape._points[e].X, shape._points[e].Y, shape._points[e].Z, 1 }) * projectionMatrix;
-                    _graphics.DrawLine(_p, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
-                }
             }
         }
 

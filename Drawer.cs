@@ -19,7 +19,7 @@ namespace Graph6
 
         }
 
-        public void DrawShape(Shape Shape)
+        public void DrawShape(ShapeSaver Shape)
         {
 
         }

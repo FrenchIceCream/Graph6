@@ -28,35 +28,41 @@ namespace Graph6
             _graphics.ScaleTransform(1, -1);
 
 
-            
+
             _graphics.Flush();
 
         }
 
-        private void Button_Mirror_Click(object sender, EventArgs e)
+        private void DrawCubePerspective()
         {
             List<MyPoint> points = new List<MyPoint>();
 
-            points.Add(new MyPoint(-20, -20, 100));
+            points.Add(new MyPoint(-20, -20, 20));
 
-            points.Add(new MyPoint(20, -20, 100));
-            points.Add(new MyPoint(-20, 20, 100));
-            points.Add(new MyPoint(-20, -20, 500));
+            points.Add(new MyPoint(20, -20, 20));
+            points.Add(new MyPoint(-20, 20, 20));
+            points.Add(new MyPoint(-20, -20, 60));
 
-            points.Add(new MyPoint(20, 20, 100));
-            points.Add(new MyPoint(-20, 20, 500));
-            points.Add(new MyPoint(20, -20, 500));
+            points.Add(new MyPoint(20, 20, 20));
+            points.Add(new MyPoint(-20, 20, 60));
+            points.Add(new MyPoint(20, -20, 60));
 
-            points.Add(new MyPoint(20, 20, 500));
+            points.Add(new MyPoint(20, 20, 60));
+            List<(int, int)> edges = new();
+            edges.Add((0,1));
+            edges.Add((0,2));
+            edges.Add((0,3));
+            edges.Add((7,4));
+            edges.Add((7,5));
+            edges.Add((7,6));
+            edges.Add((4,1));
+            edges.Add((4,2));
+            edges.Add((5,3));
+            edges.Add((5,2));
+            edges.Add((6,1));
+            edges.Add((6,3));
 
-            Dictionary<int, List<int>> _faces = new Dictionary<int, List<int>>();
-
-            _faces.Add(0, new List<int>() { 1, 2, 3 });
-            _faces.Add(7, new List<int>() { 4, 5, 6 });
-            _faces.Add(1, new List<int>() { 4 });
-            _faces.Add(3, new List<int>() { 6 });
-
-            Shape s = new Shape(points, _faces);
+            Shape s = new Shape(points, edges);
 
 
             Viewer v = new(_graphics, Projection.Perspective);
@@ -64,8 +70,52 @@ namespace Graph6
             v.View(s);
         }
 
+        private void DrawCubeParallel()
+        {
+            List<MyPoint> points = new List<MyPoint>();
+
+            points.Add(new MyPoint(-20, -20, 20));
+
+            points.Add(new MyPoint(20, -20, 20));
+            points.Add(new MyPoint(-20, 20, 20));
+            points.Add(new MyPoint(-20, -20, 60));
+
+            points.Add(new MyPoint(20, 20, 20));
+            points.Add(new MyPoint(-20, 20, 60));
+            points.Add(new MyPoint(20, -20, 60));
+
+            points.Add(new MyPoint(20, 20, 60));
+            List<(int, int)> edges = new();
+            edges.Add((0, 1));
+            edges.Add((0, 2));
+            edges.Add((0, 3));
+            edges.Add((7, 4));
+            edges.Add((7, 5));
+            edges.Add((7, 6));
+            edges.Add((4, 1));
+            edges.Add((4, 2));
+            edges.Add((5, 3));
+            edges.Add((5, 2));
+            edges.Add((6, 1));
+            edges.Add((6, 3));
+
+            Shape s = new Shape(points, edges);
+
+
+            Viewer v = new(_graphics, Projection.Isometric);
+
+            v.View(s);
+        }
+
+        private void Button_Mirror_Click(object sender, EventArgs e)
+        {
+            //DrawCubeParallel();
+            DrawCubePerspective();
+        }
+
         private void Button_Scale_Click(object sender, EventArgs e)
         {
+            DrawCubeParallel();
 
         }
 

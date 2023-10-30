@@ -47,15 +47,27 @@
         }
     }
 
+    public class Shape
+    {
+        public readonly List<MyPoint> points = new();
+
+        public readonly List<(int,int)> edges = new();
+
+        public Shape(List<MyPoint> point, List<(int, int)> edges)
+        {
+            this.points = point;
+            this.edges = edges;
+        }
+    }
 
     //"Форма" для сохранения и загрузки в файд
-    public class Shape
+    public class ShapeSaver
     {
         public readonly List<MyPoint> _points = new();
 
         public readonly Dictionary<int, List<int>> _faces = new Dictionary<int, List<int>>();
 
-        public Shape(List<MyPoint> point, Dictionary<int, List<int>> faces)
+        public ShapeSaver(List<MyPoint> point, Dictionary<int, List<int>> faces)
         {
             _points = point;
             _faces = faces;
