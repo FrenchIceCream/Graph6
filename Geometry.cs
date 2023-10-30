@@ -1,11 +1,6 @@
 ﻿namespace Graph6
 {
-    public enum Projection
-    {
-        Perspective,
-        Isometric,
-        Axonometry,
-    }
+    
 
     public class MyPoint
     {
@@ -56,9 +51,9 @@
     //"Форма" для сохранения и загрузки в файд
     public class Shape
     {
-        private readonly List<MyPoint> _points = new();
+        public readonly List<MyPoint> _points = new();
 
-        private readonly Dictionary<int, List<int>> _faces = new Dictionary<int, List<int>>();
+        public readonly Dictionary<int, List<int>> _faces = new Dictionary<int, List<int>>();
 
         public Shape(List<MyPoint> point, Dictionary<int, List<int>> faces)
         {

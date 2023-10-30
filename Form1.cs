@@ -1,9 +1,12 @@
+using System.Windows.Forms;
+
 namespace Graph6
 {
     public partial class Form1 : Form
     {
 
         private IList<Face> _faces = new List<Face>();
+        private Graphics _graphics;
 
         public Form1()
         {
@@ -19,6 +22,10 @@ namespace Graph6
             AxesList_Rt.SelectedIndex = 0;
 
             ScaleValue.Text = "2";
+
+            _graphics = Canvas.CreateGraphics();
+            _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
+            _graphics.ScaleTransform(1, -1);
         }
 
         private void Button_Mirror_Click(object sender, EventArgs e)
