@@ -26,11 +26,42 @@ namespace Graph6
             _graphics = Canvas.CreateGraphics();
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
             _graphics.ScaleTransform(1, -1);
+
+
+            
+            _graphics.Flush();
+
         }
 
         private void Button_Mirror_Click(object sender, EventArgs e)
         {
+            List<MyPoint> points = new List<MyPoint>();
 
+            points.Add(new MyPoint(-20, -20, 100));
+
+            points.Add(new MyPoint(20, -20, 100));
+            points.Add(new MyPoint(-20, 20, 100));
+            points.Add(new MyPoint(-20, -20, 500));
+
+            points.Add(new MyPoint(20, 20, 100));
+            points.Add(new MyPoint(-20, 20, 500));
+            points.Add(new MyPoint(20, -20, 500));
+
+            points.Add(new MyPoint(20, 20, 500));
+
+            Dictionary<int, List<int>> _faces = new Dictionary<int, List<int>>();
+
+            _faces.Add(0, new List<int>() { 1, 2, 3 });
+            _faces.Add(7, new List<int>() { 4, 5, 6 });
+            _faces.Add(1, new List<int>() { 4 });
+            _faces.Add(3, new List<int>() { 6 });
+
+            Shape s = new Shape(points, _faces);
+
+
+            Viewer v = new(_graphics, Projection.Perspective);
+
+            v.View(s);
         }
 
         private void Button_Scale_Click(object sender, EventArgs e)
