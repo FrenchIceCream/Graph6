@@ -1,6 +1,6 @@
 ﻿namespace Graph6
 {
-    
+
 
     public class MyPoint
     {
@@ -51,12 +51,52 @@
     {
         public readonly List<MyPoint> points = new();
 
-        public readonly List<(int,int)> edges = new();
+        public readonly List<(int, int)> edges = new();
 
         public Shape(List<MyPoint> point, List<(int, int)> edges)
         {
             this.points = point;
             this.edges = edges;
+        }
+    }
+
+    public static class Shapes
+    {
+        public static Shape Cube()
+        {
+            List<MyPoint> points = new List<MyPoint>();
+
+            points.Add(new MyPoint(-20, -20, 20));
+
+            points.Add(new MyPoint(20, -20, 20));
+            points.Add(new MyPoint(-20, 20, 20));
+            points.Add(new MyPoint(-20, -20, 60));
+
+            points.Add(new MyPoint(20, 20, 20));
+            points.Add(new MyPoint(-20, 20, 60));
+            points.Add(new MyPoint(20, -20, 60));
+
+            points.Add(new MyPoint(20, 20, 60));
+            List<(int, int)> edges = new();
+            edges.Add((0, 1));
+            edges.Add((0, 2));
+            edges.Add((0, 3));
+            edges.Add((7, 4));
+            edges.Add((7, 5));
+            edges.Add((7, 6));
+            edges.Add((4, 1));
+            edges.Add((4, 2));
+            edges.Add((5, 3));
+            edges.Add((5, 2));
+            edges.Add((6, 1));
+            edges.Add((6, 3));
+
+            Shape s = new Shape(points, edges);
+            return s;
+        }
+        public static Shape Empty()
+        {
+            return new Shape(new List<MyPoint>(), new List<(int, int)>());
         }
     }
 

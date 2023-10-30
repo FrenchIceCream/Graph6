@@ -36,6 +36,11 @@ namespace Graph6
             _p = new Pen(Color.Red, 1);
         }
 
+        public void SetProjection(Projection projection)
+        {
+            _projection = projection;
+        }
+
         public void View(Shape shape)
         {
             _graphics.Clear(Color.White);
@@ -83,7 +88,7 @@ namespace Graph6
             foreach (var (a, b) in shape.edges)
             {
                 MyMatrix t = new MyMatrix(1, 4, new float[] { shape.points[a].X, shape.points[a].Y, shape.points[a].Z, 1 }) * projectionMatrix;
-                MyMatrix r = new MyMatrix(1, 4, new float[] { shape.points[b].X, shape.points[b].Y, shape.points[b].Z, 1 })* projectionMatrix;
+                MyMatrix r = new MyMatrix(1, 4, new float[] { shape.points[b].X, shape.points[b].Y, shape.points[b].Z, 1 }) * projectionMatrix;
                 _graphics.DrawLine(_p, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
 
             }

@@ -7,7 +7,8 @@ namespace Graph6
 
         private IList<Face> _faces = new List<Face>();
         private Graphics _graphics;
-
+        private Viewer _viewer;
+        private Shape _shape;
         public Form1()
         {
             InitializeComponent();
@@ -28,94 +29,17 @@ namespace Graph6
             _graphics.ScaleTransform(1, -1);
 
 
+            _viewer = new Viewer(_graphics, Projection.Isometric);
+            _shape = Shapes.Empty();
 
-            _graphics.Flush();
-
-        }
-
-        private void DrawCubePerspective()
-        {
-            List<MyPoint> points = new List<MyPoint>();
-
-            points.Add(new MyPoint(-20, -20, 20));
-
-            points.Add(new MyPoint(20, -20, 20));
-            points.Add(new MyPoint(-20, 20, 20));
-            points.Add(new MyPoint(-20, -20, 60));
-
-            points.Add(new MyPoint(20, 20, 20));
-            points.Add(new MyPoint(-20, 20, 60));
-            points.Add(new MyPoint(20, -20, 60));
-
-            points.Add(new MyPoint(20, 20, 60));
-            List<(int, int)> edges = new();
-            edges.Add((0,1));
-            edges.Add((0,2));
-            edges.Add((0,3));
-            edges.Add((7,4));
-            edges.Add((7,5));
-            edges.Add((7,6));
-            edges.Add((4,1));
-            edges.Add((4,2));
-            edges.Add((5,3));
-            edges.Add((5,2));
-            edges.Add((6,1));
-            edges.Add((6,3));
-
-            Shape s = new Shape(points, edges);
-
-
-            Viewer v = new(_graphics, Projection.Perspective);
-
-            v.View(s);
-        }
-
-        private void DrawCubeParallel()
-        {
-            List<MyPoint> points = new List<MyPoint>();
-
-            points.Add(new MyPoint(-20, -20, 20));
-
-            points.Add(new MyPoint(20, -20, 20));
-            points.Add(new MyPoint(-20, 20, 20));
-            points.Add(new MyPoint(-20, -20, 60));
-
-            points.Add(new MyPoint(20, 20, 20));
-            points.Add(new MyPoint(-20, 20, 60));
-            points.Add(new MyPoint(20, -20, 60));
-
-            points.Add(new MyPoint(20, 20, 60));
-            List<(int, int)> edges = new();
-            edges.Add((0, 1));
-            edges.Add((0, 2));
-            edges.Add((0, 3));
-            edges.Add((7, 4));
-            edges.Add((7, 5));
-            edges.Add((7, 6));
-            edges.Add((4, 1));
-            edges.Add((4, 2));
-            edges.Add((5, 3));
-            edges.Add((5, 2));
-            edges.Add((6, 1));
-            edges.Add((6, 3));
-
-            Shape s = new Shape(points, edges);
-
-
-            Viewer v = new(_graphics, Projection.Isometric);
-
-            v.View(s);
         }
 
         private void Button_Mirror_Click(object sender, EventArgs e)
         {
-            //DrawCubeParallel();
-            DrawCubePerspective();
         }
 
         private void Button_Scale_Click(object sender, EventArgs e)
         {
-            DrawCubeParallel();
 
         }
 
@@ -127,6 +51,24 @@ namespace Graph6
         private void Button_Turn_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void ParallelButton_Click(object sender, EventArgs e)
+        {
+            _viewer.SetProjection(Projection.Isometric);
+            _viewer.View(_shape);
+        }
+
+        private void PerspectiveButton_Click(object sender, EventArgs e)
+        {
+            _viewer.SetProjection(Projection.Perspective);
+            _viewer.View(_shape);
+        }
+
+        private void CubeButton_Click(object sender, EventArgs e)
+        {
+            _shape = Shapes.Cube();
+            _viewer.View(_shape);
         }
     }
 
