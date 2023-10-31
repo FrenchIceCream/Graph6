@@ -128,6 +128,7 @@
             ScaleValue.Name = "ScaleValue";
             ScaleValue.Size = new Size(36, 27);
             ScaleValue.TabIndex = 7;
+            ScaleValue.TextAlign = HorizontalAlignment.Center;
             // 
             // AxesList_Rt
             // 
@@ -181,6 +182,7 @@
             Angle.Name = "Angle";
             Angle.Size = new Size(36, 27);
             Angle.TabIndex = 13;
+            Angle.TextAlign = HorizontalAlignment.Center;
             // 
             // label5
             // 
@@ -197,6 +199,7 @@
             X1.Name = "X1";
             X1.Size = new Size(31, 27);
             X1.TabIndex = 15;
+            X1.TextAlign = HorizontalAlignment.Center;
             // 
             // Y1
             // 
@@ -204,6 +207,7 @@
             Y1.Name = "Y1";
             Y1.Size = new Size(31, 27);
             Y1.TabIndex = 16;
+            Y1.TextAlign = HorizontalAlignment.Center;
             // 
             // Z1
             // 
@@ -211,6 +215,7 @@
             Z1.Name = "Z1";
             Z1.Size = new Size(31, 27);
             Z1.TabIndex = 17;
+            Z1.TextAlign = HorizontalAlignment.Center;
             // 
             // Z2
             // 
@@ -218,6 +223,7 @@
             Z2.Name = "Z2";
             Z2.Size = new Size(31, 27);
             Z2.TabIndex = 20;
+            Z2.TextAlign = HorizontalAlignment.Center;
             // 
             // Y2
             // 
@@ -225,6 +231,7 @@
             Y2.Name = "Y2";
             Y2.Size = new Size(31, 27);
             Y2.TabIndex = 19;
+            Y2.TextAlign = HorizontalAlignment.Center;
             // 
             // X2
             // 
@@ -232,6 +239,7 @@
             X2.Name = "X2";
             X2.Size = new Size(31, 27);
             X2.TabIndex = 18;
+            X2.TextAlign = HorizontalAlignment.Center;
             // 
             // PerspectiveButton
             // 
