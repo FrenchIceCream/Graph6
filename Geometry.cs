@@ -17,6 +17,16 @@
             _y = y;
             _z = z;
         }
+
+        public static MyPoint operator +(MyPoint lhs, MyPoint rhs)
+        {
+            return new MyPoint(lhs.X + rhs.X, lhs.Y + rhs.Y, lhs.Z + rhs.Z);
+        }
+
+        public static MyPoint operator -(MyPoint lhs, MyPoint rhs)
+        {
+            return new MyPoint(lhs.X - rhs.X, lhs.Y - rhs.Y, lhs.Z - rhs.Z);
+        }
     }
 
     //public class Edge
@@ -49,14 +59,29 @@
 
     public class Shape
     {
-        public readonly List<MyPoint> points = new();
+        public List<MyPoint> points = new();
 
-        public readonly List<(int, int)> edges = new();
+        public List<(int, int)> edges = new();
 
         public Shape(List<MyPoint> point, List<(int, int)> edges)
         {
             this.points = point;
             this.edges = edges;
+        }
+
+       public MyPoint GetCenter()
+        {
+            float x = 0;
+            float y = 0;
+            float z = 0;
+            foreach (var point in points)
+            {
+                x += point.X;
+                y += point.Y;
+                z += point.Z;
+            }
+
+            return new MyPoint(x / points.Count, y / points.Count, z / points.Count);
         }
     }
 

@@ -76,7 +76,6 @@ namespace Graph6
             {
                 for (int j = 0; j < rhs.n; j++)
                 {
-
                     res[i, j] = lhs[i, j] + rhs[i, j];
                 }
             }
