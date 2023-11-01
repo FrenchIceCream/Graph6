@@ -99,7 +99,7 @@ namespace Graph6
             0, -(float)Math.Sin(deg), (float)Math.Cos(deg), 0,
             0, 0, 0, 1});
 
-            switch (AxesList.Text)
+            switch (AxesList_Rt.Text)
             {
                 case "X":
                     break;
