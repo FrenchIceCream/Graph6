@@ -192,5 +192,17 @@ namespace Graph6
             _shape = Shapes.Cube();
             _viewer.View(_shape);
         }
+
+        private void OctahedronButton_Click(object sender, EventArgs e)
+        {
+            _shape = Shapes.Octahedron();
+            _viewer.View(_shape);
+        }
+
+        private void TetrahedronButton_Click(object sender, EventArgs e)
+        {
+            _shape = Shapes.Tetrahedron();
+            _viewer.View(_shape);
+        }
     }
 }

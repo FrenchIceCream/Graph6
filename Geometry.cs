@@ -69,7 +69,7 @@
             this.edges = edges;
         }
 
-       public MyPoint GetCenter()
+        public MyPoint GetCenter()
         {
             float x = 0;
             float y = 0;
@@ -89,36 +89,88 @@
     {
         public static Shape Cube()
         {
-            List<MyPoint> points = new List<MyPoint>();
+            List<MyPoint> points = new List<MyPoint>
+            {
+                new MyPoint(-20, -20, 20),
+                new MyPoint(20, -20, 20),
+                new MyPoint(-20, 20, 20),
+                new MyPoint(-20, -20, 60),
+                new MyPoint(20, 20, 20),
+                new MyPoint(-20, 20, 60),
+                new MyPoint(20, -20, 60),
+                new MyPoint(20, 20, 60)
+            };
+            List<(int, int)> edges = new()
+            {
+                (0, 1),
+                (0, 2),
+                (0, 3),
+                (7, 4),
+                (7, 5),
+                (7, 6),
+                (4, 1),
+                (4, 2),
+                (5, 3),
+                (5, 2),
+                (6, 1),
+                (6, 3)
+            };
 
-            points.Add(new MyPoint(-20, -20, 20));
-
-            points.Add(new MyPoint(20, -20, 20));
-            points.Add(new MyPoint(-20, 20, 20));
-            points.Add(new MyPoint(-20, -20, 60));
-
-            points.Add(new MyPoint(20, 20, 20));
-            points.Add(new MyPoint(-20, 20, 60));
-            points.Add(new MyPoint(20, -20, 60));
-
-            points.Add(new MyPoint(20, 20, 60));
-            List<(int, int)> edges = new();
-            edges.Add((0, 1));
-            edges.Add((0, 2));
-            edges.Add((0, 3));
-            edges.Add((7, 4));
-            edges.Add((7, 5));
-            edges.Add((7, 6));
-            edges.Add((4, 1));
-            edges.Add((4, 2));
-            edges.Add((5, 3));
-            edges.Add((5, 2));
-            edges.Add((6, 1));
-            edges.Add((6, 3));
-
-            Shape s = new Shape(points, edges);
-            return s;
+            return new(points, edges);
         }
+        public static Shape Tetrahedron()
+        {
+            float h = (float)Math.Sqrt(3) * 50; // Для равнобедренности
+            List<MyPoint> points = new()
+            {
+                new MyPoint(-50, -h / 3, 20),
+                new MyPoint(50, -h / 3, 20),
+                new MyPoint(0, 2 * h / 3, 20),
+                new MyPoint(0, 0, 25 * (float)Math.Sqrt(13)),
+            };
+            List<(int, int)> edges = new()
+            {
+                (0, 1),  // Ребро AB
+                (0, 2),  // Ребро AC
+                (0, 3),  // Ребро AD
+                (1, 2),  // Ребро BC
+                (1, 3),  // Ребро BD
+                (2, 3)   // Ребро CD
+            };
+            return new(points, edges);
+        }
+
+
+        public static Shape Octahedron()
+        {
+            List<MyPoint> points = new List<MyPoint>
+            {
+                new MyPoint(0, 0, 30),   
+                new MyPoint(-30, 0, 0),
+                new MyPoint(0, -30, 0),
+                new MyPoint(30, 0, 0),
+                new MyPoint(0, 30, 0),
+                new MyPoint(0, 0, -30)
+            };
+
+            List<(int, int)> edges = new List<(int, int)>
+            {
+                (0, 1), 
+                (0, 2), 
+                (0, 3), 
+                (0, 4),
+                (1, 2), 
+                (2, 3),
+                (3, 4),
+                (4, 1),
+                (1, 5), 
+                (2, 5),
+                (3, 5),  
+                (4, 5) 
+            };
+            return new(points, edges);
+        }
+
         public static Shape Empty()
         {
             return new Shape(new List<MyPoint>(), new List<(int, int)>());

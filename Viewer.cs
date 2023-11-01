@@ -14,7 +14,6 @@ namespace Graph6
     }
 
     public class Viewer
-
     {
         private readonly MyMatrix projectionMatrix = new(4, 4, new float[] { 1,0,0,0,
         0,1,0,0,
