@@ -1,7 +1,9 @@
-﻿namespace Graph6
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Windows.Forms.VisualStyles;
+
+namespace Graph6
 {
-
-
     public class MyPoint
     {
         private readonly float _x;
@@ -149,17 +151,35 @@
         }
     }
 
-    //"Форма" для сохранения и загрузки в файл
-    public class ShapeSaver
+
+    public class Converter : JsonConverter<Shape>
     {
-        public readonly List<MyPoint> _points = new();
-
-        public readonly Dictionary<int, List<int>> _faces = new Dictionary<int, List<int>>();
-
-        public ShapeSaver(List<MyPoint> point, Dictionary<int, List<int>> faces)
+        public override Shape? ReadJson(JsonReader reader, Type objectType, Shape? existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            _points = point;
-            _faces = faces;
+            if (reader.TokenType == JsonToken.Null)
+                return null;
+
+            JObject jsonObject = JObject.Load(reader);
+            var points = jsonObject["points"].ToObject<List<MyPoint>>();
+            var edges = jsonObject["edges"].ToObject<List<(int, int)>>();
+            return new Shape(points, edges);
+        }
+
+        public override void WriteJson(JsonWriter writer, Shape? value, JsonSerializer serializer)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+
+            var jsonObject = new JObject
+            {
+                { "points", JToken.FromObject(value.Points, serializer) },
+                { "edges", JToken.FromObject(value.Edges, serializer) }
+            };
+            jsonObject.WriteTo(writer);
         }
     }
+
 }

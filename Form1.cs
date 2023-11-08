@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Windows.Forms;
 
 namespace Graph6
@@ -200,6 +201,49 @@ namespace Graph6
         {
             _shape = Shapes.Tetrahedron();
             ViewShape();
+        }
+
+        private void LoadButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog diaglog = new()
+            {
+                Filter = "(*.pgj)|*.pgj",
+                FilterIndex = 2,
+                RestoreDirectory = true
+            };
+
+            if (diaglog.ShowDialog() == DialogResult.OK)
+            {
+                if (diaglog.CheckFileExists)
+                {
+                    string file = File.ReadAllText(diaglog.FileName);
+                    _shape = JsonConvert.DeserializeObject<Shape>(file, new Converter());
+                    ViewShape();
+                }
+            }
+        }
+
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            if (_shape == null)
+                return;
+
+            string file = JsonConvert.SerializeObject(_shape, Formatting.Indented, new Converter());
+            SaveFileDialog diaglog = new()
+            {
+                Filter = "(*.pgj)|*.pgj",
+                FilterIndex = 2,
+                RestoreDirectory = true
+            };
+
+            if (diaglog.ShowDialog() == DialogResult.OK)
+            {
+                if (diaglog.CheckFileExists)
+                {
+                    File.Delete(diaglog.FileName);
+                }
+                File.WriteAllText(diaglog.FileName, file);
+            }
         }
     }
 }

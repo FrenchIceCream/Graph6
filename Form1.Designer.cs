@@ -56,6 +56,8 @@
             label7 = new Label();
             button1 = new Button();
             button2 = new Button();
+            LoadButton = new Button();
+            SaveButton = new Button();
             ((System.ComponentModel.ISupportInitialize)Canvas).BeginInit();
             SuspendLayout();
             // 
@@ -331,11 +333,35 @@
             button2.UseVisualStyleBackColor = true;
             button2.Click += TetrahedronButton_Click;
             // 
+            // LoadButton
+            // 
+            LoadButton.Location = new Point(767, 24);
+            LoadButton.Margin = new Padding(3, 2, 3, 2);
+            LoadButton.Name = "LoadButton";
+            LoadButton.Size = new Size(136, 22);
+            LoadButton.TabIndex = 28;
+            LoadButton.Text = "Загрузить";
+            LoadButton.UseVisualStyleBackColor = true;
+            LoadButton.Click += LoadButton_Click;
+            // 
+            // SaveButton
+            // 
+            SaveButton.Location = new Point(768, 50);
+            SaveButton.Margin = new Padding(3, 2, 3, 2);
+            SaveButton.Name = "SaveButton";
+            SaveButton.Size = new Size(136, 22);
+            SaveButton.TabIndex = 29;
+            SaveButton.Text = "Сохранить";
+            SaveButton.UseVisualStyleBackColor = true;
+            SaveButton.Click += SaveButton_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(774, 400);
+            ClientSize = new Size(916, 400);
+            Controls.Add(SaveButton);
+            Controls.Add(LoadButton);
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(label7);
@@ -402,5 +428,7 @@
         private Label label7;
         private Button button1;
         private Button button2;
+        private Button LoadButton;
+        private Button SaveButton;
     }
 }
