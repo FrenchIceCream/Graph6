@@ -4,8 +4,6 @@ namespace Graph6
 {
     public partial class Form1 : Form
     {
-
-        private IList<Face> _faces = new List<Face>();
         private Graphics _graphics;
         private Viewer _viewer;
         private Shape _shape;
@@ -31,18 +29,21 @@ namespace Graph6
             Y2.Text = "20";
             Z2.Text = "10";
 
+            //”казание начала координат в центре окна
             _graphics = Canvas.CreateGraphics();
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
             _graphics.ScaleTransform(1, -1);
-
 
             _viewer = new Viewer(_graphics, Projection.Isometric);
             _shape = Shapes.Empty();
         }
 
+        private void ViewShape() =>
+            _viewer.View(_shape);
+
         private void Button_Mirror_Click(object sender, EventArgs e)
         {
-            if (_shape.points.Count == 0)
+            if (_shape.Points.Count == 0)
                 return;
 
             int kx = -1;
@@ -62,147 +63,143 @@ namespace Graph6
                     break;
             }
 
-            MyMatrix MirrorMat = new MyMatrix(4, 4, new float[]
-            {kx, 0, 0, 0,
-            0, ky, 0, 0,
-            0, 0, kz, 0,
-            0, 0, 0, 1});
-            AffineTransform(MirrorMat);
+            MyMatrix mirrorMatrix = new MyMatrix(4, 4, new float[] {kx, 0,  0,  0,
+                                                                    0,  ky, 0,  0,
+                                                                    0,  0,  kz, 0,
+                                                                    0,  0,  0,  1});
+            AffineTransform(mirrorMatrix);
         }
 
         private void Button_Scale_Click(object sender, EventArgs e)
         {
-            if (_shape.points.Count == 0)
+            if (_shape.Points.Count == 0)
                 return;
 
             float k = float.Parse(ScaleValue.Text);
 
-            MyMatrix ScaleMat = new MyMatrix(4, 4, new float[]
-            {k, 0, 0, 0,
-            0, k, 0, 0,
-            0, 0, k, 0,
-            0, 0, 0, 1});
+            MyMatrix ScaleMat = new MyMatrix(4, 4, new float[] {k, 0, 0, 0,
+                                                                0, k, 0, 0,
+                                                                0, 0, k, 0,
+                                                                0, 0, 0, 1});
             AffineTransform(ScaleMat);
-            _viewer.View(_shape);
+            ViewShape();
         }
 
         private void Button_Rotate_Click(object sender, EventArgs e)
         {
-            if (_shape.points.Count == 0)
+            if (_shape.Points.Count == 0)
                 return;
 
-            float deg = float.Parse(Angle.Text) * (float)(Math.PI / 180);
+            float degree = float.Parse(Angle.Text) * (float)(Math.PI / 180);
 
-            MyMatrix RotationMat = new MyMatrix(4, 4, new float[]
-            {1, 0, 0, 0,
-            0, (float)Math.Cos(deg), (float)Math.Sin(deg), 0,
-            0, -(float)Math.Sin(deg), (float)Math.Cos(deg), 0,
-            0, 0, 0, 1});
+            MyMatrix rotationMatrix = new MyMatrix(4, 4, new float[]   {1, 0, 0, 0,
+                                                                     0, (float)Math.Cos(degree), (float)Math.Sin(degree), 0,
+                                                                     0, -(float)Math.Sin(degree), (float)Math.Cos(degree), 0,
+                                                                     0, 0, 0, 1});
 
             switch (AxesList_Rt.Text)
             {
                 case "X":
                     break;
                 case "Y":
-                    RotationMat = new MyMatrix(4, 4, new float[]
-                        {(float)Math.Cos(deg), 0, -(float)Math.Sin(deg), 0,
+                    rotationMatrix = new MyMatrix(4, 4, new float[]
+                        {(float)Math.Cos(degree), 0, -(float)Math.Sin(degree), 0,
                         0, 1, 0, 0,
-                        (float)Math.Sin(deg), 0, (float)Math.Cos(deg), 0,
+                        (float)Math.Sin(degree), 0, (float)Math.Cos(degree), 0,
                         0, 0, 0, 1});
                     break;
                 case "Z":
-                    RotationMat = new MyMatrix(4, 4, new float[]
-                        {(float)Math.Cos(deg), (float)Math.Sin(deg), 0, 0,
-                        -(float)Math.Sin(deg), (float)Math.Cos(deg), 0, 0,
+                    rotationMatrix = new MyMatrix(4, 4, new float[]
+                        {(float)Math.Cos(degree), (float)Math.Sin(degree), 0, 0,
+                        -(float)Math.Sin(degree), (float)Math.Cos(degree), 0, 0,
                         0, 0, 1, 0,
                         0, 0, 0, 1});
                     break;
             }
-            AffineTransform(RotationMat);
-            _viewer.View(_shape);
+            AffineTransform(rotationMatrix);
+            ViewShape();
         }
 
         private void Button_Turn_Click(object sender, EventArgs e)
         {
-            if (_shape.points.Count == 0)
+            if (_shape.Points.Count == 0)
                 return;
 
-            float deg = float.Parse(Angle.Text) * (float)(Math.PI / 180);
+            float degree = float.Parse(Angle.Text) * (float)(Math.PI / 180);
 
             MyPoint A = new MyPoint(float.Parse(X1.Text), float.Parse(Y1.Text), float.Parse(Z1.Text));
             MyPoint B = new MyPoint(float.Parse(X2.Text), float.Parse(Y2.Text), float.Parse(Z2.Text));
 
-            MyPoint vec = B - A;
-            float length = (float)Math.Sqrt(vec.X * vec.X + vec.Y * vec.Y + vec.Z * vec.Z);
-            float l = vec.X / length;
-            float m = vec.Y / length;
-            float n = vec.Z / length;
+            MyPoint vector = B - A;
+            float length = (float)Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z);
+            float l = vector.X / length;
+            float m = vector.Y / length;
+            float n = vector.Z / length;
 
-            MyMatrix ScaleMat = new MyMatrix(4, 4, new float[]
-            {l*l + (float)Math.Cos(deg)*(1 - l*l), l*(1 - (float)Math.Cos(deg))*m + n*(float)Math.Sin(deg), l * (1 - (float)Math.Cos(deg)) * n - m * (float)Math.Sin(deg), 0,
-            l*(1 - (float)Math.Cos(deg))*m - n*(float)Math.Sin(deg), m*m + (float)Math.Cos(deg) * (1 - m*m), m*(1 - (float)Math.Cos(deg)) * n + l* (float)Math.Sin(deg), 0,
-            l * (1 - (float)Math.Cos(deg))*n + m * (float)Math.Sin(deg), m * (1 - (float)Math.Cos(deg)) * n - l*(float)Math.Sin(deg), n * n + (float)Math.Cos(deg) * (1 - n * n), 0,
+            //”жас, но работает
+            MyMatrix scaleMatrix = new MyMatrix(4, 4, new float[]
+            {l*l + (float)Math.Cos(degree)*(1 - l*l), l*(1 - (float)Math.Cos(degree))*m + n*(float)Math.Sin(degree), l * (1 - (float)Math.Cos(degree)) * n - m * (float)Math.Sin(degree), 0,
+            l*(1 - (float)Math.Cos(degree))*m - n*(float)Math.Sin(degree), m*m + (float)Math.Cos(degree) * (1 - m*m), m*(1 - (float)Math.Cos(degree)) * n + l* (float)Math.Sin(degree), 0,
+            l * (1 - (float)Math.Cos(degree))*n + m * (float)Math.Sin(degree), m * (1 - (float)Math.Cos(degree)) * n - l*(float)Math.Sin(degree), n * n + (float)Math.Cos(degree) * (1 - n * n), 0,
             0, 0, 0, 1});
-            AffineTransform(ScaleMat);
-            _viewer.View(_shape);
+            AffineTransform(scaleMatrix);
+            ViewShape();
         }
 
-        void AffineTransform(MyMatrix mat)
+        private void AffineTransform(MyMatrix mat)
         {
-            List<MyPoint> new_points = new List<MyPoint>();
-
             var center = _shape.GetCenter();
 
-            MyMatrix ToCenter = new MyMatrix(4, 4, new float[] { 1, 0, 0, 0,
+            MyMatrix toCenter = new MyMatrix(4, 4, new float[] { 1, 0, 0, 0,
                                                                  0, 1, 0, 0,
                                                                  0, 0, 1, 0,
-                                                      -center.X, -center.Y, -center.Z, 1});
+                                                                 -center.X, -center.Y, -center.Z, 1});
 
-            MyMatrix FromCenter = new MyMatrix(4, 4, new float[] { 1, 0, 0, 0,
-                                                                 0, 1, 0, 0,
-                                                                 0, 0, 1, 0,
-                                                      center.X, center.Y, center.Z, 1});
+            MyMatrix fromCenter = new MyMatrix(4, 4, new float[] { 1, 0, 0, 0,
+                                                                   0, 1, 0, 0,
+                                                                   0, 0, 1, 0,
+                                                                   center.X, center.Y, center.Z, 1});
 
-            MyMatrix TransformMatrix = ToCenter * mat * FromCenter;
+            MyMatrix transformMatrix = toCenter * mat * fromCenter;
 
-            foreach (var point in _shape.points)
+            for (int i = 0; i < _shape.Points.Count; i++)
             {
+                MyPoint point = _shape.Points[i];
                 MyMatrix point_matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
-                var res = point_matrix * TransformMatrix;
-                new_points.Add(new MyPoint(res.matrix[0, 0], res.matrix[0, 1], res.matrix[0, 2]));
+                var res = point_matrix * transformMatrix;
+                _shape.Points[i] = new MyPoint(res.matrix[0, 0], res.matrix[0, 1], res.matrix[0, 2]);
             }
-            _shape.points = new_points;
-            _viewer.View(_shape);
+            ViewShape();
         }
 
         private void ParallelButton_Click(object sender, EventArgs e)
         {
             _viewer.SetProjection(Projection.Isometric);
-            _viewer.View(_shape);
+            ViewShape();
         }
 
         private void PerspectiveButton_Click(object sender, EventArgs e)
         {
             _viewer.SetProjection(Projection.Perspective);
-            _viewer.View(_shape);
+            ViewShape();
         }
 
         private void CubeButton_Click(object sender, EventArgs e)
         {
             _shape = Shapes.Cube();
-            _viewer.View(_shape);
+            ViewShape();
         }
 
         private void OctahedronButton_Click(object sender, EventArgs e)
         {
             _shape = Shapes.Octahedron();
-            _viewer.View(_shape);
+            ViewShape();
         }
 
         private void TetrahedronButton_Click(object sender, EventArgs e)
         {
             _shape = Shapes.Tetrahedron();
-            _viewer.View(_shape);
+            ViewShape();
         }
     }
 }

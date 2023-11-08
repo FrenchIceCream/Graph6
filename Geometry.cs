@@ -29,44 +29,16 @@
         }
     }
 
-    //public class Edge
-    //{
-    //    private readonly Point _start;
-    //    private readonly Point _end;
-
-    //    public Point Start => _start;
-    //    public Point End => _end;
-
-    //    public Edge(Point start, Point end)
-    //    {
-    //        _start = start;
-    //        _end = end;
-    //    }
-    //}
-
-
-    public class Face
-    {
-        private readonly List<MyPoint> _points = new();
-        public IReadOnlyList<MyPoint> MyPoint => _points;
-
-
-        public Face(IEnumerable<MyPoint> points)
-        {
-            _points.AddRange(points);
-        }
-    }
-
     public class Shape
     {
-        public List<MyPoint> points = new();
+        public List<MyPoint> Points { get; private set; } = new();
 
-        public List<(int, int)> edges = new();
+        public List<(int, int)> Edges { get; private set; } = new();
 
         public Shape(List<MyPoint> point, List<(int, int)> edges)
         {
-            this.points = point;
-            this.edges = edges;
+            Points = point;
+            Edges = edges;
         }
 
         public MyPoint GetCenter()
@@ -74,14 +46,14 @@
             float x = 0;
             float y = 0;
             float z = 0;
-            foreach (var point in points)
+            foreach (var point in Points)
             {
                 x += point.X;
                 y += point.Y;
                 z += point.Z;
             }
 
-            return new MyPoint(x / points.Count, y / points.Count, z / points.Count);
+            return new MyPoint(x / Points.Count, y / Points.Count, z / Points.Count);
         }
     }
 
@@ -120,7 +92,7 @@
         }
         public static Shape Tetrahedron()
         {
-            float h = (float)Math.Sqrt(3) * 50; // Для равнобедренности
+            float h = (float)Math.Sqrt(3) * 50;
             List<MyPoint> points = new()
             {
                 new MyPoint(-50, -h / 3, 20),
@@ -177,7 +149,7 @@
         }
     }
 
-    //"Форма" для сохранения и загрузки в файд
+    //"Форма" для сохранения и загрузки в файл
     public class ShapeSaver
     {
         public readonly List<MyPoint> _points = new();
