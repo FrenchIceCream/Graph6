@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System.Windows.Forms;
+using org.mariuszgromada.math.mxparser;
 
 namespace Graph6
 {
@@ -245,5 +246,83 @@ namespace Graph6
                 File.WriteAllText(diaglog.FileName, file);
             }
         }
+
+        private void calculateButton_Click(object sender, EventArgs e)
+        {
+            CalculateShapeByFunction();
+        }
+
+        private void CalculateShapeByFunction()
+        {
+            double X0;
+            double X1;
+            double Y0;
+            double Y1;
+            double Xdelta;
+            double Ydelta;
+            if (!Double.TryParse(X0TextBox.Text, out X0))
+            {
+                return;
+            }
+            if (!Double.TryParse(X1TextBox.Text, out X1))
+            {
+                return;
+            }
+            if (!Double.TryParse(Y0TextBox.Text, out Y0))
+            {
+                return;
+            }
+            if (!Double.TryParse(Y1TextBox.Text, out Y1))
+            {
+                return;
+            }
+            if (!Double.TryParse(XDeltaTextBox.Text, out Xdelta))
+            {
+                return;
+            }
+            if (!Double.TryParse(YDeltaTextBox.Text, out Ydelta))
+            {
+                return;
+            }
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            string formul = formulTextBox.Text;
+
+            Function f = new Function($"f(x,y)={formul}");
+
+            List<MyPoint> Points = new();
+
+            List<(int, int)> Edges = new();
+
+            double XT, YT;
+            int i, j;
+            int itemsInRow = (int)((X1 - X0) / Xdelta);
+            for (i = 0, XT = X0; XT < X1; i++, XT += Xdelta)
+            {
+                for (j = 0, YT = Y0; YT < Y1; j++, YT += Xdelta)
+                {
+
+                    Expression expr = new Expression($"f({XT},{YT})", f);
+                    Points.Add(new MyPoint((float)XT, (float)YT, (float)expr.calculate()+15));
+                    if (j != 0)
+                    {
+                        Edges.Add((Points.Count - 1, Points.Count - 2));
+                    }
+                    if (i != 0)
+                    {
+                        Edges.Add((Points.Count - 1, Points.Count - 2 - itemsInRow));
+                    }
+                }
+
+            }
+
+            Shape s = new Shape(Points, Edges);
+
+            _shape = s;
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ru-RU");
+            ViewShape();
+
+
+        }
+
     }
 }

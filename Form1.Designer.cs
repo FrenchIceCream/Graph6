@@ -58,6 +58,16 @@
             button2 = new Button();
             LoadButton = new Button();
             SaveButton = new Button();
+            calculateButton = new Button();
+            formulTextBox = new TextBox();
+            X0TextBox = new TextBox();
+            label8 = new Label();
+            X1TextBox = new TextBox();
+            Y1TextBox = new TextBox();
+            Y0TextBox = new TextBox();
+            label9 = new Label();
+            XDeltaTextBox = new TextBox();
+            YDeltaTextBox = new TextBox();
             ((System.ComponentModel.ISupportInitialize)Canvas).BeginInit();
             SuspendLayout();
             // 
@@ -355,11 +365,120 @@
             SaveButton.UseVisualStyleBackColor = true;
             SaveButton.Click += SaveButton_Click;
             // 
+            // calculateButton
+            // 
+            calculateButton.Location = new Point(768, 233);
+            calculateButton.Margin = new Padding(3, 2, 3, 2);
+            calculateButton.Name = "calculateButton";
+            calculateButton.Size = new Size(136, 22);
+            calculateButton.TabIndex = 30;
+            calculateButton.Text = "посчитать";
+            calculateButton.UseVisualStyleBackColor = true;
+            calculateButton.Click += calculateButton_Click;
+            // 
+            // formulTextBox
+            // 
+            formulTextBox.Location = new Point(768, 200);
+            formulTextBox.Margin = new Padding(3, 2, 3, 2);
+            formulTextBox.Name = "formulTextBox";
+            formulTextBox.Size = new Size(136, 23);
+            formulTextBox.TabIndex = 31;
+            formulTextBox.Text = "5*(cos(x*x+y*y+1)/(x*x+y*y+1)+0.1)";
+            formulTextBox.TextAlign = HorizontalAlignment.Center;
+            // 
+            // X0TextBox
+            // 
+            X0TextBox.Location = new Point(791, 268);
+            X0TextBox.Margin = new Padding(3, 2, 3, 2);
+            X0TextBox.Name = "X0TextBox";
+            X0TextBox.Size = new Size(32, 23);
+            X0TextBox.TabIndex = 33;
+            X0TextBox.Text = "-2";
+            X0TextBox.TextAlign = HorizontalAlignment.Center;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(768, 270);
+            label8.Name = "label8";
+            label8.Size = new Size(17, 15);
+            label8.TabIndex = 32;
+            label8.Text = "X:";
+            // 
+            // X1TextBox
+            // 
+            X1TextBox.Location = new Point(829, 268);
+            X1TextBox.Margin = new Padding(3, 2, 3, 2);
+            X1TextBox.Name = "X1TextBox";
+            X1TextBox.Size = new Size(32, 23);
+            X1TextBox.TabIndex = 34;
+            X1TextBox.Text = "2";
+            X1TextBox.TextAlign = HorizontalAlignment.Center;
+            // 
+            // Y1TextBox
+            // 
+            Y1TextBox.Location = new Point(829, 302);
+            Y1TextBox.Margin = new Padding(3, 2, 3, 2);
+            Y1TextBox.Name = "Y1TextBox";
+            Y1TextBox.Size = new Size(32, 23);
+            Y1TextBox.TabIndex = 37;
+            Y1TextBox.Text = "2";
+            Y1TextBox.TextAlign = HorizontalAlignment.Center;
+            // 
+            // Y0TextBox
+            // 
+            Y0TextBox.Location = new Point(791, 301);
+            Y0TextBox.Margin = new Padding(3, 2, 3, 2);
+            Y0TextBox.Name = "Y0TextBox";
+            Y0TextBox.Size = new Size(32, 23);
+            Y0TextBox.TabIndex = 36;
+            Y0TextBox.Text = "-2";
+            Y0TextBox.TextAlign = HorizontalAlignment.Center;
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new Point(768, 303);
+            label9.Name = "label9";
+            label9.Size = new Size(17, 15);
+            label9.TabIndex = 35;
+            label9.Text = "Y:";
+            // 
+            // XDeltaTextBox
+            // 
+            XDeltaTextBox.Location = new Point(867, 268);
+            XDeltaTextBox.Margin = new Padding(3, 2, 3, 2);
+            XDeltaTextBox.Name = "XDeltaTextBox";
+            XDeltaTextBox.Size = new Size(32, 23);
+            XDeltaTextBox.TabIndex = 38;
+            XDeltaTextBox.Text = "0,3";
+            XDeltaTextBox.TextAlign = HorizontalAlignment.Center;
+            // 
+            // YDeltaTextBox
+            // 
+            YDeltaTextBox.Location = new Point(867, 303);
+            YDeltaTextBox.Margin = new Padding(3, 2, 3, 2);
+            YDeltaTextBox.Name = "YDeltaTextBox";
+            YDeltaTextBox.Size = new Size(32, 23);
+            YDeltaTextBox.TabIndex = 39;
+            YDeltaTextBox.Text = "0,3";
+            YDeltaTextBox.TextAlign = HorizontalAlignment.Center;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(916, 400);
+            Controls.Add(YDeltaTextBox);
+            Controls.Add(XDeltaTextBox);
+            Controls.Add(Y1TextBox);
+            Controls.Add(Y0TextBox);
+            Controls.Add(label9);
+            Controls.Add(X1TextBox);
+            Controls.Add(X0TextBox);
+            Controls.Add(label8);
+            Controls.Add(formulTextBox);
+            Controls.Add(calculateButton);
             Controls.Add(SaveButton);
             Controls.Add(LoadButton);
             Controls.Add(button2);
@@ -392,7 +511,7 @@
             Controls.Add(Canvas);
             Margin = new Padding(3, 2, 3, 2);
             Name = "Form1";
-            Text = "Графика. Лабораторная 6";
+            Text = "Графика. Лабораторная 7";
             ((System.ComponentModel.ISupportInitialize)Canvas).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -430,5 +549,15 @@
         private Button button2;
         private Button LoadButton;
         private Button SaveButton;
+        private Button calculateButton;
+        private TextBox formulTextBox;
+        private TextBox X0TextBox;
+        private Label label8;
+        private TextBox X1TextBox;
+        private TextBox Y1TextBox;
+        private TextBox Y0TextBox;
+        private Label label9;
+        private TextBox XDeltaTextBox;
+        private TextBox YDeltaTextBox;
     }
 }
