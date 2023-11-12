@@ -1,6 +1,9 @@
 using Newtonsoft.Json;
 using System.Windows.Forms;
 using org.mariuszgromada.math.mxparser;
+using System.Drawing;
+using System.Configuration;
+using System.Diagnostics;
 
 namespace Graph6
 {
@@ -9,9 +12,29 @@ namespace Graph6
         private Graphics _graphics;
         private Viewer _viewer;
         private Shape _shape;
+        private List<PointF> _solid_of_revolution;
+        private DrawingState _drawingState;
+        private Pen _pen;
         public Form1()
         {
             InitializeComponent();
+            InitListsAndBoxes();
+
+            _drawingState = DrawingState.NODRAWING;
+            _pen = new Pen(Color.Blue, 2);
+            _solid_of_revolution = new List<PointF> { };
+
+            //”казание начала координат в центре окна
+            _graphics = Canvas.CreateGraphics();
+            _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
+            _graphics.ScaleTransform(1, -1);
+
+            _viewer = new Viewer(_graphics, Projection.Isometric);
+            _shape = Shapes.Empty();
+        }
+
+        private void InitListsAndBoxes()
+        {
             AxesList.Items.Add("X");
             AxesList.Items.Add("Y");
             AxesList.Items.Add("Z");
@@ -22,6 +45,11 @@ namespace Graph6
             AxesList_Rt.Items.Add("Z");
             AxesList_Rt.SelectedIndex = 0;
 
+            AxesList_SolidOfRev.Items.Add("X");
+            AxesList_SolidOfRev.Items.Add("Y");
+            AxesList_SolidOfRev.Items.Add("Z");
+            AxesList_SolidOfRev.SelectedIndex = 0;
+
             ScaleValue.Text = "2";
             Angle.Text = "90";
             X1.Text = "10";
@@ -31,14 +59,10 @@ namespace Graph6
             Y2.Text = "20";
             Z2.Text = "10";
 
-            //”казание начала координат в центре окна
-            _graphics = Canvas.CreateGraphics();
-            _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
-            _graphics.ScaleTransform(1, -1);
-
-            _viewer = new Viewer(_graphics, Projection.Isometric);
-            _shape = Shapes.Empty();
+            NumOfSections.Text = "6";
         }
+
+        enum DrawingState { NODRAWING, FREE_DRAWING }
 
         private void ViewShape() =>
             _viewer.View(_shape);
@@ -302,7 +326,7 @@ namespace Graph6
                 {
 
                     Expression expr = new Expression($"f({XT},{YT})", f);
-                    Points.Add(new MyPoint((float)XT, (float)YT, (float)expr.calculate()+15));
+                    Points.Add(new MyPoint((float)XT, (float)YT, (float)expr.calculate() + 15));
                     if (j != 0)
                     {
                         Edges.Add((Points.Count - 1, Points.Count - 2));
@@ -324,5 +348,101 @@ namespace Graph6
 
         }
 
+        private void Button_SolidOfRevolution_Click(object sender, EventArgs e)
+        {
+            if (_drawingState == DrawingState.NODRAWING)
+            {
+                _graphics.ScaleTransform(1, -1);
+                _graphics.TranslateTransform(-Canvas.Width / 2, -Canvas.Height / 2);
+            }
+            _drawingState = DrawingState.FREE_DRAWING;
+
+            _graphics.Clear(Color.White);
+            _solid_of_revolution.Clear();
+            _graphics.DrawLine(new Pen(Color.Black, 1), new Point(Canvas.Width / 2, Canvas.Height - 20), new Point(Canvas.Width / 2, 20));
+        }
+
+        private void Canvas_Click(object sender, EventArgs e)
+        {
+            if (_drawingState == DrawingState.FREE_DRAWING)
+            {
+                MouseEventArgs mouseEventArgs = (MouseEventArgs)e;
+                Point p = new Point(mouseEventArgs.X, mouseEventArgs.Y);
+                FreeDraw(p);
+            }
+        }
+
+        private void FreeDraw(PointF p)
+        {
+            if (_solid_of_revolution.Count() == 0)
+            {
+                p.X = Canvas.Width / 2;
+                _graphics.DrawRectangle(_pen, p.X, p.Y, 1, 1);
+            }
+            else
+            {
+                if (p.X < Canvas.Width / 2)
+                    p.X = Canvas.Width / 2;
+                PointF prev = _solid_of_revolution.Last();
+                _graphics.DrawLine(_pen, prev, p);
+            }
+            _solid_of_revolution.Add(p);
+        }
+
+        private void Button_SolidOfRev_Show_Click(object sender, EventArgs e)
+        {
+            if (_solid_of_revolution.Last().X != Canvas.Width / 2)
+                _solid_of_revolution.Add(new PointF(Canvas.Width / 2, _solid_of_revolution.Last().Y));
+
+            _graphics.Clear(Color.White);
+            _drawingState = DrawingState.NODRAWING;
+            _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
+            _graphics.ScaleTransform(1, -1);
+
+            foreach (var p in _solid_of_revolution)
+                Debug.WriteLine(p.X);
+
+            for (int i = 0; i < _solid_of_revolution.Count; i++)
+                _solid_of_revolution[i] = new PointF(_solid_of_revolution[i].X - Canvas.Width / 2, (_solid_of_revolution[i].Y - Canvas.Height / 2) * (-1));
+
+
+            /*
+            foreach (var p in _solid_of_revolution)
+            {
+                Debug.WriteLine(p.X);
+                _graphics.DrawRectangle(_pen, p.X, p.Y, 1, 1);
+            }
+            */
+
+            //угол поворота
+            float deg = 2 * (float)Math.PI / float.Parse(NumOfSections.Text);
+
+            MyMatrix rotationMatrix = new MyMatrix(4, 4, new float[]   {1, 0, 0, 0,
+                                                                     0, (float)Math.Cos(deg), (float)Math.Sin(deg), 0,
+                                                                     0, -(float)Math.Sin(deg), (float)Math.Cos(deg), 0,
+                                                                     0, 0, 0, 1});
+
+            switch (AxesList_SolidOfRev.Text)
+            {
+                case "X":
+                    break;
+                case "Y":
+                    rotationMatrix = new MyMatrix(4, 4, new float[]
+                        {(float)Math.Cos(deg), 0, -(float)Math.Sin(deg), 0,
+                        0, 1, 0, 0,
+                        (float)Math.Sin(deg), 0, (float)Math.Cos(deg), 0,
+                        0, 0, 0, 1});
+                    break;
+                case "Z":
+                    rotationMatrix = new MyMatrix(4, 4, new float[]
+                        {(float)Math.Cos(deg), (float)Math.Sin(deg), 0, 0,
+                        -(float)Math.Sin(deg), (float)Math.Cos(deg), 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1});
+                    break;
+            }
+
+
+        }
     }
 }
