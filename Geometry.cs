@@ -92,6 +92,130 @@ namespace Graph6
 
             return new(points, edges);
         }
+
+        public static Shape Icosahedron()
+        {
+            float phi = 1.6180f;
+            float coef = (float)Math.Sqrt(1 + phi * phi);
+
+            List<MyPoint> points = new()
+            {
+                new MyPoint(phi * 50 / coef, 1 * 50 / coef, 0),
+                new MyPoint(phi * 50 / coef, -1 * 50 / coef, 0),
+                new MyPoint(-phi * 50 / coef, -1 * 50 / coef, 0),
+                new MyPoint(-phi * 50 / coef, 1 * 50 / coef, 0),
+                new MyPoint(0, phi * 50 / coef, 1 * 50 / coef),
+                new MyPoint(0, -phi * 50 / coef, 1 * 50 / coef),
+                new MyPoint(0, -phi * 50 / coef, -1 * 50 / coef),
+                new MyPoint(0, phi * 50 / coef, -1 * 50 / coef),
+                new MyPoint(1 * 50 / coef, 0, phi * 50 / coef),
+                new MyPoint(1 * 50 / coef, 0, -phi * 50 / coef),
+                new MyPoint(-1 * 50 / coef, 0, -phi * 50 / coef),
+                new MyPoint(-1 * 50 / coef, 0, phi * 50 / coef),
+            };
+
+            List<(int, int)> edges = new()
+            {
+            (7, 0),
+            (7, 4),
+            (7, 3),
+            (7, 10),
+            (7, 9),
+            (5, 8),
+            (5, 11),
+            (5, 2),
+            (5, 6),
+            (5, 1),
+            (0, 8),
+            (0, 4),
+            (8, 4),
+            (8, 11),
+            (4, 11),
+            (4, 3),
+            (11, 3),
+            (11, 2),
+            (3, 2),
+            (3, 10),
+            (2, 10),
+            (2, 6),
+            (10, 6),
+            (10, 9),
+            (6, 9),
+            (6, 1),
+            (9, 1),
+            (9, 0),
+            (1, 0),
+            (1, 8),
+            };
+            return new(points, edges);
+        }
+
+
+        public static Shape Dodecahedron()
+        {
+            float phi = 1.6180f;
+            List<MyPoint> points = new()
+            {
+                new MyPoint(35, 35, 35),
+                new MyPoint(35, 35, -35),
+                new MyPoint(35, -35, 35),
+                new MyPoint(35, -35, -35),
+                new MyPoint(-35, 35, 35),
+                new MyPoint(-35, 35, -35),
+                new MyPoint(-35, -35, 35),
+                new MyPoint(-35, -35, -35),
+                new MyPoint(0, 1 * 35 / phi, phi * 35),
+                new MyPoint(0, 1 * 35 / phi, -phi * 35),
+                new MyPoint(0, -1 * 35 / phi, phi * 35),
+                new MyPoint(0, -1 * 35 / phi, -phi * 35),
+                new MyPoint(1 * 35 / phi, phi * 35, 0),
+                new MyPoint(1 * 35 / phi, -phi * 35, 0),
+                new MyPoint(-1 * 35 / phi, phi * 35, 0),
+                new MyPoint(-1 * 35 / phi, -phi * 35, 0),
+                new MyPoint(phi * 35, 0, 1 * 35 / phi),
+                new MyPoint(phi * 35, 0, -1 * 35 / phi),
+                new MyPoint(-phi * 35, 0, 1 * 35 / phi),
+                new MyPoint(-phi * 35, 0, -1 * 35 / phi),
+            };
+
+            List<(int, int)> edges = new()
+            {
+                (8,10),
+                (8,0),
+                (8,4),
+                (10,2),
+                (10,6),
+                (9,11),
+                (9,1),
+                (9,5),
+                (11,3),
+                (11,7),
+                (12,14),
+                (13,15),
+                (12,0),
+                (12,1),
+                (14,4),
+                (14,5),
+                (13,2),
+                (13,3),
+                (15,6),
+                (15,7),
+                (16,17),
+                (18,19),
+                (16,0),
+                (16,2),
+                (17,1),
+                (17,3),
+                (18,4),
+                (18,6),
+                (19,5),
+                (19,7),
+            };
+            return new(points, edges);
+        }
+
+
+
         public static Shape Tetrahedron()
         {
             float h = (float)Math.Sqrt(3) * 50;
@@ -119,7 +243,7 @@ namespace Graph6
         {
             List<MyPoint> points = new List<MyPoint>
             {
-                new MyPoint(0, 0, 30),   
+                new MyPoint(0, 0, 30),
                 new MyPoint(-30, 0, 0),
                 new MyPoint(0, -30, 0),
                 new MyPoint(30, 0, 0),
@@ -129,18 +253,18 @@ namespace Graph6
 
             List<(int, int)> edges = new List<(int, int)>
             {
-                (0, 1), 
-                (0, 2), 
-                (0, 3), 
+                (0, 1),
+                (0, 2),
+                (0, 3),
                 (0, 4),
-                (1, 2), 
+                (1, 2),
                 (2, 3),
                 (3, 4),
                 (4, 1),
-                (1, 5), 
+                (1, 5),
                 (2, 5),
-                (3, 5),  
-                (4, 5) 
+                (3, 5),
+                (4, 5)
             };
             return new(points, edges);
         }

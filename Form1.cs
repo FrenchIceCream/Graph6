@@ -228,6 +228,18 @@ namespace Graph6
             ViewShape();
         }
 
+        private void IcosahedronButton_Click(object sender, EventArgs e)
+        {
+            _shape = Shapes.Icosahedron();
+            ViewShape();
+        }
+
+        private void DodecahedronButton_Click(object sender, EventArgs e)
+        {
+            _shape = Shapes.Dodecahedron();
+            ViewShape();
+        }
+
         private void LoadButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog diaglog = new()
@@ -444,5 +456,7 @@ namespace Graph6
 
 
         }
+
+
     }
 }
