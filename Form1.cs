@@ -93,7 +93,7 @@ namespace Graph6
                                                                     0,  ky, 0,  0,
                                                                     0,  0,  kz, 0,
                                                                     0,  0,  0,  1});
-            AffineTransform(mirrorMatrix);
+            AffineTransform(mirrorMatrix, _shape);
         }
 
         private void Button_Scale_Click(object sender, EventArgs e)
@@ -101,13 +101,14 @@ namespace Graph6
             if (_shape.Points.Count == 0)
                 return;
 
+            ScaleValue.Text = ScaleValue.Text.Replace('.', ',');
             float k = float.Parse(ScaleValue.Text);
 
             MyMatrix ScaleMat = new MyMatrix(4, 4, new float[] {k, 0, 0, 0,
                                                                 0, k, 0, 0,
                                                                 0, 0, k, 0,
                                                                 0, 0, 0, 1});
-            AffineTransform(ScaleMat);
+            AffineTransform(ScaleMat, _shape);
             ViewShape();
         }
 
@@ -142,7 +143,7 @@ namespace Graph6
                         0, 0, 0, 1});
                     break;
             }
-            AffineTransform(rotationMatrix);
+            AffineTransform(rotationMatrix, _shape);
             ViewShape();
         }
 
@@ -168,13 +169,26 @@ namespace Graph6
             l*(1 - (float)Math.Cos(degree))*m - n*(float)Math.Sin(degree), m*m + (float)Math.Cos(degree) * (1 - m*m), m*(1 - (float)Math.Cos(degree)) * n + l* (float)Math.Sin(degree), 0,
             l * (1 - (float)Math.Cos(degree))*n + m * (float)Math.Sin(degree), m * (1 - (float)Math.Cos(degree)) * n - l*(float)Math.Sin(degree), n * n + (float)Math.Cos(degree) * (1 - n * n), 0,
             0, 0, 0, 1});
-            AffineTransform(scaleMatrix);
+
+            TurnShape(scaleMatrix, ref _shape);
+
             ViewShape();
         }
 
-        private void AffineTransform(MyMatrix mat)
+        public void TurnShape(MyMatrix mat, ref Shape shape)
         {
-            var center = _shape.GetCenter();
+            for (int i = 0; i < _shape.Points.Count; i++)
+            {
+                MyPoint point = _shape.Points[i];
+                MyMatrix point_matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
+                var res = point_matrix * mat;
+                _shape.Points[i] = new MyPoint(res.matrix[0, 0], res.matrix[0, 1], res.matrix[0, 2]);
+            }
+        }
+
+        private void AffineTransform(MyMatrix mat, Shape shape)
+        {
+            var center = shape.GetCenter();
 
             MyMatrix toCenter = new MyMatrix(4, 4, new float[] { 1, 0, 0, 0,
                                                                  0, 1, 0, 0,
@@ -188,14 +202,13 @@ namespace Graph6
 
             MyMatrix transformMatrix = toCenter * mat * fromCenter;
 
-            for (int i = 0; i < _shape.Points.Count; i++)
+            for (int i = 0; i < shape.Points.Count; i++)
             {
-                MyPoint point = _shape.Points[i];
+                MyPoint point = shape.Points[i];
                 MyMatrix point_matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
                 var res = point_matrix * transformMatrix;
-                _shape.Points[i] = new MyPoint(res.matrix[0, 0], res.matrix[0, 1], res.matrix[0, 2]);
+                shape.Points[i] = new MyPoint(res.matrix[0, 0], res.matrix[0, 1], res.matrix[0, 2]);
             }
-            ViewShape();
         }
 
         private void ParallelButton_Click(object sender, EventArgs e)
@@ -372,6 +385,7 @@ namespace Graph6
             _graphics.Clear(Color.White);
             _solid_of_revolution.Clear();
             _graphics.DrawLine(new Pen(Color.Black, 1), new Point(Canvas.Width / 2, Canvas.Height - 20), new Point(Canvas.Width / 2, 20));
+            _graphics.DrawLine(new Pen(Color.Black, 1), new Point(20, Canvas.Height / 2), new Point(Canvas.Width - 20, Canvas.Height / 2));
         }
 
         private void Canvas_Click(object sender, EventArgs e)
@@ -388,13 +402,16 @@ namespace Graph6
         {
             if (_solid_of_revolution.Count() == 0)
             {
-                p.X = Canvas.Width / 2;
+             //   p.X = Canvas.Width / 2;
                 _graphics.DrawRectangle(_pen, p.X, p.Y, 1, 1);
             }
             else
             {
+                //Вспомогательная штука - при необходимости раскомментить
+                /*
                 if (p.X < Canvas.Width / 2)
                     p.X = Canvas.Width / 2;
+                */
                 PointF prev = _solid_of_revolution.Last();
                 _graphics.DrawLine(_pen, prev, p);
             }
@@ -403,60 +420,84 @@ namespace Graph6
 
         private void Button_SolidOfRev_Show_Click(object sender, EventArgs e)
         {
-            if (_solid_of_revolution.Last().X != Canvas.Width / 2)
-                _solid_of_revolution.Add(new PointF(Canvas.Width / 2, _solid_of_revolution.Last().Y));
-
+            ShowSolidOfRevolution();
+        }
+        private void ShowSolidOfRevolution()
+        {
             _graphics.Clear(Color.White);
             _drawingState = DrawingState.NODRAWING;
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
             _graphics.ScaleTransform(1, -1);
 
-            foreach (var p in _solid_of_revolution)
-                Debug.WriteLine(p.X);
+            if (_solid_of_revolution.Count == 0)
+                return;
 
-            for (int i = 0; i < _solid_of_revolution.Count; i++)
-                _solid_of_revolution[i] = new PointF(_solid_of_revolution[i].X - Canvas.Width / 2, (_solid_of_revolution[i].Y - Canvas.Height / 2) * (-1));
-
+            Shape solid_shape = Shapes.Empty();
 
             /*
-            foreach (var p in _solid_of_revolution)
-            {
-                Debug.WriteLine(p.X);
-                _graphics.DrawRectangle(_pen, p.X, p.Y, 1, 1);
-            }
+            if (_solid_of_revolution.Last().X != Canvas.Width / 2)
+                _solid_of_revolution.Add(new PointF(Canvas.Width / 2, _solid_of_revolution.Last().Y));
             */
+            solid_shape.Points.Add(new MyPoint(_solid_of_revolution[0].X - Canvas.Width / 2, (_solid_of_revolution[0].Y - Canvas.Height / 2) * (-1), 0));
+            for (int i = 1; i < _solid_of_revolution.Count; i++)
+            {
+                solid_shape.Points.Add(new MyPoint(_solid_of_revolution[i].X - Canvas.Width / 2, (_solid_of_revolution[i].Y - Canvas.Height / 2) * (-1), 0));
+                solid_shape.Edges.Add((i - 1, i));
+            }
+            _shape = new Shape(solid_shape);
 
             //угол поворота
-            float deg = 2 * (float)Math.PI / float.Parse(NumOfSections.Text);
+            int sections = int.Parse(NumOfSections.Text);
+            float deg = (360 / sections) * (float)(Math.PI / 180);
 
-            MyMatrix rotationMatrix = new MyMatrix(4, 4, new float[]   {1, 0, 0, 0,
-                                                                     0, (float)Math.Cos(deg), (float)Math.Sin(deg), 0,
-                                                                     0, -(float)Math.Sin(deg), (float)Math.Cos(deg), 0,
-                                                                     0, 0, 0, 1});
+            MyPoint A = new MyPoint(0, 0, 0);  //вокруг X
+            MyPoint B = new MyPoint(10, 0, 0);
 
             switch (AxesList_SolidOfRev.Text)
             {
                 case "X":
                     break;
                 case "Y":
-                    rotationMatrix = new MyMatrix(4, 4, new float[]
-                        {(float)Math.Cos(deg), 0, -(float)Math.Sin(deg), 0,
-                        0, 1, 0, 0,
-                        (float)Math.Sin(deg), 0, (float)Math.Cos(deg), 0,
-                        0, 0, 0, 1});
+                    A = new MyPoint(0, 0, 0);
+                    B = new MyPoint(0, 10, 0);
                     break;
                 case "Z":
-                    rotationMatrix = new MyMatrix(4, 4, new float[]
-                        {(float)Math.Cos(deg), (float)Math.Sin(deg), 0, 0,
-                        -(float)Math.Sin(deg), (float)Math.Cos(deg), 0, 0,
-                        0, 0, 1, 0,
-                        0, 0, 0, 1});
+                    A = new MyPoint(0, 0, 0);
+                    B = new MyPoint(0, 0, 10);
                     break;
             }
 
+            MyPoint vector = B - A;
+            float length = (float)Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z);
+            float l = vector.X / length;
+            float m = vector.Y / length;
+            float n = vector.Z / length;
 
+            MyMatrix scaleMatrix = new MyMatrix(4, 4, new float[]
+            {l*l + (float)Math.Cos(deg)*(1 - l*l), l*(1 - (float)Math.Cos(deg))*m + n*(float)Math.Sin(deg), l * (1 - (float)Math.Cos(deg)) * n - m * (float)Math.Sin(deg), 0,
+            l*(1 - (float)Math.Cos(deg))*m - n*(float)Math.Sin(deg), m*m + (float)Math.Cos(deg) * (1 - m*m), m*(1 - (float)Math.Cos(deg)) * n + l* (float)Math.Sin(deg), 0,
+            l * (1 - (float)Math.Cos(deg))*n + m * (float)Math.Sin(deg), m * (1 - (float)Math.Cos(deg)) * n - l*(float)Math.Sin(deg), n * n + (float)Math.Cos(deg) * (1 - n * n), 0,
+            0, 0, 0, 1});
+
+            int c = solid_shape.Points.Count();
+
+            for (int i = 1; i < sections; i++)
+            {
+                TurnShape(scaleMatrix, ref solid_shape);
+                for (int j = 0; j < c; j++)
+                {
+                    _shape.Points.Add(solid_shape.Points[j]);
+                    _shape.Edges.Add(((i - 1) * c + j, i * c + j));
+                }
+
+                for (int j = 1; j < c; j++)
+                    _shape.Edges.Add((i * c + j - 1, i * c + j));
+            }
+
+            for (int j = 0; j < c; j++)
+                _shape.Edges.Add((j, (sections - 1) * c + j));
+
+            ViewShape();
         }
-
-
     }
 }

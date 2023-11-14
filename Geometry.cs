@@ -1,6 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Windows.Forms.VisualStyles;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Xml.Linq;
 
 namespace Graph6
 {
@@ -41,6 +44,12 @@ namespace Graph6
         {
             Points = point;
             Edges = edges;
+        }
+
+        public Shape(Shape anotherShape)
+        {
+            Points = new List<MyPoint>(anotherShape.Points);
+            Edges = new List<(int, int)>(anotherShape.Edges);
         }
 
         public MyPoint GetCenter()
