@@ -88,6 +88,8 @@
             label16 = new Label();
             Clear_Button = new Button();
             label17 = new Label();
+            label18 = new Label();
+            Hide_CheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)Canvas).BeginInit();
             SuspendLayout();
             // 
@@ -339,7 +341,7 @@
             label7.BorderStyle = BorderStyle.Fixed3D;
             label7.Location = new Point(608, 164);
             label7.Name = "label7";
-            label7.Size = new Size(315, 2);
+            label7.Size = new Size(360, 2);
             label7.TabIndex = 25;
             // 
             // button1
@@ -680,11 +682,30 @@
             label17.TabIndex = 59;
             label17.Text = "Текущая фигура:";
             // 
+            // label18
+            // 
+            label18.BorderStyle = BorderStyle.Fixed3D;
+            label18.Location = new Point(767, 336);
+            label18.Name = "label18";
+            label18.Size = new Size(200, 2);
+            label18.TabIndex = 60;
+            // 
+            // Hide_CheckBox
+            // 
+            Hide_CheckBox.Location = new Point(775, 339);
+            Hide_CheckBox.Name = "Hide_CheckBox";
+            Hide_CheckBox.Size = new Size(148, 51);
+            Hide_CheckBox.TabIndex = 61;
+            Hide_CheckBox.Text = "Удаление невидимых граней";
+            Hide_CheckBox.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(921, 589);
+            ClientSize = new Size(920, 589);
+            Controls.Add(Hide_CheckBox);
+            Controls.Add(label18);
             Controls.Add(label17);
             Controls.Add(Clear_Button);
             Controls.Add(label16);
@@ -815,5 +836,7 @@
         private Label label16;
         private Button Clear_Button;
         private Label label17;
+        private Label label18;
+        private CheckBox Hide_CheckBox;
     }
 }

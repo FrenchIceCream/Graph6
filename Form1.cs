@@ -538,5 +538,12 @@ namespace Graph6
 
         private void ShapesBox_SelectedIndexChanged(object sender, EventArgs e) => SelectItem();
 
+        private void HideEdges_CheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!Hide_CheckBox.Checked)
+            {
+
+            }
+        }
     }
 }
