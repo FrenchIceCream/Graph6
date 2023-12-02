@@ -32,17 +32,23 @@
             _projection = projection;
         }
 
-        public void View(Shape shape)
+        public void View(IList<Shape> shapes)
         {
             _graphics.Clear(Color.White);
 
             switch (_projection)
             {
                 case Projection.Perspective:
-                    Perspective(shape);
+                    foreach (var shape in shapes)
+                    {
+                        Perspective(shape);
+                    }
                     break;
                 case Projection.Isometric:
-                    Isometric(shape);
+                    foreach (var shape in shapes)
+                    {
+                        Isometric(shape);
+                    }
                     break;
                 case Projection.Axonometry:
                     break;

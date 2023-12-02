@@ -1,11 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Windows.Forms.VisualStyles;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Xml.Linq;
-
-namespace Graph6
+﻿namespace Graph6
 {
     public class MyPoint
     {
@@ -33,21 +26,24 @@ namespace Graph6
             return new MyPoint(lhs.X - rhs.X, lhs.Y - rhs.Y, lhs.Z - rhs.Z);
         }
     }
-
     public class Shape
     {
+        public string Id { get; private set; }
+
         public List<MyPoint> Points { get; private set; } = new();
 
         public List<(int, int)> Edges { get; private set; } = new();
 
         public Shape(List<MyPoint> point, List<(int, int)> edges)
         {
+            Id = GenerateUniqueId();
             Points = point;
             Edges = edges;
         }
 
         public Shape(Shape anotherShape)
         {
+            Id = anotherShape.Id;
             Points = new List<MyPoint>(anotherShape.Points);
             Edges = new List<(int, int)>(anotherShape.Edges);
         }
@@ -63,14 +59,89 @@ namespace Graph6
                 y += point.Y;
                 z += point.Z;
             }
-
             return new MyPoint(x / Points.Count, y / Points.Count, z / Points.Count);
+        }
+
+        private string GenerateUniqueId()
+        {
+            return Guid.NewGuid().ToString("N").Substring(0, 4);
+        }
+
+        public override string ToString()
+        {
+            return $"Shape: {Id}";
+        }
+    }
+    public class Cube: Shape
+    {
+        public Cube(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"Cube: {Id}";
+        }
+    }
+    public class Icosahedron : Shape
+    {
+        public Icosahedron(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"Icosahedron: {Id}";
+        }
+    }
+    public class Dodecahedron : Shape
+    {
+        public Dodecahedron(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"Dodecahedron: {Id}";
+        }
+    }
+    public class Tetrahedron : Shape
+    {
+        public Tetrahedron(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"Tetrahedron: {Id}";
+        }
+    }
+    public class Octahedron : Shape
+    {
+        public Octahedron(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"Octahedron: {Id}";
+        }
+    }
+    public class FunctionShape : Shape
+    {
+        public FunctionShape(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"Function: {Id}";
         }
     }
 
     public static class Shapes
     {
-        public static Shape Cube()
+        public static Cube Cube()
         {
             List<MyPoint> points = new List<MyPoint>
             {
@@ -102,7 +173,7 @@ namespace Graph6
             return new(points, edges);
         }
 
-        public static Shape Icosahedron()
+        public static Icosahedron Icosahedron()
         {
             float phi = 1.6180f;
             float coef = (float)Math.Sqrt(1 + phi * phi);
@@ -159,8 +230,7 @@ namespace Graph6
             return new(points, edges);
         }
 
-
-        public static Shape Dodecahedron()
+        public static Dodecahedron Dodecahedron()
         {
             float phi = 1.6180f;
             List<MyPoint> points = new()
@@ -223,9 +293,7 @@ namespace Graph6
             return new(points, edges);
         }
 
-
-
-        public static Shape Tetrahedron()
+        public static Tetrahedron Tetrahedron()
         {
             float h = (float)Math.Sqrt(3) * 50;
             List<MyPoint> points = new()
@@ -247,8 +315,7 @@ namespace Graph6
             return new(points, edges);
         }
 
-
-        public static Shape Octahedron()
+        public static Octahedron Octahedron()
         {
             List<MyPoint> points = new List<MyPoint>
             {
@@ -283,36 +350,4 @@ namespace Graph6
             return new Shape(new List<MyPoint>(), new List<(int, int)>());
         }
     }
-
-
-    public class Converter : JsonConverter<Shape>
-    {
-        public override Shape? ReadJson(JsonReader reader, Type objectType, Shape? existingValue, bool hasExistingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null)
-                return null;
-
-            JObject jsonObject = JObject.Load(reader);
-            var points = jsonObject["points"].ToObject<List<MyPoint>>();
-            var edges = jsonObject["edges"].ToObject<List<(int, int)>>();
-            return new Shape(points, edges);
-        }
-
-        public override void WriteJson(JsonWriter writer, Shape? value, JsonSerializer serializer)
-        {
-            if (value == null)
-            {
-                writer.WriteNull();
-                return;
-            }
-
-            var jsonObject = new JObject
-            {
-                { "points", JToken.FromObject(value.Points, serializer) },
-                { "edges", JToken.FromObject(value.Edges, serializer) }
-            };
-            jsonObject.WriteTo(writer);
-        }
-    }
-
 }

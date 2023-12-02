@@ -78,6 +78,16 @@
             label13 = new Label();
             button3 = new Button();
             button4 = new Button();
+            ShapesBox = new ComboBox();
+            Button_Translation = new Button();
+            Translation_Z = new TextBox();
+            Translation_Y = new TextBox();
+            Translation_X = new TextBox();
+            label14 = new Label();
+            label15 = new Label();
+            label16 = new Label();
+            Clear_Button = new Button();
+            label17 = new Label();
             ((System.ComponentModel.ISupportInitialize)Canvas).BeginInit();
             SuspendLayout();
             // 
@@ -87,7 +97,7 @@
             Canvas.Location = new Point(0, -1);
             Canvas.Margin = new Padding(3, 2, 3, 2);
             Canvas.Name = "Canvas";
-            Canvas.Size = new Size(610, 403);
+            Canvas.Size = new Size(610, 590);
             Canvas.TabIndex = 0;
             Canvas.TabStop = false;
             Canvas.Click += Canvas_Click;
@@ -385,7 +395,7 @@
             calculateButton.TabIndex = 30;
             calculateButton.Text = "Посчитать";
             calculateButton.UseVisualStyleBackColor = true;
-            calculateButton.Click += calculateButton_Click;
+            calculateButton.Click += CalculateButton_Click;
             // 
             // formulTextBox
             // 
@@ -480,7 +490,7 @@
             label10.BorderStyle = BorderStyle.Fixed3D;
             label10.Location = new Point(767, -10);
             label10.Name = "label10";
-            label10.Size = new Size(3, 412);
+            label10.Size = new Size(3, 600);
             label10.TabIndex = 40;
             // 
             // label11
@@ -575,11 +585,116 @@
             button4.UseVisualStyleBackColor = true;
             button4.Click += DodecahedronButton_Click;
             // 
+            // ShapesBox
+            // 
+            ShapesBox.FormattingEnabled = true;
+            ShapesBox.Location = new Point(625, 502);
+            ShapesBox.Margin = new Padding(3, 2, 3, 2);
+            ShapesBox.Name = "ShapesBox";
+            ShapesBox.Size = new Size(124, 23);
+            ShapesBox.TabIndex = 50;
+            ShapesBox.SelectedIndexChanged += ShapesBox_SelectedIndexChanged;
+            // 
+            // Button_Translation
+            // 
+            Button_Translation.Location = new Point(626, 404);
+            Button_Translation.Margin = new Padding(3, 2, 3, 2);
+            Button_Translation.Name = "Button_Translation";
+            Button_Translation.Size = new Size(124, 22);
+            Button_Translation.TabIndex = 51;
+            Button_Translation.Text = "Перенос";
+            Button_Translation.UseVisualStyleBackColor = true;
+            Button_Translation.Click += Button_Translation_Click;
+            // 
+            // Translation_Z
+            // 
+            Translation_Z.Location = new Point(718, 445);
+            Translation_Z.Margin = new Padding(3, 2, 3, 2);
+            Translation_Z.Name = "Translation_Z";
+            Translation_Z.Size = new Size(32, 23);
+            Translation_Z.TabIndex = 54;
+            Translation_Z.TextAlign = HorizontalAlignment.Center;
+            // 
+            // Translation_Y
+            // 
+            Translation_Y.Location = new Point(671, 445);
+            Translation_Y.Margin = new Padding(3, 2, 3, 2);
+            Translation_Y.Name = "Translation_Y";
+            Translation_Y.Size = new Size(33, 23);
+            Translation_Y.TabIndex = 53;
+            Translation_Y.TextAlign = HorizontalAlignment.Center;
+            // 
+            // Translation_X
+            // 
+            Translation_X.Location = new Point(626, 445);
+            Translation_X.Margin = new Padding(3, 2, 3, 2);
+            Translation_X.Name = "Translation_X";
+            Translation_X.Size = new Size(33, 23);
+            Translation_X.TabIndex = 52;
+            Translation_X.TextAlign = HorizontalAlignment.Center;
+            // 
+            // label14
+            // 
+            label14.AutoSize = true;
+            label14.Location = new Point(626, 428);
+            label14.Name = "label14";
+            label14.Size = new Size(17, 15);
+            label14.TabIndex = 55;
+            label14.Text = "X:";
+            // 
+            // label15
+            // 
+            label15.AutoSize = true;
+            label15.Location = new Point(671, 428);
+            label15.Name = "label15";
+            label15.Size = new Size(17, 15);
+            label15.TabIndex = 56;
+            label15.Text = "Y:";
+            // 
+            // label16
+            // 
+            label16.AutoSize = true;
+            label16.Location = new Point(718, 428);
+            label16.Name = "label16";
+            label16.Size = new Size(17, 15);
+            label16.TabIndex = 57;
+            label16.Text = "Z:";
+            // 
+            // Clear_Button
+            // 
+            Clear_Button.Location = new Point(626, 556);
+            Clear_Button.Margin = new Padding(3, 2, 3, 2);
+            Clear_Button.Name = "Clear_Button";
+            Clear_Button.Size = new Size(128, 22);
+            Clear_Button.TabIndex = 58;
+            Clear_Button.Text = "Очистить";
+            Clear_Button.UseVisualStyleBackColor = true;
+            Clear_Button.Click += Clear_Button_Click;
+            // 
+            // label17
+            // 
+            label17.AutoSize = true;
+            label17.Location = new Point(625, 485);
+            label17.Name = "label17";
+            label17.Size = new Size(100, 15);
+            label17.TabIndex = 59;
+            label17.Text = "Текущая фигура:";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(921, 400);
+            ClientSize = new Size(921, 589);
+            Controls.Add(label17);
+            Controls.Add(Clear_Button);
+            Controls.Add(label16);
+            Controls.Add(label15);
+            Controls.Add(label14);
+            Controls.Add(Translation_Z);
+            Controls.Add(Translation_Y);
+            Controls.Add(Translation_X);
+            Controls.Add(Button_Translation);
+            Controls.Add(ShapesBox);
             Controls.Add(button4);
             Controls.Add(button3);
             Controls.Add(label13);
@@ -690,5 +805,15 @@
         private Label label13;
         private Button button3;
         private Button button4;
+        private ComboBox ShapesBox;
+        private Button Button_Translation;
+        private TextBox Translation_Z;
+        private TextBox Translation_Y;
+        private TextBox Translation_X;
+        private Label label14;
+        private Label label15;
+        private Label label16;
+        private Button Clear_Button;
+        private Label label17;
     }
 }
