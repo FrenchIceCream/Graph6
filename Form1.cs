@@ -4,6 +4,8 @@ using org.mariuszgromada.math.mxparser;
 using System.Drawing;
 using System.Configuration;
 using System.Diagnostics;
+using System.Numerics;
+using System.Windows.Forms.VisualStyles;
 
 namespace Graph6
 {
@@ -222,7 +224,7 @@ namespace Graph6
             _viewer.SetProjection(Projection.Perspective);
             ViewShape();
         }
-
+        
         private void CubeButton_Click(object sender, EventArgs e)
         {
             _shape = Shapes.Cube();
@@ -241,17 +243,20 @@ namespace Graph6
             ViewShape();
         }
 
+        //TODO
         private void IcosahedronButton_Click(object sender, EventArgs e)
         {
-            _shape = Shapes.Icosahedron();
+            //_shape = Shapes.Icosahedron();
             ViewShape();
         }
 
+        //TODO
         private void DodecahedronButton_Click(object sender, EventArgs e)
         {
-            _shape = Shapes.Dodecahedron();
+            //_shape = Shapes.Dodecahedron();
             ViewShape();
         }
+        
 
         private void LoadButton_Click(object sender, EventArgs e)
         {
@@ -277,7 +282,6 @@ namespace Graph6
         {
             if (_shape == null)
                 return;
-
             string file = JsonConvert.SerializeObject(_shape, Formatting.Indented, new Converter());
             SaveFileDialog diaglog = new()
             {
@@ -340,7 +344,7 @@ namespace Graph6
 
             List<MyPoint> Points = new();
 
-            List<(int, int)> Edges = new();
+            List<List<int>> Faces = new();
 
             double XT, YT;
             int i, j;
@@ -354,23 +358,22 @@ namespace Graph6
                     Points.Add(new MyPoint((float)XT, (float)YT, (float)expr.calculate() + 15));
                     if (j != 0)
                     {
-                        Edges.Add((Points.Count - 1, Points.Count - 2));
+                        Faces.Add(new List<int> { Points.Count - 1, Points.Count - 2 });
                     }
                     if (i != 0)
                     {
-                        Edges.Add((Points.Count - 1, Points.Count - 2 - itemsInRow));
+                        Faces.Add(new List<int> { Points.Count - 1, Points.Count - 2 - itemsInRow });
                     }
                 }
 
             }
 
-            Shape s = new Shape(Points, Edges);
+            Shape s = new Shape(Points, Faces);
 
             _shape = s;
+            
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ru-RU");
             ViewShape();
-
-
         }
 
         private void Button_SolidOfRevolution_Click(object sender, EventArgs e)
@@ -402,16 +405,10 @@ namespace Graph6
         {
             if (_solid_of_revolution.Count() == 0)
             {
-             //   p.X = Canvas.Width / 2;
                 _graphics.DrawRectangle(_pen, p.X, p.Y, 1, 1);
             }
             else
             {
-                //Вспомогательная штука - при необходимости раскомментить
-                /*
-                if (p.X < Canvas.Width / 2)
-                    p.X = Canvas.Width / 2;
-                */
                 PointF prev = _solid_of_revolution.Last();
                 _graphics.DrawLine(_pen, prev, p);
             }
@@ -420,10 +417,13 @@ namespace Graph6
 
         private void Button_SolidOfRev_Show_Click(object sender, EventArgs e)
         {
-            ShowSolidOfRevolution();
+            CalculateSolidOfRevolution();
+            ViewShape();
         }
-        private void ShowSolidOfRevolution()
+
+        private void CalculateSolidOfRevolution()
         {
+            
             _graphics.Clear(Color.White);
             _drawingState = DrawingState.NODRAWING;
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
@@ -434,15 +434,10 @@ namespace Graph6
 
             Shape solid_shape = Shapes.Empty();
 
-            /*
-            if (_solid_of_revolution.Last().X != Canvas.Width / 2)
-                _solid_of_revolution.Add(new PointF(Canvas.Width / 2, _solid_of_revolution.Last().Y));
-            */
             solid_shape.Points.Add(new MyPoint(_solid_of_revolution[0].X - Canvas.Width / 2, (_solid_of_revolution[0].Y - Canvas.Height / 2) * (-1), 0));
             for (int i = 1; i < _solid_of_revolution.Count; i++)
             {
                 solid_shape.Points.Add(new MyPoint(_solid_of_revolution[i].X - Canvas.Width / 2, (_solid_of_revolution[i].Y - Canvas.Height / 2) * (-1), 0));
-                solid_shape.Edges.Add((i - 1, i));
             }
             _shape = new Shape(solid_shape);
 
@@ -484,20 +479,25 @@ namespace Graph6
             for (int i = 1; i < sections; i++)
             {
                 TurnShape(scaleMatrix, ref solid_shape);
-                for (int j = 0; j < c; j++)
+                _shape.Points.Add(solid_shape.Points[0]);
+                for (int j = 1; j < c; j++)
                 {
                     _shape.Points.Add(solid_shape.Points[j]);
-                    _shape.Edges.Add(((i - 1) * c + j, i * c + j));
+                    _shape.Faces.Add(new List<int>{(i - 1) * c + j, i * c + j, i * c + j - 1});  //точка на предыдущей итерации + текующая точка + точка перед текущей
+                    _shape.Faces.Add(new List<int> { (i - 1) * c + j, (i - 1) * c + j - 1, i * c + j - 1 }); //точка на предыдущей итерации + точка перед ней + точка перед текущей
                 }
-
-                for (int j = 1; j < c; j++)
-                    _shape.Edges.Add((i * c + j - 1, i * c + j));
             }
 
-            for (int j = 0; j < c; j++)
-                _shape.Edges.Add((j, (sections - 1) * c + j));
+            for (int j = 1; j < c; j++)
+                _shape.Faces.Add(new List<int> { j, (sections - 1) * c + j - 1, (sections - 1) * c + j });
+        }
 
-            ViewShape();
+        //TODO
+        private void RemoveEdgesButton_Click(object sender, EventArgs e)
+        {
+            Shape shape = new Shape(_shape);
+            _graphics.Clear(Color.White);
+            
         }
     }
 }

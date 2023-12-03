@@ -1,4 +1,6 @@
-﻿namespace Graph6
+﻿using System.Net;
+
+namespace Graph6
 {
     public enum Projection
     {
@@ -51,19 +53,35 @@
 
         private void Isometric(Shape shape)
         {
-            foreach (var (a, b) in shape.Edges)
+            foreach (var face in shape.Faces)
             {
-                _graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[b].X, shape.Points[b].Y);
+                var a = face[0];
+                for (int i = 1; i < face.Count; i++)
+                {
+                    var b = face[i];
+                    _graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[b].X, shape.Points[b].Y);
+                    a = b;
+                }
+                _graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[face[0]].X, shape.Points[face[0]].Y);
             }
         }
 
         private void Perspective(Shape shape)
         {
-            foreach (var (a, b) in shape.Edges)
+            foreach (var face in shape.Faces)
             {
+                var a = face[0];
                 MyMatrix t = new MyMatrix(1, 4, new float[] { shape.Points[a].X, shape.Points[a].Y, shape.Points[a].Z, 1 }) * projectionMatrix;
-                MyMatrix r = new MyMatrix(1, 4, new float[] { shape.Points[b].X, shape.Points[b].Y, shape.Points[b].Z, 1 }) * projectionMatrix;
+                MyMatrix r = new MyMatrix(1, 4, new float[] { shape.Points[face.Last()].X, shape.Points[face.Last()].Y, shape.Points[face.Last()].Z, 1 }) * projectionMatrix;
                 _graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
+                for (int i = 1; i < face.Count; i++)
+                {
+                    var b = face[i];
+                    t = new MyMatrix(1, 4, new float[] { shape.Points[a].X, shape.Points[a].Y, shape.Points[a].Z, 1 }) * projectionMatrix;
+                    r = new MyMatrix(1, 4, new float[] { shape.Points[b].X, shape.Points[b].Y, shape.Points[b].Z, 1 }) * projectionMatrix;
+                    _graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
+                    a = b;
+                }
             }
         }
     }

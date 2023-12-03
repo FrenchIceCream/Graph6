@@ -37,19 +37,19 @@ namespace Graph6
     public class Shape
     {
         public List<MyPoint> Points { get; private set; } = new();
+        public List<List<int>> Faces { get; private set; } = new();
+        public List<float> Normals { get; private set; } = new();
 
-        public List<(int, int)> Edges { get; private set; } = new();
-
-        public Shape(List<MyPoint> point, List<(int, int)> edges)
+        public Shape(List<MyPoint> point, List<List<int>> faces)
         {
             Points = point;
-            Edges = edges;
+            Faces= faces;
         }
 
         public Shape(Shape anotherShape)
         {
             Points = new List<MyPoint>(anotherShape.Points);
-            Edges = new List<(int, int)>(anotherShape.Edges);
+            Faces = new List<List<int>>(anotherShape.Faces);
         }
 
         public MyPoint GetCenter()
@@ -68,6 +68,7 @@ namespace Graph6
         }
     }
 
+    
     public static class Shapes
     {
         public static Shape Cube()
@@ -83,25 +84,20 @@ namespace Graph6
                 new MyPoint(20, -20, 60),
                 new MyPoint(20, 20, 60)
             };
-            List<(int, int)> edges = new()
+
+            List<List<int>> faces = new List<List<int>>
             {
-                (0, 1),
-                (0, 2),
-                (0, 3),
-                (7, 4),
-                (7, 5),
-                (7, 6),
-                (4, 1),
-                (4, 2),
-                (5, 3),
-                (5, 2),
-                (6, 1),
-                (6, 3)
+                new List<int>{ 0, 1, 6, 3},
+                new List<int>{ 0, 2, 4, 1},
+                new List<int>{ 0, 3, 5, 2},
+                new List<int>{ 1, 6, 7, 4},
+                new List<int>{ 6, 3, 5, 7},
+                new List<int>{ 7, 5, 2, 4}
             };
 
-            return new(points, edges);
+            return new(points, faces);
         }
-
+        /*
         public static Shape Icosahedron()
         {
             float phi = 1.6180f;
@@ -158,8 +154,8 @@ namespace Graph6
             };
             return new(points, edges);
         }
-
-
+        */
+        /*
         public static Shape Dodecahedron()
         {
             float phi = 1.6180f;
@@ -222,8 +218,7 @@ namespace Graph6
             };
             return new(points, edges);
         }
-
-
+        */
 
         public static Shape Tetrahedron()
         {
@@ -235,16 +230,14 @@ namespace Graph6
                 new MyPoint(0, 2 * h / 3, 20),
                 new MyPoint(0, 0, 25 * (float)Math.Sqrt(13)),
             };
-            List<(int, int)> edges = new()
+            List<List<int>> faces = new List<List<int>>
             {
-                (0, 1),  // Ребро AB
-                (0, 2),  // Ребро AC
-                (0, 3),  // Ребро AD
-                (1, 2),  // Ребро BC
-                (1, 3),  // Ребро BD
-                (2, 3)   // Ребро CD
+                new List<int> { 0, 1, 2 },
+                new List<int> { 0, 2, 3 },
+                new List<int> { 0, 1, 3},
+                new List<int> { 3, 2, 1 }
             };
-            return new(points, edges);
+            return new(points, faces);
         }
 
 
@@ -260,59 +253,54 @@ namespace Graph6
                 new MyPoint(0, 0, -30)
             };
 
-            List<(int, int)> edges = new List<(int, int)>
+            List<List<int>> faces = new List<List<int>>
             {
-                (0, 1),
-                (0, 2),
-                (0, 3),
-                (0, 4),
-                (1, 2),
-                (2, 3),
-                (3, 4),
-                (4, 1),
-                (1, 5),
-                (2, 5),
-                (3, 5),
-                (4, 5)
+                new List<int>{ 0, 1, 4 },
+                new List<int>{ 0, 3, 4 },
+                new List<int>{ 0, 2, 1 },
+                new List<int>{ 0, 2, 3 },
+                new List<int>{ 3, 4, 5 },
+                new List<int>{ 1, 4, 5 },
+                new List<int>{ 1, 2, 5 },
+                new List<int>{ 2, 3, 5 },
             };
-            return new(points, edges);
+            return new(points, faces);
         }
-
+        
         public static Shape Empty()
         {
-            return new Shape(new List<MyPoint>(), new List<(int, int)>());
+            return new Shape(new List<MyPoint>(), new List<List<int>>());
         }
     }
-
-
-    public class Converter : JsonConverter<Shape>
-    {
-        public override Shape? ReadJson(JsonReader reader, Type objectType, Shape? existingValue, bool hasExistingValue, JsonSerializer serializer)
+    
+        public class Converter : JsonConverter<Shape>
         {
-            if (reader.TokenType == JsonToken.Null)
-                return null;
 
-            JObject jsonObject = JObject.Load(reader);
-            var points = jsonObject["points"].ToObject<List<MyPoint>>();
-            var edges = jsonObject["edges"].ToObject<List<(int, int)>>();
-            return new Shape(points, edges);
-        }
-
-        public override void WriteJson(JsonWriter writer, Shape? value, JsonSerializer serializer)
-        {
-            if (value == null)
+            public override Shape? ReadJson(JsonReader reader, Type objectType, Shape? existingValue, bool hasExistingValue, JsonSerializer serializer)
             {
-                writer.WriteNull();
-                return;
+                if (reader.TokenType == JsonToken.Null)
+                    return null;
+
+                JObject jsonObject = JObject.Load(reader);
+                var points = jsonObject["points"].ToObject<List<MyPoint>>();
+                var faces = jsonObject["faces"].ToObject<List<List<int>>>();
+                return new Shape(points, faces);
             }
 
-            var jsonObject = new JObject
+            public override void WriteJson(JsonWriter writer, Shape? value, JsonSerializer serializer)
             {
-                { "points", JToken.FromObject(value.Points, serializer) },
-                { "edges", JToken.FromObject(value.Edges, serializer) }
-            };
-            jsonObject.WriteTo(writer);
+                if (value == null)
+                {
+                    writer.WriteNull();
+                    return;
+                }
+
+                var jsonObject = new JObject
+                {
+                    { "points", JToken.FromObject(value.Points, serializer) },
+                    { "faces", JToken.FromObject(value.Faces, serializer) }
+                };
+                jsonObject.WriteTo(writer);
+            }
         }
     }
-
-}
