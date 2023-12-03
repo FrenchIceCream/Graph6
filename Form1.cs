@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Numerics;
 using System.Windows.Forms.VisualStyles;
+using static Graph6.FunctionShape;
 
 namespace Graph6
 {
@@ -26,7 +27,7 @@ namespace Graph6
             _pen = new Pen(Color.Blue, 2);
             _solid_of_revolution = new List<PointF> { };
 
-            //Указание начала координат в центре окна
+            //РЈРєР°Р·Р°РЅРёРµ РЅР°С‡Р°Р»Р° РєРѕРѕСЂРґРёРЅР°С‚ РІ С†РµРЅС‚СЂРµ РѕРєРЅР°
             _graphics = Canvas.CreateGraphics();
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
             _graphics.ScaleTransform(1, -1);
@@ -165,7 +166,7 @@ namespace Graph6
             float m = vector.Y / length;
             float n = vector.Z / length;
 
-            //Ужас, но работает
+            //РЈР¶Р°СЃ, РЅРѕ СЂР°Р±РѕС‚Р°РµС‚
             MyMatrix scaleMatrix = new MyMatrix(4, 4, new float[]
             {l*l + (float)Math.Cos(degree)*(1 - l*l), l*(1 - (float)Math.Cos(degree))*m + n*(float)Math.Sin(degree), l * (1 - (float)Math.Cos(degree)) * n - m * (float)Math.Sin(degree), 0,
             l*(1 - (float)Math.Cos(degree))*m - n*(float)Math.Sin(degree), m*m + (float)Math.Cos(degree) * (1 - m*m), m*(1 - (float)Math.Cos(degree)) * n + l* (float)Math.Sin(degree), 0,
@@ -224,7 +225,7 @@ namespace Graph6
             _viewer.SetProjection(Projection.Perspective);
             ViewShape();
         }
-        
+
         private void CubeButton_Click(object sender, EventArgs e)
         {
             _shape = Shapes.Cube();
@@ -256,7 +257,7 @@ namespace Graph6
             //_shape = Shapes.Dodecahedron();
             ViewShape();
         }
-        
+
 
         private void LoadButton_Click(object sender, EventArgs e)
         {
@@ -371,7 +372,7 @@ namespace Graph6
             Shape s = new Shape(Points, Faces);
 
             _shape = s;
-            
+
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ru-RU");
             ViewShape();
         }
@@ -423,7 +424,7 @@ namespace Graph6
 
         private void CalculateSolidOfRevolution()
         {
-            
+
             _graphics.Clear(Color.White);
             _drawingState = DrawingState.NODRAWING;
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
@@ -441,11 +442,11 @@ namespace Graph6
             }
             _shape = new Shape(solid_shape);
 
-            //угол поворота
+            //СѓРіРѕР» РїРѕРІРѕСЂРѕС‚Р°
             int sections = int.Parse(NumOfSections.Text);
             float deg = (360 / sections) * (float)(Math.PI / 180);
 
-            MyPoint A = new MyPoint(0, 0, 0);  //вокруг X
+            MyPoint A = new MyPoint(0, 0, 0);  //РІРѕРєСЂСѓРі X
             MyPoint B = new MyPoint(10, 0, 0);
 
             switch (AxesList_SolidOfRev.Text)
@@ -483,8 +484,8 @@ namespace Graph6
                 for (int j = 1; j < c; j++)
                 {
                     _shape.Points.Add(solid_shape.Points[j]);
-                    _shape.Faces.Add(new List<int>{(i - 1) * c + j, i * c + j, i * c + j - 1});  //точка на предыдущей итерации + текующая точка + точка перед текущей
-                    _shape.Faces.Add(new List<int> { (i - 1) * c + j, (i - 1) * c + j - 1, i * c + j - 1 }); //точка на предыдущей итерации + точка перед ней + точка перед текущей
+                    _shape.Faces.Add(new List<int> { (i - 1) * c + j, i * c + j, i * c + j - 1 });  //С‚РѕС‡РєР° РЅР° РїСЂРµРґС‹РґСѓС‰РµР№ РёС‚РµСЂР°С†РёРё + С‚РµРєСѓСЋС‰Р°СЏ С‚РѕС‡РєР° + С‚РѕС‡РєР° РїРµСЂРµРґ С‚РµРєСѓС‰РµР№
+                    _shape.Faces.Add(new List<int> { (i - 1) * c + j, (i - 1) * c + j - 1, i * c + j - 1 }); //С‚РѕС‡РєР° РЅР° РїСЂРµРґС‹РґСѓС‰РµР№ РёС‚РµСЂР°С†РёРё + С‚РѕС‡РєР° РїРµСЂРµРґ РЅРµР№ + С‚РѕС‡РєР° РїРµСЂРµРґ С‚РµРєСѓС‰РµР№
                 }
             }
 
@@ -497,7 +498,7 @@ namespace Graph6
         {
             Shape shape = new Shape(_shape);
             _graphics.Clear(Color.White);
-            
+
         }
     }
 }

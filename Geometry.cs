@@ -1,11 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Windows.Forms.VisualStyles;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Xml.Linq;
-
-namespace Graph6
+﻿namespace Graph6
 {
     public class MyPoint
     {
@@ -33,21 +26,24 @@ namespace Graph6
             return new MyPoint(lhs.X - rhs.X, lhs.Y - rhs.Y, lhs.Z - rhs.Z);
         }
     }
-
     public class Shape
     {
+        public string Id { get; private set; }
+
         public List<MyPoint> Points { get; private set; } = new();
         public List<List<int>> Faces { get; private set; } = new();
         public List<float> Normals { get; private set; } = new();
 
         public Shape(List<MyPoint> point, List<List<int>> faces)
         {
+            Id = GenerateUniqueId();
             Points = point;
             Faces= faces;
         }
 
         public Shape(Shape anotherShape)
         {
+            Id = anotherShape.Id;
             Points = new List<MyPoint>(anotherShape.Points);
             Faces = new List<List<int>>(anotherShape.Faces);
         }
@@ -63,15 +59,84 @@ namespace Graph6
                 y += point.Y;
                 z += point.Z;
             }
-
             return new MyPoint(x / Points.Count, y / Points.Count, z / Points.Count);
         }
+
+        private string GenerateUniqueId()
+        {
+            return Guid.NewGuid().ToString("N").Substring(0, 4);
+        }
+
+        public override string ToString()
+        {
+            return $"Shape: {Id}";
+        }
     }
+    public class Cube: Shape
+    {
+        public Cube(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"Cube: {Id}";
+        }
+    }
+    public class Icosahedron : Shape
+    {
+        public Icosahedron(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"Icosahedron: {Id}";
+        }
+    }
+    public class Dodecahedron : Shape
+    {
+        public Dodecahedron(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"Dodecahedron: {Id}";
+        }
+    }
+    public class Tetrahedron : Shape
+    {
+        public Tetrahedron(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"Tetrahedron: {Id}";
+        }
+    }
+    public class Octahedron : Shape
+    {
+        public Octahedron(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"Octahedron: {Id}";
+        }
+    }
+    public class FunctionShape : Shape
+    {
+        public FunctionShape(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        {
+        }
 
     
     public static class Shapes
     {
-        public static Shape Cube()
+        public static Cube Cube()
         {
             List<MyPoint> points = new List<MyPoint>
             {
@@ -240,8 +305,7 @@ namespace Graph6
             return new(points, faces);
         }
 
-
-        public static Shape Octahedron()
+        public static Octahedron Octahedron()
         {
             List<MyPoint> points = new List<MyPoint>
             {
@@ -304,3 +368,6 @@ namespace Graph6
             }
         }
     }
+}
+}
+}

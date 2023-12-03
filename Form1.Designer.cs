@@ -80,6 +80,17 @@
             button4 = new Button();
             RemoveEdgesButton = new Button();
             label14 = new Label();
+            ShapesBox = new ComboBox();
+            Button_Translation = new Button();
+            Translation_Z = new TextBox();
+            Translation_Y = new TextBox();
+            Translation_X = new TextBox();
+            label15 = new Label();
+            label16 = new Label();
+            Clear_Button = new Button();
+            label17 = new Label();
+            label18 = new Label();
+            Hide_CheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)Canvas).BeginInit();
             SuspendLayout();
             // 
@@ -197,7 +208,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(709, 467);
+            label4.Location = new Point(1177, 113);
             label4.Name = "label4";
             label4.Size = new Size(20, 20);
             label4.TabIndex = 12;
@@ -214,7 +225,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(709, 500);
+            label5.Location = new Point(1177, 146);
             label5.Name = "label5";
             label5.Size = new Size(20, 20);
             label5.TabIndex = 14;
@@ -364,7 +375,6 @@
             calculateButton.TabIndex = 30;
             calculateButton.Text = "Посчитать";
             calculateButton.UseVisualStyleBackColor = true;
-            calculateButton.Click += calculateButton_Click;
             // 
             // formulTextBox
             // 
@@ -553,19 +563,132 @@
             // 
             // label14
             // 
+            label14.AutoSize = true;
             label14.BorderStyle = BorderStyle.Fixed3D;
-            label14.Location = new Point(878, 455);
+            label14.Location = new Point(1095, 63);
             label14.Name = "label14";
-            label14.Size = new Size(175, 3);
-            label14.TabIndex = 51;
+            label14.Size = new Size(23, 22);
+            label14.TabIndex = 55;
+            label14.Text = "X:";
+            // 
+            // ShapesBox
+            // 
+            ShapesBox.FormattingEnabled = true;
+            ShapesBox.Location = new Point(1095, 168);
+            ShapesBox.Margin = new Padding(3, 2, 3, 2);
+            ShapesBox.Name = "ShapesBox";
+            ShapesBox.Size = new Size(124, 28);
+            ShapesBox.TabIndex = 50;
+            // 
+            // Button_Translation
+            // 
+            Button_Translation.Location = new Point(1095, 32);
+            Button_Translation.Margin = new Padding(3, 2, 3, 2);
+            Button_Translation.Name = "Button_Translation";
+            Button_Translation.Size = new Size(124, 29);
+            Button_Translation.TabIndex = 51;
+            Button_Translation.Text = "Перенос";
+            Button_Translation.UseVisualStyleBackColor = true;
+            // 
+            // Translation_Z
+            // 
+            Translation_Z.Location = new Point(1185, 85);
+            Translation_Z.Margin = new Padding(3, 2, 3, 2);
+            Translation_Z.Name = "Translation_Z";
+            Translation_Z.Size = new Size(32, 27);
+            Translation_Z.TabIndex = 54;
+            Translation_Z.TextAlign = HorizontalAlignment.Center;
+            // 
+            // Translation_Y
+            // 
+            Translation_Y.Location = new Point(1138, 85);
+            Translation_Y.Margin = new Padding(3, 2, 3, 2);
+            Translation_Y.Name = "Translation_Y";
+            Translation_Y.Size = new Size(33, 27);
+            Translation_Y.TabIndex = 53;
+            Translation_Y.TextAlign = HorizontalAlignment.Center;
+            // 
+            // Translation_X
+            // 
+            Translation_X.Location = new Point(1093, 85);
+            Translation_X.Margin = new Padding(3, 2, 3, 2);
+            Translation_X.Name = "Translation_X";
+            Translation_X.Size = new Size(33, 27);
+            Translation_X.TabIndex = 52;
+            Translation_X.TextAlign = HorizontalAlignment.Center;
+            // 
+            // label15
+            // 
+            label15.AutoSize = true;
+            label15.Location = new Point(1140, 63);
+            label15.Name = "label15";
+            label15.Size = new Size(20, 20);
+            label15.TabIndex = 56;
+            label15.Text = "Y:";
+            // 
+            // label16
+            // 
+            label16.AutoSize = true;
+            label16.Location = new Point(1187, 63);
+            label16.Name = "label16";
+            label16.Size = new Size(21, 20);
+            label16.TabIndex = 57;
+            label16.Text = "Z:";
+            // 
+            // Clear_Button
+            // 
+            Clear_Button.Location = new Point(1088, 364);
+            Clear_Button.Margin = new Padding(3, 2, 3, 2);
+            Clear_Button.Name = "Clear_Button";
+            Clear_Button.Size = new Size(128, 34);
+            Clear_Button.TabIndex = 58;
+            Clear_Button.Text = "Очистить";
+            Clear_Button.UseVisualStyleBackColor = true;
+            // 
+            // label17
+            // 
+            label17.AutoSize = true;
+            label17.Location = new Point(1093, 131);
+            label17.Name = "label17";
+            label17.Size = new Size(123, 20);
+            label17.TabIndex = 59;
+            label17.Text = "Текущая фигура:";
+            // 
+            // label18
+            // 
+            label18.BorderStyle = BorderStyle.Fixed3D;
+            label18.Location = new Point(877, 447);
+            label18.Name = "label18";
+            label18.Size = new Size(200, 2);
+            label18.TabIndex = 60;
+            // 
+            // Hide_CheckBox
+            // 
+            Hide_CheckBox.Location = new Point(1095, 287);
+            Hide_CheckBox.Name = "Hide_CheckBox";
+            Hide_CheckBox.Size = new Size(148, 51);
+            Hide_CheckBox.TabIndex = 61;
+            Hide_CheckBox.Text = "Удаление невидимых граней";
+            Hide_CheckBox.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1053, 533);
-            Controls.Add(label14);
+            ClientSize = new Size(1255, 538);
             Controls.Add(RemoveEdgesButton);
+            Controls.Add(Hide_CheckBox);
+            Controls.Add(label18);
+            Controls.Add(label17);
+            Controls.Add(Clear_Button);
+            Controls.Add(label16);
+            Controls.Add(label15);
+            Controls.Add(label14);
+            Controls.Add(Translation_Z);
+            Controls.Add(Translation_Y);
+            Controls.Add(Translation_X);
+            Controls.Add(Button_Translation);
+            Controls.Add(ShapesBox);
             Controls.Add(button4);
             Controls.Add(button3);
             Controls.Add(label13);
@@ -677,5 +800,17 @@
         private Button button4;
         private Button RemoveEdgesButton;
         private Label label14;
+        private ComboBox ShapesBox;
+        private Button Button_Translation;
+        private TextBox Translation_Z;
+        private TextBox Translation_Y;
+        private TextBox Translation_X;
+        //private Label label14;
+        private Label label15;
+        private Label label16;
+        private Button Clear_Button;
+        private Label label17;
+        private Label label18;
+        private CheckBox Hide_CheckBox;
     }
 }
