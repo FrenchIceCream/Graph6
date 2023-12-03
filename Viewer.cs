@@ -34,23 +34,23 @@ namespace Graph6
             _projection = projection;
         }
 
-        public void View(IList<Shape> shapes)
+        public void View(Shape shape)
         {
             _graphics.Clear(Color.White);
 
             switch (_projection)
             {
                 case Projection.Perspective:
-                    foreach (var shape in shapes)
-                    {
+                   // foreach (var shape in shapes)
+                   // {
                         Perspective(shape);
-                    }
+                    //}
                     break;
                 case Projection.Isometric:
-                    foreach (var shape in shapes)
-                    {
+                    //foreach (var shape in shapes)
+                    //{
                         Isometric(shape);
-                    }
+                    //}
                     break;
                 case Projection.Axonometry:
                     break;

@@ -74,7 +74,7 @@
     }
     public class Cube: Shape
     {
-        public Cube(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        public Cube(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
         {
         }
 
@@ -85,7 +85,7 @@
     }
     public class Icosahedron : Shape
     {
-        public Icosahedron(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        public Icosahedron(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
         {
         }
 
@@ -96,7 +96,7 @@
     }
     public class Dodecahedron : Shape
     {
-        public Dodecahedron(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        public Dodecahedron(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
         {
         }
 
@@ -107,7 +107,7 @@
     }
     public class Tetrahedron : Shape
     {
-        public Tetrahedron(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        public Tetrahedron(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
         {
         }
 
@@ -118,7 +118,7 @@
     }
     public class Octahedron : Shape
     {
-        public Octahedron(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        public Octahedron(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
         {
         }
 
@@ -129,7 +129,7 @@
     }
     public class FunctionShape : Shape
     {
-        public FunctionShape(List<MyPoint> point, List<(int, int)> edges) : base(point, edges)
+        public FunctionShape(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
         {
         }
 
@@ -336,38 +336,5 @@
             return new Shape(new List<MyPoint>(), new List<List<int>>());
         }
     }
-    
-        public class Converter : JsonConverter<Shape>
-        {
-
-            public override Shape? ReadJson(JsonReader reader, Type objectType, Shape? existingValue, bool hasExistingValue, JsonSerializer serializer)
-            {
-                if (reader.TokenType == JsonToken.Null)
-                    return null;
-
-                JObject jsonObject = JObject.Load(reader);
-                var points = jsonObject["points"].ToObject<List<MyPoint>>();
-                var faces = jsonObject["faces"].ToObject<List<List<int>>>();
-                return new Shape(points, faces);
-            }
-
-            public override void WriteJson(JsonWriter writer, Shape? value, JsonSerializer serializer)
-            {
-                if (value == null)
-                {
-                    writer.WriteNull();
-                    return;
-                }
-
-                var jsonObject = new JObject
-                {
-                    { "points", JToken.FromObject(value.Points, serializer) },
-                    { "faces", JToken.FromObject(value.Faces, serializer) }
-                };
-                jsonObject.WriteTo(writer);
-            }
-        }
-    }
-}
 }
 }

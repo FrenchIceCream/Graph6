@@ -5,6 +5,7 @@ namespace Graph6
 {
     public class Converter : JsonConverter<Shape>
     {
+
         public override Shape? ReadJson(JsonReader reader, Type objectType, Shape? existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.Null)
@@ -12,8 +13,8 @@ namespace Graph6
 
             JObject jsonObject = JObject.Load(reader);
             var points = jsonObject["points"].ToObject<List<MyPoint>>();
-            var edges = jsonObject["edges"].ToObject<List<(int, int)>>();
-            return new Shape(points, edges);
+            var faces = jsonObject["faces"].ToObject<List<List<int>>>();
+            return new Shape(points, faces);
         }
 
         public override void WriteJson(JsonWriter writer, Shape? value, JsonSerializer serializer)
@@ -25,12 +26,11 @@ namespace Graph6
             }
 
             var jsonObject = new JObject
-            {
-                { "points", JToken.FromObject(value.Points, serializer) },
-                { "edges", JToken.FromObject(value.Edges, serializer) }
-            };
+                {
+                    { "points", JToken.FromObject(value.Points, serializer) },
+                    { "faces", JToken.FromObject(value.Faces, serializer) }
+                };
             jsonObject.WriteTo(writer);
         }
     }
-
 }
