@@ -1,5 +1,4 @@
-﻿using System.Net;
-
+﻿
 namespace Graph6
 {
     public enum Projection
@@ -16,7 +15,14 @@ namespace Graph6
                                                                              0, 0, 0, -1f/-200,
                                                                              0, 0, 0, 1 });
 
-        private Graphics _graphics;
+        public MyPoint Position { get; private set; }
+        public MyPoint CameraVector { get; private set; }
+        public MyMatrix ToCameraCoordinates {  get; private set; } = new(4, 4, new float[] { 1, 0, 0, 0,
+                                                                             0, 1, 0, 0,
+                                                                             0, 0, 1, 0,
+                                                                             0, 0, 0, 1 });
+
+        public Graphics Graphics;
 
         private Projection _projection;
 
@@ -24,9 +30,12 @@ namespace Graph6
 
         public Viewer(Graphics graphics, Projection projection)
         {
-            _graphics = graphics;
+            Graphics = graphics;
             _projection = projection;
             _pen = new Pen(Color.Red, 1);
+
+            Position = new MyPoint(0, 0, 0);
+            Position = new MyPoint(0, 0, 1);
         }
 
         public void SetProjection(Projection projection)
@@ -36,7 +45,7 @@ namespace Graph6
 
         public void View(Shape shape)
         {
-            _graphics.Clear(Color.White);
+            Graphics.Clear(Color.White);
 
             switch (_projection)
             {
@@ -65,10 +74,10 @@ namespace Graph6
                 for (int i = 1; i < face.Count; i++)
                 {
                     var b = face[i];
-                    _graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[b].X, shape.Points[b].Y);
+                    Graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[b].X, shape.Points[b].Y);
                     a = b;
                 }
-                _graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[face[0]].X, shape.Points[face[0]].Y);
+                Graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[face[0]].X, shape.Points[face[0]].Y);
             }
         }
 
@@ -77,15 +86,15 @@ namespace Graph6
             foreach (var face in shape.Faces)
             {
                 var a = face[0];
-                MyMatrix t = new MyMatrix(1, 4, new float[] { shape.Points[a].X, shape.Points[a].Y, shape.Points[a].Z, 1 }) * projectionMatrix;
-                MyMatrix r = new MyMatrix(1, 4, new float[] { shape.Points[face.Last()].X, shape.Points[face.Last()].Y, shape.Points[face.Last()].Z, 1 }) * projectionMatrix;
-                _graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
+                MyMatrix t = new MyMatrix(1, 4, new float[] { shape.Points[a].X, shape.Points[a].Y, shape.Points[a].Z, 1 }) * shape.MatrixToWorld * this.ToCameraCoordinates * projectionMatrix;
+                MyMatrix r = new MyMatrix(1, 4, new float[] { shape.Points[face.Last()].X, shape.Points[face.Last()].Y, shape.Points[face.Last()].Z, 1 }) * shape.MatrixToWorld * this.ToCameraCoordinates * projectionMatrix;
+                Graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
                 for (int i = 1; i < face.Count; i++)
                 {
                     var b = face[i];
-                    t = new MyMatrix(1, 4, new float[] { shape.Points[a].X, shape.Points[a].Y, shape.Points[a].Z, 1 }) * projectionMatrix;
-                    r = new MyMatrix(1, 4, new float[] { shape.Points[b].X, shape.Points[b].Y, shape.Points[b].Z, 1 }) * projectionMatrix;
-                    _graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
+                    t = new MyMatrix(1, 4, new float[] { shape.Points[a].X, shape.Points[a].Y, shape.Points[a].Z, 1 }) * shape.MatrixToWorld * this.ToCameraCoordinates * projectionMatrix;
+                    r = new MyMatrix(1, 4, new float[] { shape.Points[b].X, shape.Points[b].Y, shape.Points[b].Z, 1 }) * shape.MatrixToWorld * this.ToCameraCoordinates * projectionMatrix;
+                    Graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
                     a = b;
                 }
             }

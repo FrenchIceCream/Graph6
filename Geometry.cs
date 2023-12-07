@@ -25,6 +25,12 @@
         {
             return new MyPoint(lhs.X - rhs.X, lhs.Y - rhs.Y, lhs.Z - rhs.Z);
         }
+
+        public MyPoint Normalize()
+        {
+            float sum = _x + _y + _z;
+            return new MyPoint(_x / sum, _y / sum, _z / sum);
+        }
     }
     public class Shape
     {
@@ -33,12 +39,17 @@
         public List<MyPoint> Points { get; private set; } = new();
         public List<List<int>> Faces { get; private set; } = new();
         public List<float> Normals { get; private set; } = new();
+        public MyMatrix MatrixToWorld { get; set; } = new(4, 4, new float[] {
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1 });
 
         public Shape(List<MyPoint> point, List<List<int>> faces)
         {
             Id = GenerateUniqueId();
             Points = point;
-            Faces= faces;
+            Faces = faces;
         }
 
         public Shape(Shape anotherShape)
@@ -72,7 +83,7 @@
             return $"Shape: {Id}";
         }
     }
-    public class Cube: Shape
+    public class Cube : Shape
     {
         public Cube(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
         {
@@ -133,12 +144,12 @@
         {
         }
 
-    
-    public static class Shapes
-    {
-        public static Cube Cube()
+
+        public static class Shapes
         {
-            List<MyPoint> points = new List<MyPoint>
+            public static Cube Cube()
+            {
+                List<MyPoint> points = new List<MyPoint>
             {
                 new MyPoint(-20, -20, 20),
                 new MyPoint(20, -20, 20),
@@ -150,7 +161,7 @@
                 new MyPoint(20, 20, 60)
             };
 
-            List<List<int>> faces = new List<List<int>>
+                List<List<int>> faces = new List<List<int>>
             {
                 new List<int>{ 0, 1, 6, 3},
                 new List<int>{ 0, 2, 4, 1},
@@ -160,154 +171,154 @@
                 new List<int>{ 7, 5, 2, 4}
             };
 
-            return new(points, faces);
-        }
-        /*
-        public static Shape Icosahedron()
-        {
-            float phi = 1.6180f;
-            float coef = (float)Math.Sqrt(1 + phi * phi);
-
-            List<MyPoint> points = new()
+                return new(points, faces);
+            }
+            /*
+            public static Shape Icosahedron()
             {
-                new MyPoint(phi * 50 / coef, 1 * 50 / coef, 0),
-                new MyPoint(phi * 50 / coef, -1 * 50 / coef, 0),
-                new MyPoint(-phi * 50 / coef, -1 * 50 / coef, 0),
-                new MyPoint(-phi * 50 / coef, 1 * 50 / coef, 0),
-                new MyPoint(0, phi * 50 / coef, 1 * 50 / coef),
-                new MyPoint(0, -phi * 50 / coef, 1 * 50 / coef),
-                new MyPoint(0, -phi * 50 / coef, -1 * 50 / coef),
-                new MyPoint(0, phi * 50 / coef, -1 * 50 / coef),
-                new MyPoint(1 * 50 / coef, 0, phi * 50 / coef),
-                new MyPoint(1 * 50 / coef, 0, -phi * 50 / coef),
-                new MyPoint(-1 * 50 / coef, 0, -phi * 50 / coef),
-                new MyPoint(-1 * 50 / coef, 0, phi * 50 / coef),
-            };
+                float phi = 1.6180f;
+                float coef = (float)Math.Sqrt(1 + phi * phi);
 
-            List<(int, int)> edges = new()
-            {
-            (7, 0),
-            (7, 4),
-            (7, 3),
-            (7, 10),
-            (7, 9),
-            (5, 8),
-            (5, 11),
-            (5, 2),
-            (5, 6),
-            (5, 1),
-            (0, 8),
-            (0, 4),
-            (8, 4),
-            (8, 11),
-            (4, 11),
-            (4, 3),
-            (11, 3),
-            (11, 2),
-            (3, 2),
-            (3, 10),
-            (2, 10),
-            (2, 6),
-            (10, 6),
-            (10, 9),
-            (6, 9),
-            (6, 1),
-            (9, 1),
-            (9, 0),
-            (1, 0),
-            (1, 8),
-            };
-            return new(points, edges);
-        }
-        */
-        /*
-        public static Shape Dodecahedron()
-        {
-            float phi = 1.6180f;
-            List<MyPoint> points = new()
-            {
-                new MyPoint(35, 35, 35),
-                new MyPoint(35, 35, -35),
-                new MyPoint(35, -35, 35),
-                new MyPoint(35, -35, -35),
-                new MyPoint(-35, 35, 35),
-                new MyPoint(-35, 35, -35),
-                new MyPoint(-35, -35, 35),
-                new MyPoint(-35, -35, -35),
-                new MyPoint(0, 1 * 35 / phi, phi * 35),
-                new MyPoint(0, 1 * 35 / phi, -phi * 35),
-                new MyPoint(0, -1 * 35 / phi, phi * 35),
-                new MyPoint(0, -1 * 35 / phi, -phi * 35),
-                new MyPoint(1 * 35 / phi, phi * 35, 0),
-                new MyPoint(1 * 35 / phi, -phi * 35, 0),
-                new MyPoint(-1 * 35 / phi, phi * 35, 0),
-                new MyPoint(-1 * 35 / phi, -phi * 35, 0),
-                new MyPoint(phi * 35, 0, 1 * 35 / phi),
-                new MyPoint(phi * 35, 0, -1 * 35 / phi),
-                new MyPoint(-phi * 35, 0, 1 * 35 / phi),
-                new MyPoint(-phi * 35, 0, -1 * 35 / phi),
-            };
+                List<MyPoint> points = new()
+                {
+                    new MyPoint(phi * 50 / coef, 1 * 50 / coef, 0),
+                    new MyPoint(phi * 50 / coef, -1 * 50 / coef, 0),
+                    new MyPoint(-phi * 50 / coef, -1 * 50 / coef, 0),
+                    new MyPoint(-phi * 50 / coef, 1 * 50 / coef, 0),
+                    new MyPoint(0, phi * 50 / coef, 1 * 50 / coef),
+                    new MyPoint(0, -phi * 50 / coef, 1 * 50 / coef),
+                    new MyPoint(0, -phi * 50 / coef, -1 * 50 / coef),
+                    new MyPoint(0, phi * 50 / coef, -1 * 50 / coef),
+                    new MyPoint(1 * 50 / coef, 0, phi * 50 / coef),
+                    new MyPoint(1 * 50 / coef, 0, -phi * 50 / coef),
+                    new MyPoint(-1 * 50 / coef, 0, -phi * 50 / coef),
+                    new MyPoint(-1 * 50 / coef, 0, phi * 50 / coef),
+                };
 
-            List<(int, int)> edges = new()
+                List<(int, int)> edges = new()
+                {
+                (7, 0),
+                (7, 4),
+                (7, 3),
+                (7, 10),
+                (7, 9),
+                (5, 8),
+                (5, 11),
+                (5, 2),
+                (5, 6),
+                (5, 1),
+                (0, 8),
+                (0, 4),
+                (8, 4),
+                (8, 11),
+                (4, 11),
+                (4, 3),
+                (11, 3),
+                (11, 2),
+                (3, 2),
+                (3, 10),
+                (2, 10),
+                (2, 6),
+                (10, 6),
+                (10, 9),
+                (6, 9),
+                (6, 1),
+                (9, 1),
+                (9, 0),
+                (1, 0),
+                (1, 8),
+                };
+                return new(points, edges);
+            }
+            */
+            /*
+            public static Shape Dodecahedron()
             {
-                (8,10),
-                (8,0),
-                (8,4),
-                (10,2),
-                (10,6),
-                (9,11),
-                (9,1),
-                (9,5),
-                (11,3),
-                (11,7),
-                (12,14),
-                (13,15),
-                (12,0),
-                (12,1),
-                (14,4),
-                (14,5),
-                (13,2),
-                (13,3),
-                (15,6),
-                (15,7),
-                (16,17),
-                (18,19),
-                (16,0),
-                (16,2),
-                (17,1),
-                (17,3),
-                (18,4),
-                (18,6),
-                (19,5),
-                (19,7),
-            };
-            return new(points, edges);
-        }
-        */
+                float phi = 1.6180f;
+                List<MyPoint> points = new()
+                {
+                    new MyPoint(35, 35, 35),
+                    new MyPoint(35, 35, -35),
+                    new MyPoint(35, -35, 35),
+                    new MyPoint(35, -35, -35),
+                    new MyPoint(-35, 35, 35),
+                    new MyPoint(-35, 35, -35),
+                    new MyPoint(-35, -35, 35),
+                    new MyPoint(-35, -35, -35),
+                    new MyPoint(0, 1 * 35 / phi, phi * 35),
+                    new MyPoint(0, 1 * 35 / phi, -phi * 35),
+                    new MyPoint(0, -1 * 35 / phi, phi * 35),
+                    new MyPoint(0, -1 * 35 / phi, -phi * 35),
+                    new MyPoint(1 * 35 / phi, phi * 35, 0),
+                    new MyPoint(1 * 35 / phi, -phi * 35, 0),
+                    new MyPoint(-1 * 35 / phi, phi * 35, 0),
+                    new MyPoint(-1 * 35 / phi, -phi * 35, 0),
+                    new MyPoint(phi * 35, 0, 1 * 35 / phi),
+                    new MyPoint(phi * 35, 0, -1 * 35 / phi),
+                    new MyPoint(-phi * 35, 0, 1 * 35 / phi),
+                    new MyPoint(-phi * 35, 0, -1 * 35 / phi),
+                };
 
-        public static Shape Tetrahedron()
-        {
-            float h = (float)Math.Sqrt(3) * 50;
-            List<MyPoint> points = new()
+                List<(int, int)> edges = new()
+                {
+                    (8,10),
+                    (8,0),
+                    (8,4),
+                    (10,2),
+                    (10,6),
+                    (9,11),
+                    (9,1),
+                    (9,5),
+                    (11,3),
+                    (11,7),
+                    (12,14),
+                    (13,15),
+                    (12,0),
+                    (12,1),
+                    (14,4),
+                    (14,5),
+                    (13,2),
+                    (13,3),
+                    (15,6),
+                    (15,7),
+                    (16,17),
+                    (18,19),
+                    (16,0),
+                    (16,2),
+                    (17,1),
+                    (17,3),
+                    (18,4),
+                    (18,6),
+                    (19,5),
+                    (19,7),
+                };
+                return new(points, edges);
+            }
+            */
+
+            public static Shape Tetrahedron()
+            {
+                float h = (float)Math.Sqrt(3) * 50;
+                List<MyPoint> points = new()
             {
                 new MyPoint(-50, -h / 3, 20),
                 new MyPoint(50, -h / 3, 20),
                 new MyPoint(0, 2 * h / 3, 20),
                 new MyPoint(0, 0, 25 * (float)Math.Sqrt(13)),
             };
-            List<List<int>> faces = new List<List<int>>
+                List<List<int>> faces = new List<List<int>>
             {
                 new List<int> { 0, 1, 2 },
                 new List<int> { 0, 2, 3 },
                 new List<int> { 0, 1, 3},
                 new List<int> { 3, 2, 1 }
             };
-            return new(points, faces);
-        }
+                return new(points, faces);
+            }
 
-        public static Octahedron Octahedron()
-        {
-            List<MyPoint> points = new List<MyPoint>
+            public static Octahedron Octahedron()
+            {
+                List<MyPoint> points = new List<MyPoint>
             {
                 new MyPoint(0, 0, 30),
                 new MyPoint(-30, 0, 0),
@@ -317,7 +328,7 @@
                 new MyPoint(0, 0, -30)
             };
 
-            List<List<int>> faces = new List<List<int>>
+                List<List<int>> faces = new List<List<int>>
             {
                 new List<int>{ 0, 1, 4 },
                 new List<int>{ 0, 3, 4 },
@@ -328,13 +339,13 @@
                 new List<int>{ 1, 2, 5 },
                 new List<int>{ 2, 3, 5 },
             };
-            return new(points, faces);
-        }
-        
-        public static Shape Empty()
-        {
-            return new Shape(new List<MyPoint>(), new List<List<int>>());
+                return new(points, faces);
+            }
+
+            public static Shape Empty()
+            {
+                return new Shape(new List<MyPoint>(), new List<List<int>>());
+            }
         }
     }
-}
 }

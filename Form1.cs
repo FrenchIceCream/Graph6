@@ -1,11 +1,5 @@
 using Newtonsoft.Json;
-using System.Windows.Forms;
 using org.mariuszgromada.math.mxparser;
-using System.Drawing;
-using System.Configuration;
-using System.Diagnostics;
-using System.Numerics;
-using System.Windows.Forms.VisualStyles;
 using static Graph6.FunctionShape;
 
 namespace Graph6
@@ -67,8 +61,12 @@ namespace Graph6
 
         enum DrawingState { NODRAWING, FREE_DRAWING }
 
-        private void ViewShape() =>
+        private void ViewShape()
+        {
+            if (_shape is null)
+                return;
             _viewer.View(_shape);
+        }
 
         private void Button_Mirror_Click(object sender, EventArgs e)
         {
@@ -180,6 +178,8 @@ namespace Graph6
 
         public void TurnShape(MyMatrix mat, ref Shape shape)
         {
+
+            
             for (int i = 0; i < _shape.Points.Count; i++)
             {
                 MyPoint point = _shape.Points[i];
@@ -205,13 +205,14 @@ namespace Graph6
 
             MyMatrix transformMatrix = toCenter * mat * fromCenter;
 
-            for (int i = 0; i < shape.Points.Count; i++)
+            shape.MatrixToWorld = shape.MatrixToWorld * transformMatrix;
+            /*for (int i = 0; i < shape.Points.Count; i++)
             {
                 MyPoint point = shape.Points[i];
                 MyMatrix point_matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
                 var res = point_matrix * transformMatrix;
                 shape.Points[i] = new MyPoint(res.matrix[0, 0], res.matrix[0, 1], res.matrix[0, 2]);
-            }
+            }*/
         }
 
         private void ParallelButton_Click(object sender, EventArgs e)
@@ -499,6 +500,14 @@ namespace Graph6
             Shape shape = new Shape(_shape);
             _graphics.Clear(Color.White);
 
+        }
+
+        private void Form1_ResizeEnd(object sender, EventArgs e)
+        {
+            _graphics = Canvas.CreateGraphics();
+            _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
+            _viewer.Graphics = _graphics;
+            ViewShape();
         }
     }
 }
