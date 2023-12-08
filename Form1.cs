@@ -179,7 +179,7 @@ namespace Graph6
         public void TurnShape(MyMatrix mat, ref Shape shape)
         {
 
-            
+
             for (int i = 0; i < _shape.Points.Count; i++)
             {
                 MyPoint point = _shape.Points[i];
@@ -507,6 +507,79 @@ namespace Graph6
             _graphics = Canvas.CreateGraphics();
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
             _viewer.Graphics = _graphics;
+            ViewShape();
+        }
+
+        private void Form1_KeyPress(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.A:
+                    _viewer.MoveLeft();
+                    break;
+            }
+            ViewShape();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            _viewer.MoveDown();
+            ViewShape();
+        }
+
+        private void leftButton_Click(object sender, EventArgs e)
+        {
+            _viewer.MoveLeft();
+            ViewShape();
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            _viewer.MoveUp();
+            ViewShape();
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            _viewer.MoveRight();
+            ViewShape();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            _viewer.MoveForward();
+            ViewShape();
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            _viewer.MoveBackward();
+            ViewShape();
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            _viewer.RotateUp();
+            ViewShape();
+
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            _viewer.RotateDown();
+            ViewShape();
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            _viewer.RotateLeft();
+            ViewShape();
+        }
+
+        private void button13_Click(object sender, EventArgs e)
+        {
+            //_viewer.RotateRight();
+            _viewer.Rotate2(_shape);
             ViewShape();
         }
     }

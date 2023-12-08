@@ -91,6 +91,16 @@
             label17 = new Label();
             label18 = new Label();
             Hide_CheckBox = new CheckBox();
+            leftButton = new Button();
+            button6 = new Button();
+            button7 = new Button();
+            button8 = new Button();
+            button5 = new Button();
+            button9 = new Button();
+            button10 = new Button();
+            button11 = new Button();
+            button12 = new Button();
+            button13 = new Button();
             ((System.ComponentModel.ISupportInitialize)Canvas).BeginInit();
             SuspendLayout();
             // 
@@ -101,7 +111,7 @@
             Canvas.Location = new Point(0, -1);
             Canvas.Margin = new Padding(3, 2, 3, 2);
             Canvas.Name = "Canvas";
-            Canvas.Size = new Size(610, 403);
+            Canvas.Size = new Size(686, 486);
             Canvas.TabIndex = 0;
             Canvas.TabStop = false;
             Canvas.Click += Canvas_Click;
@@ -109,7 +119,7 @@
             // Button_Mirror
             // 
             Button_Mirror.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Button_Mirror.Location = new Point(625, 201);
+            Button_Mirror.Location = new Point(701, 201);
             Button_Mirror.Margin = new Padding(3, 2, 3, 2);
             Button_Mirror.Name = "Button_Mirror";
             Button_Mirror.Size = new Size(82, 22);
@@ -122,7 +132,7 @@
             // 
             separator_dont_touch.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             separator_dont_touch.BorderStyle = BorderStyle.Fixed3D;
-            separator_dont_touch.Location = new Point(608, 76);
+            separator_dont_touch.Location = new Point(684, 76);
             separator_dont_touch.Name = "separator_dont_touch";
             separator_dont_touch.Size = new Size(315, 2);
             separator_dont_touch.TabIndex = 2;
@@ -131,7 +141,7 @@
             // 
             label1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label1.AutoSize = true;
-            label1.Location = new Point(633, 166);
+            label1.Location = new Point(709, 166);
             label1.Name = "label1";
             label1.Size = new Size(101, 30);
             label1.TabIndex = 3;
@@ -142,7 +152,7 @@
             // 
             label2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label2.AutoSize = true;
-            label2.Location = new Point(653, 7);
+            label2.Location = new Point(729, 7);
             label2.Name = "label2";
             label2.Size = new Size(66, 15);
             label2.TabIndex = 4;
@@ -153,7 +163,7 @@
             // 
             AxesList.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             AxesList.FormattingEnabled = true;
-            AxesList.Location = new Point(722, 202);
+            AxesList.Location = new Point(798, 202);
             AxesList.Margin = new Padding(3, 2, 3, 2);
             AxesList.Name = "AxesList";
             AxesList.Size = new Size(32, 23);
@@ -162,7 +172,7 @@
             // Button_Scale
             // 
             Button_Scale.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Button_Scale.Location = new Point(625, 234);
+            Button_Scale.Location = new Point(701, 234);
             Button_Scale.Margin = new Padding(3, 2, 3, 2);
             Button_Scale.Name = "Button_Scale";
             Button_Scale.Size = new Size(82, 22);
@@ -174,7 +184,7 @@
             // ScaleValue
             // 
             ScaleValue.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            ScaleValue.Location = new Point(722, 236);
+            ScaleValue.Location = new Point(798, 236);
             ScaleValue.Margin = new Padding(3, 2, 3, 2);
             ScaleValue.Name = "ScaleValue";
             ScaleValue.Size = new Size(32, 23);
@@ -185,7 +195,7 @@
             // 
             AxesList_Rt.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             AxesList_Rt.FormattingEnabled = true;
-            AxesList_Rt.Location = new Point(722, 268);
+            AxesList_Rt.Location = new Point(798, 268);
             AxesList_Rt.Margin = new Padding(3, 2, 3, 2);
             AxesList_Rt.Name = "AxesList_Rt";
             AxesList_Rt.Size = new Size(32, 23);
@@ -194,7 +204,7 @@
             // Button_Rotate
             // 
             Button_Rotate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Button_Rotate.Location = new Point(625, 268);
+            Button_Rotate.Location = new Point(701, 268);
             Button_Rotate.Margin = new Padding(3, 2, 3, 2);
             Button_Rotate.Name = "Button_Rotate";
             Button_Rotate.Size = new Size(82, 22);
@@ -206,7 +216,7 @@
             // Button_Turn
             // 
             Button_Turn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Button_Turn.Location = new Point(625, 315);
+            Button_Turn.Location = new Point(701, 315);
             Button_Turn.Margin = new Padding(3, 2, 3, 2);
             Button_Turn.Name = "Button_Turn";
             Button_Turn.Size = new Size(82, 22);
@@ -219,7 +229,7 @@
             // 
             label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label3.AutoSize = true;
-            label3.Location = new Point(718, 294);
+            label3.Location = new Point(794, 294);
             label3.Name = "label3";
             label3.Size = new Size(36, 15);
             label3.TabIndex = 11;
@@ -229,7 +239,7 @@
             // 
             label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label4.AutoSize = true;
-            label4.Location = new Point(1030, 85);
+            label4.Location = new Point(1106, 85);
             label4.Name = "label4";
             label4.Size = new Size(16, 15);
             label4.TabIndex = 12;
@@ -238,7 +248,7 @@
             // Angle
             // 
             Angle.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Angle.Location = new Point(722, 315);
+            Angle.Location = new Point(798, 315);
             Angle.Margin = new Padding(3, 2, 3, 2);
             Angle.Name = "Angle";
             Angle.Size = new Size(32, 23);
@@ -249,7 +259,7 @@
             // 
             label5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label5.AutoSize = true;
-            label5.Location = new Point(1030, 110);
+            label5.Location = new Point(1106, 110);
             label5.Name = "label5";
             label5.Size = new Size(16, 15);
             label5.TabIndex = 14;
@@ -258,7 +268,7 @@
             // X1
             // 
             X1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            X1.Location = new Point(644, 346);
+            X1.Location = new Point(720, 346);
             X1.Margin = new Padding(3, 2, 3, 2);
             X1.Name = "X1";
             X1.Size = new Size(28, 23);
@@ -268,7 +278,7 @@
             // Y1
             // 
             Y1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Y1.Location = new Point(683, 346);
+            Y1.Location = new Point(759, 346);
             Y1.Margin = new Padding(3, 2, 3, 2);
             Y1.Name = "Y1";
             Y1.Size = new Size(28, 23);
@@ -278,7 +288,7 @@
             // Z1
             // 
             Z1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Z1.Location = new Point(722, 346);
+            Z1.Location = new Point(798, 346);
             Z1.Margin = new Padding(3, 2, 3, 2);
             Z1.Name = "Z1";
             Z1.Size = new Size(28, 23);
@@ -288,7 +298,7 @@
             // Z2
             // 
             Z2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Z2.Location = new Point(722, 372);
+            Z2.Location = new Point(798, 372);
             Z2.Margin = new Padding(3, 2, 3, 2);
             Z2.Name = "Z2";
             Z2.Size = new Size(28, 23);
@@ -298,7 +308,7 @@
             // Y2
             // 
             Y2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Y2.Location = new Point(683, 372);
+            Y2.Location = new Point(759, 372);
             Y2.Margin = new Padding(3, 2, 3, 2);
             Y2.Name = "Y2";
             Y2.Size = new Size(28, 23);
@@ -308,7 +318,7 @@
             // X2
             // 
             X2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            X2.Location = new Point(644, 372);
+            X2.Location = new Point(720, 372);
             X2.Margin = new Padding(3, 2, 3, 2);
             X2.Name = "X2";
             X2.Size = new Size(28, 23);
@@ -318,7 +328,7 @@
             // PerspectiveButton
             // 
             PerspectiveButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            PerspectiveButton.Location = new Point(621, 24);
+            PerspectiveButton.Location = new Point(697, 24);
             PerspectiveButton.Margin = new Padding(3, 2, 3, 2);
             PerspectiveButton.Name = "PerspectiveButton";
             PerspectiveButton.Size = new Size(136, 22);
@@ -330,7 +340,7 @@
             // ParallelButton
             // 
             ParallelButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            ParallelButton.Location = new Point(621, 50);
+            ParallelButton.Location = new Point(697, 50);
             ParallelButton.Margin = new Padding(3, 2, 3, 2);
             ParallelButton.Name = "ParallelButton";
             ParallelButton.Size = new Size(136, 22);
@@ -342,7 +352,7 @@
             // CubeButton
             // 
             CubeButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            CubeButton.Location = new Point(626, 108);
+            CubeButton.Location = new Point(702, 108);
             CubeButton.Margin = new Padding(3, 2, 3, 2);
             CubeButton.Name = "CubeButton";
             CubeButton.Size = new Size(61, 22);
@@ -355,7 +365,7 @@
             // 
             label6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label6.AutoSize = true;
-            label6.Location = new Point(625, 84);
+            label6.Location = new Point(701, 84);
             label6.Name = "label6";
             label6.Size = new Size(53, 15);
             label6.TabIndex = 24;
@@ -366,7 +376,7 @@
             // 
             label7.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label7.BorderStyle = BorderStyle.Fixed3D;
-            label7.Location = new Point(608, 164);
+            label7.Location = new Point(684, 164);
             label7.Name = "label7";
             label7.Size = new Size(315, 2);
             label7.TabIndex = 25;
@@ -374,7 +384,7 @@
             // button1
             // 
             button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button1.Location = new Point(626, 133);
+            button1.Location = new Point(702, 133);
             button1.Margin = new Padding(3, 2, 3, 2);
             button1.Name = "button1";
             button1.Size = new Size(61, 22);
@@ -386,7 +396,7 @@
             // button2
             // 
             button2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button2.Location = new Point(695, 108);
+            button2.Location = new Point(771, 108);
             button2.Margin = new Padding(3, 2, 3, 2);
             button2.Name = "button2";
             button2.Size = new Size(62, 22);
@@ -398,7 +408,7 @@
             // LoadButton
             // 
             LoadButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            LoadButton.Location = new Point(777, 24);
+            LoadButton.Location = new Point(853, 24);
             LoadButton.Margin = new Padding(3, 2, 3, 2);
             LoadButton.Name = "LoadButton";
             LoadButton.Size = new Size(136, 22);
@@ -410,7 +420,7 @@
             // SaveButton
             // 
             SaveButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            SaveButton.Location = new Point(778, 50);
+            SaveButton.Location = new Point(854, 50);
             SaveButton.Margin = new Padding(3, 2, 3, 2);
             SaveButton.Name = "SaveButton";
             SaveButton.Size = new Size(136, 22);
@@ -422,7 +432,7 @@
             // calculateButton
             // 
             calculateButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            calculateButton.Location = new Point(778, 234);
+            calculateButton.Location = new Point(854, 234);
             calculateButton.Margin = new Padding(3, 2, 3, 2);
             calculateButton.Name = "calculateButton";
             calculateButton.Size = new Size(136, 22);
@@ -433,7 +443,7 @@
             // formulTextBox
             // 
             formulTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            formulTextBox.Location = new Point(778, 201);
+            formulTextBox.Location = new Point(854, 201);
             formulTextBox.Margin = new Padding(3, 2, 3, 2);
             formulTextBox.Name = "formulTextBox";
             formulTextBox.Size = new Size(136, 23);
@@ -444,7 +454,7 @@
             // X0TextBox
             // 
             X0TextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            X0TextBox.Location = new Point(801, 268);
+            X0TextBox.Location = new Point(877, 268);
             X0TextBox.Margin = new Padding(3, 2, 3, 2);
             X0TextBox.Name = "X0TextBox";
             X0TextBox.Size = new Size(32, 23);
@@ -456,7 +466,7 @@
             // 
             label8.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label8.AutoSize = true;
-            label8.Location = new Point(778, 271);
+            label8.Location = new Point(854, 271);
             label8.Name = "label8";
             label8.Size = new Size(17, 15);
             label8.TabIndex = 32;
@@ -465,7 +475,7 @@
             // X1TextBox
             // 
             X1TextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            X1TextBox.Location = new Point(838, 268);
+            X1TextBox.Location = new Point(914, 268);
             X1TextBox.Margin = new Padding(3, 2, 3, 2);
             X1TextBox.Name = "X1TextBox";
             X1TextBox.Size = new Size(32, 23);
@@ -476,7 +486,7 @@
             // Y1TextBox
             // 
             Y1TextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Y1TextBox.Location = new Point(838, 303);
+            Y1TextBox.Location = new Point(914, 303);
             Y1TextBox.Margin = new Padding(3, 2, 3, 2);
             Y1TextBox.Name = "Y1TextBox";
             Y1TextBox.Size = new Size(32, 23);
@@ -487,7 +497,7 @@
             // Y0TextBox
             // 
             Y0TextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Y0TextBox.Location = new Point(801, 302);
+            Y0TextBox.Location = new Point(877, 302);
             Y0TextBox.Margin = new Padding(3, 2, 3, 2);
             Y0TextBox.Name = "Y0TextBox";
             Y0TextBox.Size = new Size(32, 23);
@@ -499,7 +509,7 @@
             // 
             label9.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label9.AutoSize = true;
-            label9.Location = new Point(778, 304);
+            label9.Location = new Point(854, 304);
             label9.Name = "label9";
             label9.Size = new Size(17, 15);
             label9.TabIndex = 35;
@@ -508,7 +518,7 @@
             // XDeltaTextBox
             // 
             XDeltaTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            XDeltaTextBox.Location = new Point(877, 268);
+            XDeltaTextBox.Location = new Point(953, 268);
             XDeltaTextBox.Margin = new Padding(3, 2, 3, 2);
             XDeltaTextBox.Name = "XDeltaTextBox";
             XDeltaTextBox.Size = new Size(32, 23);
@@ -519,7 +529,7 @@
             // YDeltaTextBox
             // 
             YDeltaTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            YDeltaTextBox.Location = new Point(877, 304);
+            YDeltaTextBox.Location = new Point(953, 304);
             YDeltaTextBox.Margin = new Padding(3, 2, 3, 2);
             YDeltaTextBox.Name = "YDeltaTextBox";
             YDeltaTextBox.Size = new Size(32, 23);
@@ -531,7 +541,7 @@
             // 
             label10.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label10.BorderStyle = BorderStyle.Fixed3D;
-            label10.Location = new Point(767, -10);
+            label10.Location = new Point(843, -10);
             label10.Name = "label10";
             label10.Size = new Size(3, 412);
             label10.TabIndex = 40;
@@ -540,7 +550,7 @@
             // 
             label11.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label11.AutoSize = true;
-            label11.Location = new Point(823, 6);
+            label11.Location = new Point(899, 6);
             label11.Name = "label11";
             label11.Size = new Size(39, 15);
             label11.TabIndex = 41;
@@ -551,7 +561,7 @@
             // 
             label12.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label12.AutoSize = true;
-            label12.Location = new Point(788, 81);
+            label12.Location = new Point(864, 81);
             label12.Name = "label12";
             label12.Size = new Size(109, 15);
             label12.TabIndex = 42;
@@ -561,7 +571,7 @@
             // Button_SolidOfRevolution
             // 
             Button_SolidOfRevolution.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Button_SolidOfRevolution.Location = new Point(777, 98);
+            Button_SolidOfRevolution.Location = new Point(853, 98);
             Button_SolidOfRevolution.Margin = new Padding(3, 2, 3, 2);
             Button_SolidOfRevolution.Name = "Button_SolidOfRevolution";
             Button_SolidOfRevolution.Size = new Size(80, 22);
@@ -573,7 +583,7 @@
             // Button_SolidOfRev_Show
             // 
             Button_SolidOfRev_Show.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Button_SolidOfRev_Show.Location = new Point(778, 134);
+            Button_SolidOfRev_Show.Location = new Point(854, 134);
             Button_SolidOfRev_Show.Margin = new Padding(3, 2, 3, 2);
             Button_SolidOfRev_Show.Name = "Button_SolidOfRev_Show";
             Button_SolidOfRev_Show.Size = new Size(79, 22);
@@ -585,7 +595,7 @@
             // NumOfSections
             // 
             NumOfSections.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            NumOfSections.Location = new Point(877, 134);
+            NumOfSections.Location = new Point(953, 134);
             NumOfSections.Margin = new Padding(3, 2, 3, 2);
             NumOfSections.Name = "NumOfSections";
             NumOfSections.Size = new Size(32, 23);
@@ -596,7 +606,7 @@
             // 
             AxesList_SolidOfRev.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             AxesList_SolidOfRev.FormattingEnabled = true;
-            AxesList_SolidOfRev.Location = new Point(877, 99);
+            AxesList_SolidOfRev.Location = new Point(953, 99);
             AxesList_SolidOfRev.Margin = new Padding(3, 2, 3, 2);
             AxesList_SolidOfRev.Name = "AxesList_SolidOfRev";
             AxesList_SolidOfRev.Size = new Size(32, 23);
@@ -606,7 +616,7 @@
             // 
             label13.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label13.AutoSize = true;
-            label13.Location = new Point(808, 169);
+            label13.Location = new Point(884, 169);
             label13.Name = "label13";
             label13.Size = new Size(74, 30);
             label13.TabIndex = 47;
@@ -616,7 +626,7 @@
             // button3
             // 
             button3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button3.Location = new Point(695, 134);
+            button3.Location = new Point(771, 134);
             button3.Margin = new Padding(3, 2, 3, 2);
             button3.Name = "button3";
             button3.Size = new Size(62, 22);
@@ -628,7 +638,7 @@
             // button4
             // 
             button4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button4.Location = new Point(683, 80);
+            button4.Location = new Point(759, 80);
             button4.Margin = new Padding(3, 2, 3, 2);
             button4.Name = "button4";
             button4.Size = new Size(74, 22);
@@ -640,7 +650,7 @@
             // RemoveEdgesButton
             // 
             RemoveEdgesButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            RemoveEdgesButton.Location = new Point(780, 350);
+            RemoveEdgesButton.Location = new Point(856, 350);
             RemoveEdgesButton.Margin = new Padding(3, 2, 3, 2);
             RemoveEdgesButton.Name = "RemoveEdgesButton";
             RemoveEdgesButton.Size = new Size(130, 42);
@@ -654,7 +664,7 @@
             label14.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label14.AutoSize = true;
             label14.BorderStyle = BorderStyle.Fixed3D;
-            label14.Location = new Point(958, 47);
+            label14.Location = new Point(1034, 47);
             label14.Name = "label14";
             label14.Size = new Size(19, 17);
             label14.TabIndex = 55;
@@ -664,7 +674,7 @@
             // 
             ShapesBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             ShapesBox.FormattingEnabled = true;
-            ShapesBox.Location = new Point(958, 126);
+            ShapesBox.Location = new Point(1034, 126);
             ShapesBox.Margin = new Padding(3, 2, 3, 2);
             ShapesBox.Name = "ShapesBox";
             ShapesBox.Size = new Size(109, 23);
@@ -673,7 +683,7 @@
             // Button_Translation
             // 
             Button_Translation.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Button_Translation.Location = new Point(958, 24);
+            Button_Translation.Location = new Point(1034, 24);
             Button_Translation.Margin = new Padding(3, 2, 3, 2);
             Button_Translation.Name = "Button_Translation";
             Button_Translation.Size = new Size(108, 22);
@@ -684,7 +694,7 @@
             // Translation_Z
             // 
             Translation_Z.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Translation_Z.Location = new Point(1037, 64);
+            Translation_Z.Location = new Point(1113, 64);
             Translation_Z.Margin = new Padding(3, 2, 3, 2);
             Translation_Z.Name = "Translation_Z";
             Translation_Z.Size = new Size(28, 23);
@@ -694,7 +704,7 @@
             // Translation_Y
             // 
             Translation_Y.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Translation_Y.Location = new Point(996, 64);
+            Translation_Y.Location = new Point(1072, 64);
             Translation_Y.Margin = new Padding(3, 2, 3, 2);
             Translation_Y.Name = "Translation_Y";
             Translation_Y.Size = new Size(29, 23);
@@ -704,7 +714,7 @@
             // Translation_X
             // 
             Translation_X.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Translation_X.Location = new Point(956, 64);
+            Translation_X.Location = new Point(1032, 64);
             Translation_X.Margin = new Padding(3, 2, 3, 2);
             Translation_X.Name = "Translation_X";
             Translation_X.Size = new Size(29, 23);
@@ -715,7 +725,7 @@
             // 
             label15.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label15.AutoSize = true;
-            label15.Location = new Point(998, 47);
+            label15.Location = new Point(1074, 47);
             label15.Name = "label15";
             label15.Size = new Size(17, 15);
             label15.TabIndex = 56;
@@ -725,7 +735,7 @@
             // 
             label16.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label16.AutoSize = true;
-            label16.Location = new Point(1039, 47);
+            label16.Location = new Point(1115, 47);
             label16.Name = "label16";
             label16.Size = new Size(17, 15);
             label16.TabIndex = 57;
@@ -734,7 +744,7 @@
             // Clear_Button
             // 
             Clear_Button.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Clear_Button.Location = new Point(952, 273);
+            Clear_Button.Location = new Point(1028, 273);
             Clear_Button.Margin = new Padding(3, 2, 3, 2);
             Clear_Button.Name = "Clear_Button";
             Clear_Button.Size = new Size(112, 26);
@@ -746,7 +756,7 @@
             // 
             label17.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label17.AutoSize = true;
-            label17.Location = new Point(956, 98);
+            label17.Location = new Point(1032, 98);
             label17.Name = "label17";
             label17.Size = new Size(100, 15);
             label17.TabIndex = 59;
@@ -756,7 +766,7 @@
             // 
             label18.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label18.BorderStyle = BorderStyle.Fixed3D;
-            label18.Location = new Point(767, 335);
+            label18.Location = new Point(843, 335);
             label18.Name = "label18";
             label18.Size = new Size(175, 2);
             label18.TabIndex = 60;
@@ -764,7 +774,7 @@
             // Hide_CheckBox
             // 
             Hide_CheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Hide_CheckBox.Location = new Point(958, 215);
+            Hide_CheckBox.Location = new Point(1034, 215);
             Hide_CheckBox.Margin = new Padding(3, 2, 3, 2);
             Hide_CheckBox.Name = "Hide_CheckBox";
             Hide_CheckBox.Size = new Size(130, 38);
@@ -772,11 +782,141 @@
             Hide_CheckBox.Text = "Удаление невидимых граней";
             Hide_CheckBox.UseVisualStyleBackColor = true;
             // 
+            // leftButton
+            // 
+            leftButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            leftButton.Location = new Point(1034, 366);
+            leftButton.Margin = new Padding(3, 2, 3, 2);
+            leftButton.Name = "leftButton";
+            leftButton.Size = new Size(27, 26);
+            leftButton.TabIndex = 62;
+            leftButton.Text = "L";
+            leftButton.UseVisualStyleBackColor = true;
+            leftButton.Click += leftButton_Click;
+            // 
+            // button6
+            // 
+            button6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button6.Location = new Point(1064, 366);
+            button6.Margin = new Padding(3, 2, 3, 2);
+            button6.Name = "button6";
+            button6.Size = new Size(27, 26);
+            button6.TabIndex = 63;
+            button6.Text = "D";
+            button6.UseVisualStyleBackColor = true;
+            button6.Click += button6_Click;
+            // 
+            // button7
+            // 
+            button7.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button7.Location = new Point(1097, 366);
+            button7.Margin = new Padding(3, 2, 3, 2);
+            button7.Name = "button7";
+            button7.Size = new Size(27, 26);
+            button7.TabIndex = 64;
+            button7.Text = "R";
+            button7.UseVisualStyleBackColor = true;
+            button7.Click += button7_Click;
+            // 
+            // button8
+            // 
+            button8.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button8.Location = new Point(1064, 337);
+            button8.Margin = new Padding(3, 2, 3, 2);
+            button8.Name = "button8";
+            button8.Size = new Size(27, 26);
+            button8.TabIndex = 65;
+            button8.Text = "U";
+            button8.UseVisualStyleBackColor = true;
+            button8.Click += button8_Click;
+            // 
+            // button5
+            // 
+            button5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button5.Location = new Point(1097, 337);
+            button5.Margin = new Padding(3, 2, 3, 2);
+            button5.Name = "button5";
+            button5.Size = new Size(27, 26);
+            button5.TabIndex = 66;
+            button5.Text = "F";
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
+            // 
+            // button9
+            // 
+            button9.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button9.Location = new Point(1034, 337);
+            button9.Margin = new Padding(3, 2, 3, 2);
+            button9.Name = "button9";
+            button9.Size = new Size(27, 26);
+            button9.TabIndex = 67;
+            button9.Text = "B";
+            button9.UseVisualStyleBackColor = true;
+            button9.Click += button9_Click;
+            // 
+            // button10
+            // 
+            button10.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button10.Location = new Point(1064, 421);
+            button10.Margin = new Padding(3, 2, 3, 2);
+            button10.Name = "button10";
+            button10.Size = new Size(27, 26);
+            button10.TabIndex = 68;
+            button10.Text = "U";
+            button10.UseVisualStyleBackColor = true;
+            button10.Click += button10_Click;
+            // 
+            // button11
+            // 
+            button11.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button11.Location = new Point(1064, 451);
+            button11.Margin = new Padding(3, 2, 3, 2);
+            button11.Name = "button11";
+            button11.Size = new Size(27, 26);
+            button11.TabIndex = 69;
+            button11.Text = "D";
+            button11.UseVisualStyleBackColor = true;
+            button11.Click += button11_Click;
+            // 
+            // button12
+            // 
+            button12.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button12.Location = new Point(1034, 451);
+            button12.Margin = new Padding(3, 2, 3, 2);
+            button12.Name = "button12";
+            button12.Size = new Size(27, 26);
+            button12.TabIndex = 70;
+            button12.Text = "L";
+            button12.UseVisualStyleBackColor = true;
+            button12.Click += button12_Click;
+            // 
+            // button13
+            // 
+            button13.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button13.Location = new Point(1095, 451);
+            button13.Margin = new Padding(3, 2, 3, 2);
+            button13.Name = "button13";
+            button13.Size = new Size(27, 26);
+            button13.TabIndex = 71;
+            button13.Text = "R";
+            button13.UseVisualStyleBackColor = true;
+            button13.Click += button13_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1098, 404);
+            ClientSize = new Size(1174, 487);
+            Controls.Add(button13);
+            Controls.Add(button12);
+            Controls.Add(button11);
+            Controls.Add(button10);
+            Controls.Add(button9);
+            Controls.Add(button5);
+            Controls.Add(button8);
+            Controls.Add(button7);
+            Controls.Add(button6);
+            Controls.Add(leftButton);
             Controls.Add(RemoveEdgesButton);
             Controls.Add(Hide_CheckBox);
             Controls.Add(label18);
@@ -844,6 +984,7 @@
             Name = "Form1";
             Text = "Графика. Лабораторная 7";
             ResizeEnd += Form1_ResizeEnd;
+            KeyDown += Form1_KeyPress;
             ((System.ComponentModel.ISupportInitialize)Canvas).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -915,5 +1056,15 @@
         private Label label17;
         private Label label18;
         private CheckBox Hide_CheckBox;
+        private Button leftButton;
+        private Button button6;
+        private Button button7;
+        private Button button8;
+        private Button button5;
+        private Button button9;
+        private Button button10;
+        private Button button11;
+        private Button button12;
+        private Button button13;
     }
 }
