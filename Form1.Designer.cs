@@ -630,6 +630,7 @@
             ShapesBox.Name = "ShapesBox";
             ShapesBox.Size = new Size(153, 23);
             ShapesBox.TabIndex = 50;
+            ShapesBox.SelectedIndexChanged += ShapesBox_SelectedIndexChanged;
             // 
             // Button_Translation
             // 
@@ -641,6 +642,7 @@
             Button_Translation.TabIndex = 51;
             Button_Translation.Text = "Перенос";
             Button_Translation.UseVisualStyleBackColor = true;
+            Button_Translation.Click += Button_Translation_Click;
             // 
             // Translation_Z
             // 
@@ -702,6 +704,7 @@
             Clear_Button.TabIndex = 58;
             Clear_Button.Text = "Очистить";
             Clear_Button.UseVisualStyleBackColor = true;
+            Clear_Button.Click += ClearButton_Click;
             // 
             // label17
             // 
@@ -732,7 +735,7 @@
             Hide_CheckBox.TabIndex = 61;
             Hide_CheckBox.Text = "Удаление невидимых граней";
             Hide_CheckBox.UseVisualStyleBackColor = true;
-            Hide_CheckBox.CheckedChanged += Hide_CheckBox_CheckedChanged;
+            Hide_CheckBox.CheckedChanged += HideCheckBox_CheckedChanged;
             // 
             // leftButton
             // 

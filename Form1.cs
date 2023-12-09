@@ -1,6 +1,5 @@
 using Newtonsoft.Json;
 using org.mariuszgromada.math.mxparser;
-using static Graph6.FunctionShape;
 
 namespace Graph6
 {
@@ -8,8 +7,9 @@ namespace Graph6
     {
         private Graphics _graphics;
         private Viewer _viewer;
-        private Shape _shape;
-        private List<PointF> _solid_of_revolution;
+        private Shape _currentShape;
+        private IList<Shape> _shapes = new List<Shape>();
+        private List<PointF> _solidOfRevolution;
         private DrawingState _drawingState;
         private Pen _pen;
         public Form1()
@@ -19,7 +19,7 @@ namespace Graph6
 
             _drawingState = DrawingState.NODRAWING;
             _pen = new Pen(Color.Blue, 2);
-            _solid_of_revolution = new List<PointF> { };
+            _solidOfRevolution = new List<PointF> { };
 
             //Указание начала координат в центре окна
             _graphics = Canvas.CreateGraphics();
@@ -27,7 +27,7 @@ namespace Graph6
             _graphics.ScaleTransform(1, -1);
 
             _viewer = new Viewer(_graphics, Projection.Isometric);
-            _shape = Shapes.Empty();
+            _currentShape = Shapes.Empty();
         }
 
         private void InitListsAndBoxes()
@@ -61,16 +61,32 @@ namespace Graph6
 
         enum DrawingState { NODRAWING, FREE_DRAWING }
 
-        private void ViewShape()
+        private void ViewShapes()
         {
-            if (_shape is null)
-                return;
-            _viewer.View(_shape);
+            _viewer.View(_shapes);
+        }
+
+        private void SelectShape(Shape shape)
+        {
+            ShapesBox.Items.Add(shape);
+            _shapes.Add(shape);
+            ShapesBox.SelectedIndex = ShapesBox.Items.Count - 1;
+            SelectItem();
+        }
+
+        private void ShapesBox_SelectedIndexChanged(object sender, EventArgs e) => SelectItem();
+
+        private void SelectItem()
+        {
+            if (_shapes.Count > 0)
+            {
+                _currentShape = _shapes[ShapesBox.SelectedIndex];
+            }
         }
 
         private void Button_Mirror_Click(object sender, EventArgs e)
         {
-            if (_shape.Points.Count == 0)
+            if (_currentShape.IsEmpty)
                 return;
 
             int kx = -1;
@@ -94,12 +110,13 @@ namespace Graph6
                                                                     0,  ky, 0,  0,
                                                                     0,  0,  kz, 0,
                                                                     0,  0,  0,  1});
-            AffineTransform(mirrorMatrix, _shape);
+            AffineTransform(mirrorMatrix, _currentShape);
+            ViewShapes();
         }
 
         private void Button_Scale_Click(object sender, EventArgs e)
         {
-            if (_shape.Points.Count == 0)
+            if (_currentShape.IsEmpty)
                 return;
 
             ScaleValue.Text = ScaleValue.Text.Replace('.', ',');
@@ -109,13 +126,13 @@ namespace Graph6
                                                                 0, k, 0, 0,
                                                                 0, 0, k, 0,
                                                                 0, 0, 0, 1});
-            AffineTransform(ScaleMat, _shape);
-            ViewShape();
+            AffineTransform(ScaleMat, _currentShape);
+            ViewShapes();
         }
 
         private void Button_Rotate_Click(object sender, EventArgs e)
         {
-            if (_shape.Points.Count == 0)
+            if (_currentShape.IsEmpty)    
                 return;
 
             float degree = float.Parse(Angle.Text) * (float)(Math.PI / 180);
@@ -144,13 +161,13 @@ namespace Graph6
                         0, 0, 0, 1});
                     break;
             }
-            AffineTransform(rotationMatrix, _shape);
-            ViewShape();
+            AffineTransform(rotationMatrix, _currentShape);
+            ViewShapes();
         }
 
         private void Button_Turn_Click(object sender, EventArgs e)
         {
-            if (_shape.Points.Count == 0)
+            if (_currentShape.IsEmpty)
                 return;
 
             float degree = float.Parse(Angle.Text) * (float)(Math.PI / 180);
@@ -171,21 +188,42 @@ namespace Graph6
             l * (1 - (float)Math.Cos(degree))*n + m * (float)Math.Sin(degree), m * (1 - (float)Math.Cos(degree)) * n - l*(float)Math.Sin(degree), n * n + (float)Math.Cos(degree) * (1 - n * n), 0,
             0, 0, 0, 1});
 
-            TurnShape(scaleMatrix, ref _shape);
+            TurnShape(scaleMatrix, ref _currentShape);
 
-            ViewShape();
+            ViewShapes();
+        }
+
+        private void Button_Translation_Click(object sender, EventArgs e)
+        {
+            if (_currentShape.IsEmpty)
+                return;
+
+            if (!float.TryParse(Translation_X.Text, out var dx))
+                return;
+            if (!float.TryParse(Translation_Y.Text, out var dy))
+                return;
+            if (!float.TryParse(Translation_Z.Text, out var dz))
+                return;
+
+            MyMatrix translationMatrix = new MyMatrix(4, 4, new float[] { 1, 0, 0, 0,
+                                                                          0, 1, 0, 0,
+                                                                          0, 0, 1, 0,
+                                                                          -dx, -dy, -dz, 1});
+
+            AffineTransform(translationMatrix, _currentShape);
+            ViewShapes();
         }
 
         public void TurnShape(MyMatrix mat, ref Shape shape)
         {
 
 
-            for (int i = 0; i < _shape.Points.Count; i++)
+            for (int i = 0; i < _currentShape.Points.Count; i++)
             {
-                MyPoint point = _shape.Points[i];
+                MyPoint point = _currentShape.Points[i];
                 MyMatrix point_matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
                 var res = point_matrix * mat;
-                _shape.Points[i] = new MyPoint(res.matrix[0, 0], res.matrix[0, 1], res.matrix[0, 2]);
+                _currentShape.Points[i] = new MyPoint(res.matrix[0, 0], res.matrix[0, 1], res.matrix[0, 2]);
             }
         }
 
@@ -218,45 +256,45 @@ namespace Graph6
         private void ParallelButton_Click(object sender, EventArgs e)
         {
             _viewer.SetProjection(Projection.Isometric);
-            ViewShape();
+            ViewShapes();
         }
 
         private void PerspectiveButton_Click(object sender, EventArgs e)
         {
             _viewer.SetProjection(Projection.Perspective);
-            ViewShape();
+            ViewShapes();
         }
 
         private void CubeButton_Click(object sender, EventArgs e)
         {
-            _shape = Shapes.Cube();
-            ViewShape();
+            SelectShape(Shapes.Cube());
+            ViewShapes();
         }
 
         private void OctahedronButton_Click(object sender, EventArgs e)
         {
-            _shape = Shapes.Octahedron();
-            ViewShape();
+            SelectShape(Shapes.Octahedron());
+            ViewShapes();
         }
 
         private void TetrahedronButton_Click(object sender, EventArgs e)
         {
-            _shape = Shapes.Tetrahedron();
-            ViewShape();
+            SelectShape(Shapes.Tetrahedron());
+            ViewShapes();
         }
 
         //TODO
         private void IcosahedronButton_Click(object sender, EventArgs e)
         {
             //_shape = Shapes.Icosahedron();
-            ViewShape();
+            ViewShapes();
         }
 
         //TODO
         private void DodecahedronButton_Click(object sender, EventArgs e)
         {
             //_shape = Shapes.Dodecahedron();
-            ViewShape();
+            ViewShapes();
         }
 
 
@@ -274,17 +312,17 @@ namespace Graph6
                 if (diaglog.CheckFileExists)
                 {
                     string file = File.ReadAllText(diaglog.FileName);
-                    _shape = JsonConvert.DeserializeObject<Shape>(file, new Converter());
-                    ViewShape();
+                    _currentShape = JsonConvert.DeserializeObject<Shape>(file, new Converter());
+                    ViewShapes();
                 }
             }
         }
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            if (_shape == null)
+            if (_currentShape.IsEmpty)
                 return;
-            string file = JsonConvert.SerializeObject(_shape, Formatting.Indented, new Converter());
+            string file = JsonConvert.SerializeObject(_currentShape, Formatting.Indented, new Converter());
             SaveFileDialog diaglog = new()
             {
                 Filter = "(*.pgj)|*.pgj",
@@ -370,12 +408,11 @@ namespace Graph6
 
             }
 
-            Shape s = new Shape(Points, Faces);
+            var function = new FunctionShape(Points, Faces);
+            SelectShape(function);
 
-            _shape = s;
-
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ru-RU");
-            ViewShape();
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ru-RU");
+            ViewShapes();
         }
 
         private void Button_SolidOfRevolution_Click(object sender, EventArgs e)
@@ -388,7 +425,7 @@ namespace Graph6
             _drawingState = DrawingState.FREE_DRAWING;
 
             _graphics.Clear(Color.White);
-            _solid_of_revolution.Clear();
+            _solidOfRevolution.Clear();
             _graphics.DrawLine(new Pen(Color.Black, 1), new Point(Canvas.Width / 2, Canvas.Height - 20), new Point(Canvas.Width / 2, 20));
             _graphics.DrawLine(new Pen(Color.Black, 1), new Point(20, Canvas.Height / 2), new Point(Canvas.Width - 20, Canvas.Height / 2));
         }
@@ -405,22 +442,22 @@ namespace Graph6
 
         private void FreeDraw(PointF p)
         {
-            if (_solid_of_revolution.Count() == 0)
+            if (_solidOfRevolution.Count() == 0)
             {
                 _graphics.DrawRectangle(_pen, p.X, p.Y, 1, 1);
             }
             else
             {
-                PointF prev = _solid_of_revolution.Last();
+                PointF prev = _solidOfRevolution.Last();
                 _graphics.DrawLine(_pen, prev, p);
             }
-            _solid_of_revolution.Add(p);
+            _solidOfRevolution.Add(p);
         }
 
         private void Button_SolidOfRev_Show_Click(object sender, EventArgs e)
         {
             CalculateSolidOfRevolution();
-            ViewShape();
+            ViewShapes();
         }
 
         private void CalculateSolidOfRevolution()
@@ -430,17 +467,17 @@ namespace Graph6
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
             _graphics.ScaleTransform(1, -1);
 
-            if (_solid_of_revolution.Count == 0)
+            if (_solidOfRevolution.Count == 0)
                 return;
 
             Shape solid_shape = Shapes.Empty();
 
-            solid_shape.Points.Add(new MyPoint(_solid_of_revolution[0].X - Canvas.Width / 2, (_solid_of_revolution[0].Y - Canvas.Height / 2) * (-1), 0));
-            for (int i = 1; i < _solid_of_revolution.Count; i++)
+            solid_shape.Points.Add(new MyPoint(_solidOfRevolution[0].X - Canvas.Width / 2, (_solidOfRevolution[0].Y - Canvas.Height / 2) * (-1), 0));
+            for (int i = 1; i < _solidOfRevolution.Count; i++)
             {
-                solid_shape.Points.Add(new MyPoint(_solid_of_revolution[i].X - Canvas.Width / 2, (_solid_of_revolution[i].Y - Canvas.Height / 2) * (-1), 0));
+                solid_shape.Points.Add(new MyPoint(_solidOfRevolution[i].X - Canvas.Width / 2, (_solidOfRevolution[i].Y - Canvas.Height / 2) * (-1), 0));
             }
-            _shape = new Shape(solid_shape);
+            _currentShape = new Shape(solid_shape);
 
             //угол поворота
             int sections = int.Parse(NumOfSections.Text);
@@ -480,24 +517,29 @@ namespace Graph6
             for (int i = 1; i < sections; i++)
             {
                 TurnShape(scaleMatrix, ref solid_shape);
-                _shape.Points.Add(solid_shape.Points[0]);
+                _currentShape.Points.Add(solid_shape.Points[0]);
                 for (int j = 1; j < c; j++)
                 {
-                    _shape.Points.Add(solid_shape.Points[j]);
-                    _shape.Faces.Add(new List<int> { (i - 1) * c + j, i * c + j, i * c + j - 1 });  //точка на предыдущей итерации + текующая точка + точка перед текущей
-                    _shape.Faces.Add(new List<int> { (i - 1) * c + j, (i - 1) * c + j - 1, i * c + j - 1 }); //точка на предыдущей итерации + точка перед ней + точка перед текущей
+                    _currentShape.Points.Add(solid_shape.Points[j]);
+                    _currentShape.Faces.Add(new List<int> { (i - 1) * c + j, i * c + j, i * c + j - 1 });  //точка на предыдущей итерации + текующая точка + точка перед текущей
+                    _currentShape.Faces.Add(new List<int> { (i - 1) * c + j, (i - 1) * c + j - 1, i * c + j - 1 }); //точка на предыдущей итерации + точка перед ней + точка перед текущей
                 }
             }
 
             for (int j = 1; j < c; j++)
-                _shape.Faces.Add(new List<int> { j, (sections - 1) * c + j - 1, (sections - 1) * c + j });
+                _currentShape.Faces.Add(new List<int> { j, (sections - 1) * c + j - 1, (sections - 1) * c + j });
         }
 
         //TODO
         private void RemoveEdgesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            Shape shape = new Shape(_shape);
-            _graphics.Clear(Color.White);
+            //Shape shape = new Shape(_currentShape);
+            //_graphics.Clear(Color.White);
+        }
+
+        private void HideCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
 
         private void Form1_ResizeEnd(object sender, EventArgs e)
@@ -505,7 +547,7 @@ namespace Graph6
             _graphics = Canvas.CreateGraphics();
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
             _viewer.Graphics = _graphics;
-            ViewShape();
+            ViewShapes();
         }
 
         private void Form1_KeyPress(object sender, KeyEventArgs e)
@@ -516,74 +558,80 @@ namespace Graph6
                     _viewer.MoveLeft();
                     break;
             }
-            ViewShape();
+            ViewShapes();
         }
 
         private void button6_Click(object sender, EventArgs e)
         {
             _viewer.MoveDown();
-            ViewShape();
+            ViewShapes();
         }
 
         private void leftButton_Click(object sender, EventArgs e)
         {
             _viewer.MoveLeft();
-            ViewShape();
+            ViewShapes();
         }
 
         private void button8_Click(object sender, EventArgs e)
         {
             _viewer.MoveUp();
-            ViewShape();
+            ViewShapes();
         }
 
         private void button7_Click(object sender, EventArgs e)
         {
             _viewer.MoveRight();
-            ViewShape();
+            ViewShapes();
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
             _viewer.MoveForward();
-            ViewShape();
+            ViewShapes();
         }
 
         private void button9_Click(object sender, EventArgs e)
         {
             _viewer.MoveBackward();
-            ViewShape();
+            ViewShapes();
         }
 
         private void button10_Click(object sender, EventArgs e)
         {
             _viewer.RotateUp();
-            ViewShape();
+            ViewShapes();
 
         }
 
         private void button11_Click(object sender, EventArgs e)
         {
             _viewer.RotateDown();
-            ViewShape();
+            ViewShapes();
         }
 
         private void button12_Click(object sender, EventArgs e)
         {
             _viewer.RotateLeft();
-            ViewShape();
+            ViewShapes();
         }
 
         private void button13_Click(object sender, EventArgs e)
         {
             //_viewer.RotateRight();
-            _viewer.Rotate2(_shape);
-            ViewShape();
+            _viewer.Rotate2(_currentShape);
+            ViewShapes();
         }
 
-        private void Hide_CheckBox_CheckedChanged(object sender, EventArgs e)
+        private void ClearButton_Click(object sender, EventArgs e)
         {
-
+            _shapes.Clear();
+            ShapesBox.SelectedItem = null;
+            _currentShape = Shapes.Empty();
+            ShapesBox.Items.Clear();
+            ViewShapes();
         }
+
+    
     }
 }

@@ -45,6 +45,8 @@
             0, 0, 1, 0,
             0, 0, 0, 1 });
 
+        public bool IsEmpty => Points.Count == 0;
+
         public Shape(List<MyPoint> point, List<List<int>> faces)
         {
             Id = GenerateUniqueId();
@@ -142,11 +144,16 @@
     {
         public FunctionShape(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
         {
+
         }
-
-
-        public static class Shapes
+        public override string ToString()
         {
+            return $"Function: {Id}";
+        }
+    }
+
+    public static class Shapes
+    {
             public static Cube Cube()
             {
                 List<MyPoint> points = new List<MyPoint>
@@ -296,7 +303,7 @@
             }
             */
 
-            public static Shape Tetrahedron()
+            public static Tetrahedron Tetrahedron()
             {
                 float h = (float)Math.Sqrt(3) * 50;
                 List<MyPoint> points = new()
@@ -315,7 +322,6 @@
             };
                 return new(points, faces);
             }
-
             public static Octahedron Octahedron()
             {
                 List<MyPoint> points = new List<MyPoint>
@@ -346,6 +352,5 @@
             {
                 return new Shape(new List<MyPoint>(), new List<List<int>>());
             }
-        }
     }
 }

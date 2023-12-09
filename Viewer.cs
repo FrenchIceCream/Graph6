@@ -1,4 +1,5 @@
 ﻿
+using System.Drawing;
 using System.Xml.Serialization;
 
 namespace Graph6
@@ -12,27 +13,31 @@ namespace Graph6
 
     public class Viewer
     {
+        private Projection _projection;
+
+        private Pen _pen;
+
         private readonly MyMatrix projectionMatrix = new(4, 4, new float[] { 1, 0, 0, 0,
                                                                              0, 1, 0, 0,
                                                                              0, 0, 0, -1f/-200,
                                                                              0, 0, 0, 1 });
-
         public MyPoint Position { get; private set; }
         public MyPoint CameraVector { get; private set; }
         public MyMatrix ToCameraCoordinates { get; private set; } = new(4, 4, new float[] { 1, 0, 0, 0,
                                                                              0, 1, 0, 0,
                                                                              0, 0, 1, 0,
                                                                              0, 0, 0, 1 });
+        private Graphics _graphics;
 
-        public Graphics Graphics;
-
-        private Projection _projection;
-
-        private Pen _pen;
+        public Graphics Graphics
+        {
+            get => _graphics;
+            set => _graphics = value; //По-хорошему вынести бы в метод UpdateGraphics;
+        }
 
         public Viewer(Graphics graphics, Projection projection)
         {
-            Graphics = graphics;
+            _graphics = graphics;
             _projection = projection;
             _pen = new Pen(Color.Red, 1);
 
@@ -45,23 +50,22 @@ namespace Graph6
             _projection = projection;
         }
 
-        public void View(Shape shape)
+        public void View(IList<Shape> shapes)
         {
-            Graphics.Clear(Color.White);
-
+            _graphics.Clear(Color.White);
             switch (_projection)
             {
                 case Projection.Perspective:
-                    // foreach (var shape in shapes)
-                    // {
-                    Perspective(shape);
-                    //}
+                    foreach (var shape in shapes)
+                    {
+                        Perspective(shape);
+                    }
                     break;
                 case Projection.Isometric:
-                    //foreach (var shape in shapes)
-                    //{
-                    Isometric(shape);
-                    //}
+                    foreach (var shape in shapes)
+                    {
+                        Isometric(shape);
+                    }
                     break;
                 case Projection.Axonometry:
                     break;
@@ -76,10 +80,10 @@ namespace Graph6
                 for (int i = 1; i < face.Count; i++)
                 {
                     var b = face[i];
-                    Graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[b].X, shape.Points[b].Y);
+                    _graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[b].X, shape.Points[b].Y);
                     a = b;
                 }
-                Graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[face[0]].X, shape.Points[face[0]].Y);
+                _graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[face[0]].X, shape.Points[face[0]].Y);
             }
         }
 
@@ -99,7 +103,7 @@ namespace Graph6
                 //{
                 //    r[0, 3] = 1;
                 //}
-                Graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
+                _graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
                 for (int i = 1; i < face.Count; i++)
                 {
                     var b = face[i];
@@ -113,7 +117,7 @@ namespace Graph6
                     //{
                     //    r[0, 3] = 1;
                     //}
-                    Graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
+                    _graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
                     a = b;
                 }
             }
