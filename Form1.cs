@@ -425,7 +425,6 @@ namespace Graph6
 
         private void CalculateSolidOfRevolution()
         {
-
             _graphics.Clear(Color.White);
             _drawingState = DrawingState.NODRAWING;
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
@@ -495,11 +494,10 @@ namespace Graph6
         }
 
         //TODO
-        private void RemoveEdgesButton_Click(object sender, EventArgs e)
+        private void RemoveEdgesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             Shape shape = new Shape(_shape);
             _graphics.Clear(Color.White);
-
         }
 
         private void Form1_ResizeEnd(object sender, EventArgs e)
@@ -581,6 +579,11 @@ namespace Graph6
             //_viewer.RotateRight();
             _viewer.Rotate2(_shape);
             ViewShape();
+        }
+
+        private void Hide_CheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
