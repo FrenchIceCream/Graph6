@@ -84,10 +84,22 @@ namespace Graph6
                 for (int i = 1; i < face.Count; i++)
                 {
                     var b = face[i];
-                    _graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[b].X, shape.Points[b].Y);
+                    var myPointA = shape.Points[a];
+                    var myPointB = shape.Points[b];
+                    var mat1 = new MyMatrix(1, 4, new float[] { myPointA.X, myPointA.Y, myPointA.Z, 1 });
+                    var mat2 = new MyMatrix(1, 4, new float[] { myPointB.X, myPointB.Y, myPointB.Z, 1 });
+                    mat1 = mat1 * shape.MatrixToWorld * this.ToCameraCoordinates;
+                    mat2 = mat2 * shape.MatrixToWorld * this.ToCameraCoordinates;
+                    _graphics.DrawLine(_pen, mat1[0,0], mat1[0, 1], mat2[0, 0], mat2[0, 1]);
                     a = b;
                 }
-                _graphics.DrawLine(_pen, shape.Points[a].X, shape.Points[a].Y, shape.Points[face[0]].X, shape.Points[face[0]].Y);
+                var myPointA2 = shape.Points[a];
+                var myPointB2 = shape.Points[0];
+                var mat11 = new MyMatrix(1, 4, new float[] { myPointA2.X, myPointA2.Y, myPointA2.Z, 1 });
+                var mat21 = new MyMatrix(1, 4, new float[] { myPointB2.X, myPointB2.Y, myPointB2.Z, 1 });
+                mat11 = mat11 * shape.MatrixToWorld * this.ToCameraCoordinates;
+                mat21 = mat21 * shape.MatrixToWorld * this.ToCameraCoordinates;
+                _graphics.DrawLine(_pen, mat11[0, 0], mat11[0, 1], mat21[0, 0], mat21[0, 1]);
             }
         }
 
@@ -288,7 +300,7 @@ namespace Graph6
 
             ToCameraCoordinates = ToCameraCoordinates /** toCenter*/ * T /** fromCenter*/;
 
-            var tmp1 = new MyMatrix(1, 4, new float[] { Position.X, Position.Y, Position.Z, 1 });
+            var tmp1 = new MyMatrix(1, 4, new float[] { 0, 0, -200, 1 });
             tmp1 = tmp1 * T;
             Position = new MyPoint(tmp1[0, 0], tmp1[0, 1], tmp1[0, 2]).Normalize();
 
