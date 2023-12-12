@@ -27,6 +27,10 @@ namespace Graph6
                                                                              0, 1, 0, 0,
                                                                              0, 0, 1, 0,
                                                                              0, 0, 0, 1 });
+        public MyMatrix ToWorldCoordinates { get; private set; } = new(4, 4, new float[] { 1, 0, 0, 0,
+                                                                             0, 1, 0, 0,
+                                                                             0, 0, 1, 0,
+                                                                             0, 0, 0, 1 });
         private Graphics _graphics;
 
         public Graphics Graphics
@@ -41,7 +45,7 @@ namespace Graph6
             _projection = projection;
             _pen = new Pen(Color.Red, 1);
 
-            Position = new MyPoint(0, 0, 0);
+            Position = new MyPoint(0, 0, -200);
             CameraVector = new MyPoint(0, 0, 1);
         }
 
@@ -125,8 +129,13 @@ namespace Graph6
 
         public void ResetPosition()
         {
-            Position = new MyPoint(0, 0, 0);
+            Position = new MyPoint(0, 0, -200);
+            CameraVector = new MyPoint(0, 0, 1);
             ToCameraCoordinates = new(4, 4, new float[] { 1, 0, 0, 0,
+                                                                             0, 1, 0, 0,
+                                                                             0, 0, 1, 0,
+                                                                             0, 0, 0, 1 });
+            ToWorldCoordinates = new(4, 4, new float[] { 1, 0, 0, 0,
                                                                              0, 1, 0, 0,
                                                                              0, 0, 1, 0,
                                                                              0, 0, 0, 1 });
@@ -134,58 +143,78 @@ namespace Graph6
 
         public void MoveUp()
         {
-            MyMatrix T = new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
+            Move(new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
             0, 1, 0, 0 ,
             0, 0, 1, 0,
-            0,10f,0,1});
-            Move(T);
+            0,10f,0,1}),
+            new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
+            0, 1, 0, 0 ,
+            0, 0, 1, 0,
+            0,-10f,0,1}));
         }
         public void MoveDown()
         {
-            MyMatrix T = new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
+            Move(new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
             0, 1, 0, 0 ,
             0, 0, 1, 0,
-            0,-10f,0,1});
-            Move(T);
+            0,-10f,0,1}),
+            new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
+            0, 1, 0, 0 ,
+            0, 0, 1, 0,
+            0,10f,0,1}));
 
         }
         public void MoveLeft()
         {
-            MyMatrix T = new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
+            Move(new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
             0, 1, 0, 0 ,
             0, 0, 1, 0,
-            -10,0f,0,1});
-            Move(T);
+            -10,0f,0,1}),
+            new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
+            0, 1, 0, 0 ,
+            0, 0, 1, 0,
+            10,0f,0,1}));
         }
         public void MoveRight()
         {
-            MyMatrix T = new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
+            Move(new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
             0, 1, 0, 0 ,
             0, 0, 1, 0,
-            10f,0,0,1});
-            Move(T);
+            10f,0,0,1}),
+            new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
+            0, 1, 0, 0 ,
+            0, 0, 1, 0,
+            -10f,0,0,1}));
         }
 
         public void MoveForward()
         {
-            MyMatrix T = new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
+            Move(new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
             0, 1, 0, 0 ,
             0, 0, 1, 0,
-            0f,0,-10,1});
-            Move(T);
+            0f,0,-10,1}),
+            new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
+            0, 1, 0, 0 ,
+            0, 0, 1, 0,
+            0f,0,10,1}));
         }
 
         public void MoveBackward()
         {
-            MyMatrix T = new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
+            Move(new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
             0, 1, 0, 0 ,
             0, 0, 1, 0,
-            0f,0,10,1});
-            Move(T);
+            0f,0,10,1}),
+            new MyMatrix(4, 4, new float[] { 1,0, 0, 0,
+            0, 1, 0, 0 ,
+            0, 0, 1, 0,
+            0f,0,-10,1})
+            );
         }
 
-        private void Move(MyMatrix T)
+        private void Move(MyMatrix T, MyMatrix T2)
         {
+            ToWorldCoordinates = ToWorldCoordinates * T2;
             ToCameraCoordinates = ToCameraCoordinates * T;
             var tmp = new MyMatrix(1, 4, new float[] { Position.X, Position.Y, Position.Z, 1 });
             tmp *= T;
@@ -196,76 +225,80 @@ namespace Graph6
 
         public void RotateUp()
         {
-            MyMatrix T = new MyMatrix(4, 4, new float[]   {1, 0, 0, 0,
+            Rotate(new MyMatrix(4, 4, new float[]   {1, 0, 0, 0,
                                                                      0, (float)Math.Cos(degree), (float)Math.Sin(degree), 0,
                                                                      0, -(float)Math.Sin(degree), (float)Math.Cos(degree), 0,
-                                                                     0, 0, 0, 1});
-            Rotate(T);
+                                                                     0, 0, 0, 1}),
+                                                                     new MyMatrix(4, 4, new float[]   {1, 0, 0, 0,
+                                                                     0, (float)Math.Cos(-degree), (float)Math.Sin(-degree), 0,
+                                                                     0, -(float)Math.Sin(-degree), (float)Math.Cos(-degree), 0,
+                                                                     0, 0, 0, 1}));
         }
         public void RotateDown()
         {
-            MyMatrix T = new MyMatrix(4, 4, new float[]   {1, 0, 0, 0,
+            Rotate(new MyMatrix(4, 4, new float[]   {1, 0, 0, 0,
                                                                      0, (float)Math.Cos(-degree), (float)Math.Sin(-degree), 0,
                                                                      0, -(float)Math.Sin(-degree), (float)Math.Cos(-degree), 0,
-                                                                     0, 0, 0, 1});
-            Rotate(T);
+                                                                     0, 0, 0, 1}),
+                                                                     new MyMatrix(4, 4, new float[]   {1, 0, 0, 0,
+                                                                     0, (float)Math.Cos(degree), (float)Math.Sin(degree), 0,
+                                                                     0, -(float)Math.Sin(degree), (float)Math.Cos(degree), 0,
+                                                                     0, 0, 0, 1}));
         }
         public void RotateLeft()
         {
-            MyMatrix T = new MyMatrix(4, 4, new float[]
+            Rotate(new MyMatrix(4, 4, new float[]
                         {(float)Math.Cos(degree), 0, -(float)Math.Sin(degree), 0,
                         0, 1, 0, 0,
                         (float)Math.Sin(degree), 0, (float)Math.Cos(degree), 0,
-                        0, 0, 0, 1});
-            Rotate(T);
-        }
-        public void RotateRight()
-        {
-            MyMatrix T = new MyMatrix(4, 4, new float[]
+                        0, 0, 0, 1}),
+                        new MyMatrix(4, 4, new float[]
                         {(float)Math.Cos(-degree), 0, -(float)Math.Sin(-degree), 0,
                         0, 1, 0, 0,
                         (float)Math.Sin(-degree), 0, (float)Math.Cos(-degree), 0,
-                        0, 0, 0, 1});
-            Rotate(T);
+                        0, 0, 0, 1}));
+        }
+        public void RotateRight()
+        {
+            Rotate(new MyMatrix(4, 4, new float[]
+                        {(float)Math.Cos(-degree), 0, -(float)Math.Sin(-degree), 0,
+                        0, 1, 0, 0,
+                        (float)Math.Sin(-degree), 0, (float)Math.Cos(-degree), 0,
+                        0, 0, 0, 1}),
+                        new MyMatrix(4, 4, new float[]
+                        {(float)Math.Cos(degree), 0, -(float)Math.Sin(degree), 0,
+                        0, 1, 0, 0,
+                        (float)Math.Sin(degree), 0, (float)Math.Cos(degree), 0,
+                        0, 0, 0, 1}));
         }
 
-        private void Rotate(MyMatrix T)
+        private void Rotate(MyMatrix T, MyMatrix T2)
         {
-            MyMatrix toCenter = new MyMatrix(4, 4, new float[] { 1, 0, 0, 0,
-                                                                 0, 1, 0, 0,
-                                                                 0, 0, 1, 0,
-                                                                 -Position.X, -Position.Y, -Position.Z, 1});
+            //MyMatrix toCenter = new MyMatrix(4, 4, new float[] { 1, 0, 0, 0,
+            //                                                     0, 1, 0, 0,
+            //                                                     0, 0, 1, 0,
+            //                                                     -Position.X, -Position.Y, -Position.Z, 1});
 
-            MyMatrix fromCenter = new MyMatrix(4, 4, new float[] { 1, 0, 0, 0,
-                                                                   0, 1, 0, 0,
-                                                                   0, 0, 1, 0,
-                                                                   Position.X, Position.Y, Position.Z, 1});
+            //MyMatrix fromCenter = new MyMatrix(4, 4, new float[] { 1, 0, 0, 0,
+            //                                                       0, 1, 0, 0,
+            //                                                       0, 0, 1, 0,
+            //                                                       Position.X, Position.Y, Position.Z, 1});
 
 
 
             ToCameraCoordinates = ToCameraCoordinates /** toCenter*/ * T /** fromCenter*/;
-            var tmp = new MyMatrix(1, 4, new float[] { CameraVector.X, CameraVector.Y, CameraVector.Z, 1 });
-            tmp = tmp * /*toCenter **/ T /** fromCenter*/;
+
+            var tmp1 = new MyMatrix(1, 4, new float[] { Position.X, Position.Y, Position.Z, 1 });
+            tmp1 = tmp1 * T;
+            Position = new MyPoint(tmp1[0, 0], tmp1[0, 1], tmp1[0, 2]).Normalize();
+
+            ToWorldCoordinates = ToWorldCoordinates * T2;
+            var tmp = new MyMatrix(1, 4, new float[] { 0, 0, 1, 1 });
+            tmp = tmp * /*toCenter **/ ToWorldCoordinates /** fromCenter*/;
             CameraVector = new MyPoint(tmp[0, 0], tmp[0, 1], tmp[0, 2]).Normalize();
 
 
         }
 
-        public void Rotate2(Shape s)
-        {
-            MyPoint vector = s.GetCenter() - s.GetCenter()+ new MyPoint(0,10,0);
-            float length = (float)Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z);
-            float l = vector.X / length;
-            float m = vector.Y / length;
-            float n = vector.Z / length;
-
-            //Ужас, но работает
-            MyMatrix scaleMatrix = new MyMatrix(4, 4, new float[]
-            {l*l + (float)Math.Cos(degree)*(1 - l*l), l*(1 - (float)Math.Cos(degree))*m + n*(float)Math.Sin(degree), l * (1 - (float)Math.Cos(degree)) * n - m * (float)Math.Sin(degree), 0,
-            l*(1 - (float)Math.Cos(degree))*m - n*(float)Math.Sin(degree), m*m + (float)Math.Cos(degree) * (1 - m*m), m*(1 - (float)Math.Cos(degree)) * n + l* (float)Math.Sin(degree), 0,
-            l * (1 - (float)Math.Cos(degree))*n + m * (float)Math.Sin(degree), m * (1 - (float)Math.Cos(degree)) * n - l*(float)Math.Sin(degree), n * n + (float)Math.Cos(degree) * (1 - n * n), 0,
-            0, 0, 0, 1});
-            Rotate(scaleMatrix);
-        }
     }
 }

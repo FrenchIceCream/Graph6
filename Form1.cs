@@ -692,8 +692,7 @@ namespace Graph6
 
         private void button13_Click(object sender, EventArgs e)
         {
-            //_viewer.RotateRight();
-            _viewer.Rotate2(_currentShape);
+            _viewer.RotateRight();
             ViewShapes();
         }
 
