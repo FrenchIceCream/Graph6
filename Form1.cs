@@ -1,5 +1,8 @@
 using Newtonsoft.Json;
 using org.mariuszgromada.math.mxparser;
+using System;
+using System.Diagnostics;
+using System.Numerics;
 
 namespace Graph6
 {
@@ -182,13 +185,14 @@ namespace Graph6
             float n = vector.Z / length;
 
             //Ужас, но работает
-            MyMatrix scaleMatrix = new MyMatrix(4, 4, new float[]
+            MyMatrix mat = new MyMatrix(4, 4, new float[]
             {l*l + (float)Math.Cos(degree)*(1 - l*l), l*(1 - (float)Math.Cos(degree))*m + n*(float)Math.Sin(degree), l * (1 - (float)Math.Cos(degree)) * n - m * (float)Math.Sin(degree), 0,
             l*(1 - (float)Math.Cos(degree))*m - n*(float)Math.Sin(degree), m*m + (float)Math.Cos(degree) * (1 - m*m), m*(1 - (float)Math.Cos(degree)) * n + l* (float)Math.Sin(degree), 0,
             l * (1 - (float)Math.Cos(degree))*n + m * (float)Math.Sin(degree), m * (1 - (float)Math.Cos(degree)) * n - l*(float)Math.Sin(degree), n * n + (float)Math.Cos(degree) * (1 - n * n), 0,
             0, 0, 0, 1});
 
-            TurnShape(scaleMatrix, ref _currentShape);
+            _currentShape.MatrixToWorld = _currentShape.MatrixToWorld * mat;
+            //TurnShape(mat, ref _currentShape);
 
             ViewShapes();
         }
@@ -216,8 +220,7 @@ namespace Graph6
 
         public void TurnShape(MyMatrix mat, ref Shape shape)
         {
-
-
+            //_currentShape.MatrixToWorld = _currentShape.MatrixToWorld * mat;
             for (int i = 0; i < _currentShape.Points.Count; i++)
             {
                 MyPoint point = _currentShape.Points[i];
@@ -243,14 +246,15 @@ namespace Graph6
 
             MyMatrix transformMatrix = toCenter * mat * fromCenter;
 
-            shape.MatrixToWorld = shape.MatrixToWorld * transformMatrix;
-            /*for (int i = 0; i < shape.Points.Count; i++)
+            //shape.MatrixToWorld = shape.MatrixToWorld * transformMatrix;
+            
+            for (int i = 0; i < shape.Points.Count; i++)
             {
                 MyPoint point = shape.Points[i];
                 MyMatrix point_matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
                 var res = point_matrix * transformMatrix;
                 shape.Points[i] = new MyPoint(res.matrix[0, 0], res.matrix[0, 1], res.matrix[0, 2]);
-            }*/
+            }
         }
 
         private void ParallelButton_Click(object sender, EventArgs e)
@@ -478,7 +482,7 @@ namespace Graph6
                 solid_shape.Points.Add(new MyPoint(_solidOfRevolution[i].X - Canvas.Width / 2, (_solidOfRevolution[i].Y - Canvas.Height / 2) * (-1), 0));
             }
             _currentShape = new Shape(solid_shape);
-
+            SelectShape(_currentShape);
             //угол поворота
             int sections = int.Parse(NumOfSections.Text);
             float deg = (360 / sections) * (float)(Math.PI / 180);
@@ -522,7 +526,7 @@ namespace Graph6
                 {
                     _currentShape.Points.Add(solid_shape.Points[j]);
                     _currentShape.Faces.Add(new List<int> { (i - 1) * c + j, i * c + j, i * c + j - 1 });  //точка на предыдущей итерации + текующая точка + точка перед текущей
-                    _currentShape.Faces.Add(new List<int> { (i - 1) * c + j, (i - 1) * c + j - 1, i * c + j - 1 }); //точка на предыдущей итерации + точка перед ней + точка перед текущей
+                    _currentShape.Faces.Add(new List<int> { (i - 1) * c + j, i * c + j - 1, (i - 1) * c + j - 1 }); //точка на предыдущей итерации + точка перед текущей + точка перед ней 
                 }
             }
 
@@ -533,8 +537,54 @@ namespace Graph6
         //TODO
         private void RemoveEdgesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            //Shape shape = new Shape(_currentShape);
-            //_graphics.Clear(Color.White);
+            Shape shape = new Shape(_currentShape);
+            _graphics.Clear(Color.White);
+
+            var mat = _currentShape.MatrixToWorld * _viewer.ToCameraCoordinates;
+
+            foreach (var face in shape.Faces)
+            {
+                var pp1 = new MyMatrix(1, 4, new float[] { shape.Points[face[0]].X, shape.Points[face[0]].Y, shape.Points[face[0]].Z, 1 }) * mat;
+                var pp2 = new MyMatrix(1, 4, new float[] { shape.Points[face[1]].X, shape.Points[face[1]].Y, shape.Points[face[1]].Z, 1 }) * mat;
+                var pp3 = new MyMatrix(1, 4, new float[] { shape.Points[face[2]].X, shape.Points[face[2]].Y, shape.Points[face[2]].Z, 1 }) * mat;
+
+                var p1 = new MyPoint(pp1[0,0], pp1[0, 1], pp1[0, 2]);
+                var p2 = new MyPoint(pp2[0, 0], pp2[0, 1], pp2[0, 2]);
+                var p3 = new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
+
+                //since encoding acts weirdly when I commit to github, I'll leave a comment in English
+                //got it from some article on calculating a surface normal - it works given that polygon is a triangle
+                float nx = (p2.Y - p1.Y) * (p3.Z - p1.Z) - (p2.Z - p1.Z) * (p3.Y - p1.Y);
+                float ny = (p2.Z - p1.Z) * (p3.X - p1.X) - (p2.X - p1.X) * (p3.Z - p1.Z);
+                float nz = (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
+
+                var center = shape.GetCenter();
+                Vector3 vec = new Vector3(_viewer.Position.X - center.X, _viewer.Position.Y - center.Y, _viewer.Position.Z - center.Z);
+                Vector3 normal = new Vector3(nx, ny, nz);
+                Vector3 normal_check = new Vector3(center.X, center.Y, center.Z);
+
+
+                //if ((normal - normal_check).Length() < (- normal + normal_check).Length())
+                //{
+                //    normal = -normal;
+                //}
+
+                var cross = Vector3.Cross(vec, normal);
+                var dot = Vector3.Dot(vec, normal);
+
+                var angle = Math.PI - Math.Atan2(cross.Length(), dot);
+                angle = angle * 360 / (2 * Math.PI);
+                //Debug.WriteLine((float)angle);
+
+                var pen = new Pen(Color.Red);
+                if (angle < 90)
+                {
+                    for (int i = 1; i < face.Count; ++i)
+                        _graphics.DrawLine(pen, new Point((int)shape.Points[face[i - 1]].X, (int)shape.Points[face[i - 1]].Y), new Point((int)shape.Points[face[i]].X, (int)shape.Points[face[i]].Y));
+
+                    _graphics.DrawLine(pen, new Point((int)shape.Points[face[face.Count - 1]].X, (int)shape.Points[face[face.Count - 1]].Y), new Point((int)shape.Points[face[0]].X, (int)shape.Points[face[0]].Y));
+                }
+            }
         }
 
         private void HideCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -544,10 +594,12 @@ namespace Graph6
 
         private void Form1_ResizeEnd(object sender, EventArgs e)
         {
+            /*
             _graphics = Canvas.CreateGraphics();
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
             _viewer.Graphics = _graphics;
             ViewShapes();
+            */
         }
 
         private void Form1_KeyPress(object sender, KeyEventArgs e)
