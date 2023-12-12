@@ -478,9 +478,8 @@ namespace Graph6
 
             solid_shape.Points.Add(new MyPoint(_solidOfRevolution[0].X - Canvas.Width / 2, (_solidOfRevolution[0].Y - Canvas.Height / 2) * (-1), 0));
             for (int i = 1; i < _solidOfRevolution.Count; i++)
-            {
                 solid_shape.Points.Add(new MyPoint(_solidOfRevolution[i].X - Canvas.Width / 2, (_solidOfRevolution[i].Y - Canvas.Height / 2) * (-1), 0));
-            }
+
             _currentShape = new Shape(solid_shape);
             SelectShape(_currentShape);
             //угол поворота
@@ -510,7 +509,7 @@ namespace Graph6
             float m = vector.Y / length;
             float n = vector.Z / length;
 
-            MyMatrix scaleMatrix = new MyMatrix(4, 4, new float[]
+            MyMatrix mat = new MyMatrix(4, 4, new float[]
             {l*l + (float)Math.Cos(deg)*(1 - l*l), l*(1 - (float)Math.Cos(deg))*m + n*(float)Math.Sin(deg), l * (1 - (float)Math.Cos(deg)) * n - m * (float)Math.Sin(deg), 0,
             l*(1 - (float)Math.Cos(deg))*m - n*(float)Math.Sin(deg), m*m + (float)Math.Cos(deg) * (1 - m*m), m*(1 - (float)Math.Cos(deg)) * n + l* (float)Math.Sin(deg), 0,
             l * (1 - (float)Math.Cos(deg))*n + m * (float)Math.Sin(deg), m * (1 - (float)Math.Cos(deg)) * n - l*(float)Math.Sin(deg), n * n + (float)Math.Cos(deg) * (1 - n * n), 0,
@@ -520,18 +519,30 @@ namespace Graph6
 
             for (int i = 1; i < sections; i++)
             {
-                TurnShape(scaleMatrix, ref solid_shape);
+                TurnShape(mat, ref solid_shape);
                 _currentShape.Points.Add(solid_shape.Points[0]);
                 for (int j = 1; j < c; j++)
                 {
                     _currentShape.Points.Add(solid_shape.Points[j]);
-                    _currentShape.Faces.Add(new List<int> { (i - 1) * c + j, i * c + j, i * c + j - 1 });  //точка на предыдущей итерации + текующая точка + точка перед текущей
-                    _currentShape.Faces.Add(new List<int> { (i - 1) * c + j, i * c + j - 1, (i - 1) * c + j - 1 }); //точка на предыдущей итерации + точка перед текущей + точка перед ней 
+                    var l1 = new List<int> { i * c + j - 1, i * c + j, (i - 1) * c + j };
+                    var l2 = new List<int> { (i - 1) * c + j - 1, i * c + j - 1, (i - 1) * c + j };
+
+
+                    _currentShape.Faces.Add(l1);  //точка перед текущей  + текующая точка + точка на предыдущей итерации
+                    if (!l1.SequenceEqual(l2))
+                        _currentShape.Faces.Add(l2); //точка перед ней + точка перед текущей + точка на предыдущей итерации 
                 }
             }
 
-            for (int j = 1; j < c; j++)
-                _currentShape.Faces.Add(new List<int> { j, (sections - 1) * c + j - 1, (sections - 1) * c + j });
+            //Pen p = new Pen(Color.Green, 4);
+            //for (int j = 1; j < c; j++)
+            //{
+            //    _graphics.DrawLine(p, _currentShape.Points[j].X, _currentShape.Points[j].Y, _currentShape.Points[(sections - 1) * c + j - 1].X, _currentShape.Points[(sections - 1) * c + j - 1].Y);
+            //    _graphics.DrawLine(p,_currentShape.Points[(sections - 1) * c + j - 1].X, _currentShape.Points[(sections - 1) * c + j - 1].Y, _currentShape.Points[(sections - 1) * c + j].X, _currentShape.Points[(sections - 1) * c + j].Y);
+            //    _currentShape.Faces.Add(new List<int> { j, (sections - 1) * c + j - 1, (sections - 1) * c + j });
+            //}
+
+            //Debug.WriteLine(_currentShape.GetCenter());
         }
 
         //TODO
@@ -544,13 +555,13 @@ namespace Graph6
 
             foreach (var face in shape.Faces)
             {
-                var pp1 = new MyMatrix(1, 4, new float[] { shape.Points[face[0]].X, shape.Points[face[0]].Y, shape.Points[face[0]].Z, 1 }) * mat;
-                var pp2 = new MyMatrix(1, 4, new float[] { shape.Points[face[1]].X, shape.Points[face[1]].Y, shape.Points[face[1]].Z, 1 }) * mat;
-                var pp3 = new MyMatrix(1, 4, new float[] { shape.Points[face[2]].X, shape.Points[face[2]].Y, shape.Points[face[2]].Z, 1 }) * mat;
+                var pp1 = new MyMatrix(1, 4, new float[] { shape.Points[face[0]].X, shape.Points[face[0]].Y, shape.Points[face[0]].Z, 1 })/* * mat*/;
+                var pp2 = new MyMatrix(1, 4, new float[] { shape.Points[face[1]].X, shape.Points[face[1]].Y, shape.Points[face[1]].Z, 1 })/* * mat*/;
+                var pp3 = new MyMatrix(1, 4, new float[] { shape.Points[face[2]].X, shape.Points[face[2]].Y, shape.Points[face[2]].Z, 1 })/* * mat*/;
 
-                var p1 = new MyPoint(pp1[0,0], pp1[0, 1], pp1[0, 2]);
+                var p1 = new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
                 var p2 = new MyPoint(pp2[0, 0], pp2[0, 1], pp2[0, 2]);
-                var p3 = new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
+                var p3 = new MyPoint(pp1[0, 0], pp1[0, 1], pp1[0, 2]);
 
                 //since encoding acts weirdly when I commit to github, I'll leave a comment in English
                 //got it from some article on calculating a surface normal - it works given that polygon is a triangle
@@ -559,9 +570,20 @@ namespace Graph6
                 float nz = (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
 
                 var center = shape.GetCenter();
-                Vector3 vec = new Vector3(_viewer.Position.X - center.X, _viewer.Position.Y - center.Y, _viewer.Position.Z - center.Z);
+                Vector3 vec = new Vector3(0 - center.X, 0 - center.Y, -200 - center.Z); //ВОТ ТУТ ПОМЕНЯЛ С CAMPOSITION
                 Vector3 normal = new Vector3(nx, ny, nz);
-                Vector3 normal_check = new Vector3(center.X, center.Y, center.Z);
+                normal = Vector3.Normalize(normal);
+                //normal = new Vector3();
+
+                float c_x = (pp1[0,0] + pp2[0, 0] + pp3[0, 0]) / 3;
+                float c_y = (pp1[0, 1] + pp2[0, 1] + pp3[0, 1]) / 3; ;
+
+                if (face == shape.Faces[0])
+                {
+                    _graphics.DrawLine(new Pen(Color.Blue), c_x, c_y, normal.X, normal.Y);
+                    _graphics.DrawRectangle(new Pen(Color.CadetBlue), normal.X, normal.Y, 4, 4);
+                    _graphics.DrawRectangle(new Pen(Color.Green), center.X, center.Y, 4, 4);
+                }
 
 
                 //if ((normal - normal_check).Length() < (- normal + normal_check).Length())

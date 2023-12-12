@@ -46,6 +46,11 @@
         {
             return new MyPoint(0, 0, 0);
         }
+
+        public override string ToString()
+        {
+            return $"<yPoint: {this.X}; {this.Y}; {this.Z}";
+        }
     }
     public class Shape
     {
@@ -374,7 +379,7 @@
                 new List<int>{ 2, 0, 3 },
                 new List<int>{ 3, 4, 5 },
                 new List<int>{ 1, 5, 4 },
-                new List<int>{ 5, 2, 1 },
+                new List<int>{ 2, 5, 1 },
                 new List<int>{ 2, 3, 5 },
             };
                 return new(points, faces);
