@@ -246,15 +246,16 @@ namespace Graph6
 
             MyMatrix transformMatrix = toCenter * mat * fromCenter;
 
-            //shape.MatrixToWorld = shape.MatrixToWorld * transformMatrix;
+            shape.MatrixToWorld = shape.MatrixToWorld * transformMatrix;
             
+            /*
             for (int i = 0; i < shape.Points.Count; i++)
             {
                 MyPoint point = shape.Points[i];
                 MyMatrix point_matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
                 var res = point_matrix * transformMatrix;
                 shape.Points[i] = new MyPoint(res.matrix[0, 0], res.matrix[0, 1], res.matrix[0, 2]);
-            }
+            }*/
         }
 
         private void ParallelButton_Click(object sender, EventArgs e)
@@ -533,6 +534,15 @@ namespace Graph6
                 }
             }
 
+            for (int j = 1; j < c; j++)
+            {
+                var l1 = new List<int> { (sections - 1) * c + j, (sections - 1) * c + j - 1, j };
+                var l2 = new List<int> { (sections - 1) * c + j, j, j + 1 };
+                _currentShape.Faces.Add(new Face(l1));
+                if (!l1.SequenceEqual(l2))
+                    _currentShape.Faces.Add(new Face(l2));
+            }    
+
             //Pen p = new Pen(Color.Green, 4);
             //for (int j = 1; j < c; j++)
             //{
@@ -544,7 +554,6 @@ namespace Graph6
             //Debug.WriteLine(_currentShape.GetCenter());
         }
 
-        //TODO
         private void RemoveEdgesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             Shape shape = new Shape(_currentShape);
@@ -554,9 +563,12 @@ namespace Graph6
 
             foreach (var face in shape.Faces)
             {
-                var pp1 = new MyMatrix(1, 4, new float[] { shape.Points[face[0]].X, shape.Points[face[0]].Y, shape.Points[face[0]].Z, 1 })/* * mat*/;
-                var pp2 = new MyMatrix(1, 4, new float[] { shape.Points[face[1]].X, shape.Points[face[1]].Y, shape.Points[face[1]].Z, 1 })/* * mat*/;
-                var pp3 = new MyMatrix(1, 4, new float[] { shape.Points[face[2]].X, shape.Points[face[2]].Y, shape.Points[face[2]].Z, 1 })/* * mat*/;
+                var pp1 = new MyMatrix(1, 4, new float[] { shape.Points[face[0]].X, shape.Points[face[0]].Y, shape.Points[face[0]].Z, 1 }) * mat;
+                var pp2 = new MyMatrix(1, 4, new float[] { shape.Points[face[1]].X, shape.Points[face[1]].Y, shape.Points[face[1]].Z, 1 }) * mat;
+                var pp3 = new MyMatrix(1, 4, new float[] { shape.Points[face[2]].X, shape.Points[face[2]].Y, shape.Points[face[2]].Z, 1 }) * mat;
+
+                Debug.WriteLine("Old: " + shape.Points[face[0]].X + " " + shape.Points[face[0]].Y + " " + shape.Points[face[0]].Z);
+                Debug.WriteLine("New: " + pp1[0, 0] + " "+ pp1[0,1] + " " + pp1[0,2]);
 
                 var p1 = new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
                 var p2 = new MyPoint(pp2[0, 0], pp2[0, 1], pp2[0, 2]);
@@ -568,27 +580,12 @@ namespace Graph6
                 float ny = (p2.Z - p1.Z) * (p3.X - p1.X) - (p2.X - p1.X) * (p3.Z - p1.Z);
                 float nz = (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
 
+                var cam_pos = _viewer.Position;
+
                 var center = shape.GetCenter();
-                Vector3 vec = new Vector3(0 - center.X, 0 - center.Y, -200 - center.Z); //ВОТ ТУТ ПОМЕНЯЛ С CAMPOSITION
+                Vector3 vec = new Vector3(0 - center.X,0 - center.Y, 200 - center.Z);
                 Vector3 normal = new Vector3(nx, ny, nz);
                 normal = Vector3.Normalize(normal);
-                //normal = new Vector3();
-
-                float c_x = (pp1[0,0] + pp2[0, 0] + pp3[0, 0]) / 3;
-                float c_y = (pp1[0, 1] + pp2[0, 1] + pp3[0, 1]) / 3; ;
-
-                if (face == shape.Faces[0])
-                {
-                    _graphics.DrawLine(new Pen(Color.Blue), c_x, c_y, normal.X, normal.Y);
-                    _graphics.DrawRectangle(new Pen(Color.CadetBlue), normal.X, normal.Y, 4, 4);
-                    _graphics.DrawRectangle(new Pen(Color.Green), center.X, center.Y, 4, 4);
-                }
-
-
-                //if ((normal - normal_check).Length() < (- normal + normal_check).Length())
-                //{
-                //    normal = -normal;
-                //}
 
                 var cross = Vector3.Cross(vec, normal);
                 var dot = Vector3.Dot(vec, normal);
@@ -600,10 +597,9 @@ namespace Graph6
                 var pen = new Pen(Color.Red);
                 if (angle < 90)
                 {
-                    for (int i = 1; i < face.Count; ++i)
-                        _graphics.DrawLine(pen, new Point((int)shape.Points[face[i - 1]].X, (int)shape.Points[face[i - 1]].Y), new Point((int)shape.Points[face[i]].X, (int)shape.Points[face[i]].Y));
-
-                    _graphics.DrawLine(pen, new Point((int)shape.Points[face[face.Count - 1]].X, (int)shape.Points[face[face.Count - 1]].Y), new Point((int)shape.Points[face[0]].X, (int)shape.Points[face[0]].Y));
+                    _graphics.DrawLine(pen, new Point((int)p1.X, (int)p1.Y), new Point((int)p2.X, (int)p2.Y));
+                    _graphics.DrawLine(pen, new Point((int)p2.X, (int)p2.Y), new Point((int)p3.X, (int)p3.Y));
+                    _graphics.DrawLine(pen, new Point((int)p1.X, (int)p1.Y), new Point((int)p3.X, (int)p3.Y));
                 }
             }
         }
