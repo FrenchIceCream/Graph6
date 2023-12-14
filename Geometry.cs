@@ -1,4 +1,7 @@
-﻿namespace Graph6
+﻿using System;
+using System.Runtime.CompilerServices;
+
+namespace Graph6
 {
     public class MyPoint
     {
@@ -52,12 +55,45 @@
             return $"<yPoint: {this.X}; {this.Y}; {this.Z}";
         }
     }
+
+
+
+    public class Face
+    {
+        private readonly List<int> _indexes = new();
+        private readonly Color _color;
+        public int this[int index] => _indexes[index];
+        public Color Color => _color;
+        public int Count => _indexes.Count;
+        //TODO сделать текстурку.
+
+        public Face(List<int> indexes)
+        {
+            _indexes = indexes;
+            _color = Utilities.RandomColor();
+        }
+        public Face(List<int> indexes, Color color) : this(indexes)
+        {
+            _color = color;
+        }
+        public bool SequenceEqual(Face face) => _indexes.SequenceEqual(face._indexes);
+
+        public int Last() => _indexes[^1];
+        public int First() => _indexes[0];
+    }
+
+
+
+
+
+
+
     public class Shape
     {
         public string Id { get; private set; }
 
         public List<MyPoint> Points { get; private set; } = new();
-        public List<List<int>> Faces { get; private set; } = new();
+        public List<Face> Faces { get; private set; } = new();
         public List<float> Normals { get; private set; } = new();
         public MyMatrix MatrixToWorld { get; set; } = new(4, 4, new float[] {
             1, 0, 0, 0,
@@ -67,7 +103,7 @@
 
         public bool IsEmpty => Points.Count == 0;
 
-        public Shape(List<MyPoint> point, List<List<int>> faces)
+        public Shape(List<MyPoint> point, List<Face> faces)
         {
             Id = GenerateUniqueId();
             Points = point;
@@ -78,7 +114,7 @@
         {
             Id = anotherShape.Id;
             Points = new List<MyPoint>(anotherShape.Points);
-            Faces = new List<List<int>>(anotherShape.Faces);
+            Faces = new List<Face>(anotherShape.Faces);
         }
 
         public MyPoint GetCenter()
@@ -107,7 +143,7 @@
     }
     public class Cube : Shape
     {
-        public Cube(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
+        public Cube(List<MyPoint> point, List<Face> faces) : base(point, faces)
         {
         }
 
@@ -118,7 +154,7 @@
     }
     public class Icosahedron : Shape
     {
-        public Icosahedron(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
+        public Icosahedron(List<MyPoint> point, List<Face> faces) : base(point, faces)
         {
         }
 
@@ -129,7 +165,7 @@
     }
     public class Dodecahedron : Shape
     {
-        public Dodecahedron(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
+        public Dodecahedron(List<MyPoint> point, List<Face> faces) : base(point, faces)
         {
         }
 
@@ -140,7 +176,7 @@
     }
     public class Tetrahedron : Shape
     {
-        public Tetrahedron(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
+        public Tetrahedron(List<MyPoint> point, List<Face> faces) : base(point, faces)
         {
         }
 
@@ -151,7 +187,7 @@
     }
     public class Octahedron : Shape
     {
-        public Octahedron(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
+        public Octahedron(List<MyPoint> point, List<Face> faces) : base(point, faces)
         {
         }
 
@@ -162,7 +198,7 @@
     }
     public class FunctionShape : Shape
     {
-        public FunctionShape(List<MyPoint> point, List<List<int>> faces) : base(point, faces)
+        public FunctionShape(List<MyPoint> point, List<Face> faces) : base(point, faces)
         {
 
         }
@@ -174,9 +210,9 @@
 
     public static class Shapes
     {
-            public static Cube Cube()
-            {
-                List<MyPoint> points = new List<MyPoint>
+        public static Cube Cube()
+        {
+            List<MyPoint> points = new List<MyPoint>
             {
                 new MyPoint(-20, -20, 20),
                 new MyPoint(20, -20, 20),
@@ -188,24 +224,24 @@
                 new MyPoint(20, 20, 60)
             };
 
-                List<List<int>> faces = new List<List<int>>
+            List<Face> faces = new List<Face>
             {
-                new List<int>{ 0, 3, 1},
-                 new List<int>{ 3, 6, 1},
-                 new List<int>{ 1, 4, 0},
-                 new List<int>{ 4, 2, 0 },
-                 new List<int>{ 2, 5, 0 },
-                 new List<int>{ 5, 3, 0 },
-                 new List<int>{ 1, 6, 4 },
-                 new List<int>{ 6, 7, 4 },
-                 new List<int>{ 7, 6, 5 },
-                 new List<int>{ 6, 3, 5 },
-                 new List<int>{ 7, 5, 2 },
-                 new List<int>{ 4, 7, 2 }
+                 new(new List<int>{ 0, 3, 1 }),
+                 new(new List<int>{ 3, 6, 1 }),
+                 new(new List<int>{ 1, 4, 0 }),
+                 new(new List<int>{ 4, 2, 0 }),
+                 new(new List<int>{ 2, 5, 0 }),
+                 new(new List<int>{ 5, 3, 0 }),
+                 new(new List<int>{ 1, 6, 4 }),
+                 new(new List<int>{ 6, 7, 4 }),
+                 new(new List<int>{ 7, 6, 5 }),
+                 new(new List<int>{ 6, 3, 5 }),
+                 new(new List<int>{ 7, 5, 2 }),
+                 new(new List<int>{ 4, 7, 2 }),
             };
 
-                return new(points, faces);
-            }
+            return new(points, faces);
+        }
         //cube made out of rectangles
         /*
         new List<int>{ 0, 1, 6, 3},
@@ -341,27 +377,27 @@
         */
 
         public static Tetrahedron Tetrahedron()
-            {
-                float h = (float)Math.Sqrt(3) * 50;
-                List<MyPoint> points = new()
+        {
+            float h = (float)Math.Sqrt(3) * 50;
+            List<MyPoint> points = new()
             {
                 new MyPoint(-50, -h / 3, 20),
                 new MyPoint(50, -h / 3, 20),
                 new MyPoint(0, 2 * h / 3, 20),
                 new MyPoint(0, 0, 25 * (float)Math.Sqrt(13)),
             };
-                List<List<int>> faces = new List<List<int>>
+            List<Face> faces = new List<Face>
             {
-                new List<int> { 1, 2, 0 },
-                new List<int> { 0, 2, 3 },
-                new List<int> { 3, 1, 0},
-                new List<int> { 3, 2, 1 }
+                new(new List<int> { 1, 2, 0 }),
+                new(new List<int> { 0, 2, 3 }),
+                new(new List<int> { 3, 1, 0}),
+                new(new List<int> { 3, 2, 1 })
             };
-                return new(points, faces);
-            }
-            public static Octahedron Octahedron()
-            {
-                List<MyPoint> points = new List<MyPoint>
+            return new(points, faces);
+        }
+        public static Octahedron Octahedron()
+        {
+            List<MyPoint> points = new List<MyPoint>
             {
                 new MyPoint(0, 0, 30),
                 new MyPoint(-30, 0, 0),
@@ -371,23 +407,23 @@
                 new MyPoint(0, 0, -30)
             };
 
-                List<List<int>> faces = new List<List<int>>
+            List<Face> faces = new List<Face>
             {
-                new List<int>{ 1, 4, 0 },
-                new List<int>{ 0, 4, 3 },
-                new List<int>{ 0, 2, 1 },
-                new List<int>{ 2, 0, 3 },
-                new List<int>{ 3, 4, 5 },
-                new List<int>{ 1, 5, 4 },
-                new List<int>{ 2, 5, 1 },
-                new List<int>{ 2, 3, 5 },
+                new(new List<int>{ 1, 4, 0 }),
+                new(new List<int>{ 0, 4, 3 }),
+                new(new List<int>{ 0, 2, 1 }),
+                new(new List<int>{ 2, 0, 3 }),
+                new(new List<int>{ 3, 4, 5 }),
+                new(new List<int>{ 1, 5, 4 }),
+                new(new List<int>{ 2, 5, 1 }),
+                new(new List<int>{ 2, 3, 5 }),
             };
-                return new(points, faces);
-            }
+            return new(points, faces);
+        }
 
-            public static Shape Empty()
-            {
-                return new Shape(new List<MyPoint>(), new List<List<int>>());
-            }
+        public static Shape Empty()
+        {
+            return new Shape(new List<MyPoint>(), new List<Face>());
+        }
     }
 }

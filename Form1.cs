@@ -388,7 +388,7 @@ namespace Graph6
 
             List<MyPoint> Points = new();
 
-            List<List<int>> Faces = new();
+            List<Face> Faces = new();
 
             double XT, YT;
             int i, j;
@@ -402,11 +402,11 @@ namespace Graph6
                     Points.Add(new MyPoint((float)XT, (float)YT, (float)expr.calculate() + 15));
                     if (j != 0)
                     {
-                        Faces.Add(new List<int> { Points.Count - 1, Points.Count - 2 });
+                        Faces.Add(new(new List<int> { Points.Count - 1, Points.Count - 2 }));
                     }
                     if (i != 0)
                     {
-                        Faces.Add(new List<int> { Points.Count - 1, Points.Count - 2 - itemsInRow });
+                        Faces.Add(new(new List<int> { Points.Count - 1, Points.Count - 2 - itemsInRow }));
                     }
                 }
 
@@ -524,9 +524,8 @@ namespace Graph6
                 for (int j = 1; j < c; j++)
                 {
                     _currentShape.Points.Add(solid_shape.Points[j]);
-                    var l1 = new List<int> { i * c + j - 1, i * c + j, (i - 1) * c + j };
-                    var l2 = new List<int> { (i - 1) * c + j - 1, i * c + j - 1, (i - 1) * c + j };
-
+                    var l1 = new Face(new List<int> { i * c + j - 1, i * c + j, (i - 1) * c + j });
+                    var l2 = new Face(new List<int> { (i - 1) * c + j - 1, i * c + j - 1, (i - 1) * c + j });
 
                     _currentShape.Faces.Add(l1);  //точка перед текущей  + текующая точка + точка на предыдущей итерации
                     if (!l1.SequenceEqual(l2))
@@ -611,7 +610,17 @@ namespace Graph6
 
         private void HideCheckBox_CheckedChanged(object sender, EventArgs e)
         {
+            Shape shape = new Shape(_currentShape);
+            
 
+            foreach (var face in shape.Faces)
+            {
+                var start = _viewer.ToIsometric(shape, shape.Points[face[0]]);
+                for (int i = 1; i < face.Count; i++)
+                {
+                    
+                }
+            }
         }
 
         private void Form1_ResizeEnd(object sender, EventArgs e)

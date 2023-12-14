@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Drawing;
 using System.Xml.Serialization;
 
@@ -101,6 +102,14 @@ namespace Graph6
                 mat21 = mat21 * shape.MatrixToWorld * this.ToCameraCoordinates;
                 _graphics.DrawLine(_pen, mat11[0, 0], mat11[0, 1], mat21[0, 0], mat21[0, 1]);
             }
+        }
+
+
+        public PointF ToIsometric(Shape shape, MyPoint point)
+        {
+            var matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
+            matrix = matrix * shape.MatrixToWorld * ToCameraCoordinates;
+            return new(matrix[0,0], matrix[0, 1]);
         }
 
         private void Perspective(Shape shape)
