@@ -32,16 +32,8 @@ namespace Graph6
             _graphics = Canvas.CreateGraphics();
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
             _graphics.ScaleTransform(1, -1);
-
-
-            Canvas.MouseMove += OnMouseMove;
             _viewer = new Viewer(_graphics, Projection.Isometric);
             _currentShape = Shapes.Empty();
-        }
-
-        private void OnMouseMove(object? sender, MouseEventArgs e)
-        {
-            Text = $"Mouse Coordinates: X={Canvas.Width / 2 - e.X}, Y={Canvas.Height / 2 - e.Y}";
         }
 
         private void InitListsAndBoxes()
@@ -258,7 +250,7 @@ namespace Graph6
             MyMatrix transformMatrix = toCenter * mat * fromCenter;
 
             shape.MatrixToWorld = shape.MatrixToWorld * transformMatrix;
-            
+
             /*
             for (int i = 0; i < shape.Points.Count; i++)
             {
@@ -552,7 +544,7 @@ namespace Graph6
                 _currentShape.Faces.Add(new Face(l1));
                 if (!l1.SequenceEqual(l2))
                     _currentShape.Faces.Add(new Face(l2));
-            }    
+            }
 
             //Pen p = new Pen(Color.Green, 4);
             //for (int j = 1; j < c; j++)
@@ -574,7 +566,7 @@ namespace Graph6
             var pen = new Pen(Color.Red);
             foreach (var face in shape.Faces)
             {
-                var result = IsDrawable(face, matrix, shape);
+                var result = IsVisible(face, matrix, shape);
                 if (result.Item4)
                 {
                     var p1 = result.Item1;
@@ -584,19 +576,19 @@ namespace Graph6
                     _graphics.DrawLine(pen, new Point((int)p2.X, (int)p2.Y), new Point((int)p3.X, (int)p3.Y));
                     _graphics.DrawLine(pen, new Point((int)p1.X, (int)p1.Y), new Point((int)p3.X, (int)p3.Y));
                 }
-                
+
             }
         }
 
 
-        private (MyPoint, MyPoint, MyPoint, bool) IsDrawable(Face face, MyMatrix matrix, Shape shape)
+        private (MyPoint, MyPoint, MyPoint, bool) IsVisible(Face face, MyMatrix matrix, Shape shape)
         {
             var pp1 = new MyMatrix(1, 4, new float[] { shape.Points[face[0]].X, shape.Points[face[0]].Y, shape.Points[face[0]].Z, 1 }) * matrix;
             var pp2 = new MyMatrix(1, 4, new float[] { shape.Points[face[1]].X, shape.Points[face[1]].Y, shape.Points[face[1]].Z, 1 }) * matrix;
             var pp3 = new MyMatrix(1, 4, new float[] { shape.Points[face[2]].X, shape.Points[face[2]].Y, shape.Points[face[2]].Z, 1 }) * matrix;
 
-            Debug.WriteLine("Old: " + shape.Points[face[0]].X + " " + shape.Points[face[0]].Y + " " + shape.Points[face[0]].Z);
-            Debug.WriteLine("New: " + pp1[0, 0] + " " + pp1[0, 1] + " " + pp1[0, 2]);
+            //Debug.WriteLine("Old: " + shape.Points[face[0]].X + " " + shape.Points[face[0]].Y + " " + shape.Points[face[0]].Z);
+            //Debug.WriteLine("New: " + pp1[0, 0] + " " + pp1[0, 1] + " " + pp1[0, 2]);
 
             var p1 = new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
             var p2 = new MyPoint(pp2[0, 0], pp2[0, 1], pp2[0, 2]);
@@ -645,13 +637,13 @@ namespace Graph6
             Bitmap bitmap = new Bitmap(Canvas.Width, Canvas.Height);
             var rectangles = new List<(Rectangle, Color)>();
             var k = 0;
-            foreach ( var shape in _shapes)
+            foreach (var shape in _shapes)
             {
                 var matrix = shape.MatrixToWorld * _viewer.ToCameraCoordinates;
                 for (int j = 0; j < shape.Faces.Count; ++j) //В данном случае face - треугольник
                 {
                     var face = shape.Faces[j];
-                    var result = IsDrawable(face, matrix, shape);
+                    var result = IsVisible(face, matrix, shape);
                     if (!result.Item4)
                         continue;
 
@@ -664,7 +656,7 @@ namespace Graph6
                     for (int i = 0; i < face.Count; ++i)
                     {
                         var point = shape.Points[face[i]];
-                        points.Add((_viewer.ToIsometric(shape, point), point.Z));
+                        points.Add((_viewer.ToScreen(shape, point), point.Z));
                     }
                     var p0 = points[0];
                     var point0 = p0.Item1;
@@ -710,6 +702,7 @@ namespace Graph6
 
                     var width = Canvas.Width / 2;
                     var height = Canvas.Height / 2;
+                    //Debug.WriteLine("АКУАЦУКАУЦ");
                     for (int y = (int)minY; y <= maxY; ++y)
                     {
                         for (int x = (int)minX; x <= maxX; ++x)
@@ -723,10 +716,13 @@ namespace Graph6
                                 {
                                     float z = z0 + (deltaZ0 * w1) + (deltaZ1 * w2);
 
-                                    if (z < zBuffer[width + x, height - y])
+                                    var newX = width + x + (int)oldPoint0.X;
+                                    var newY = height - (y + (int)oldPoint0.Y);
+                                    //Debug.WriteLine($"{z}");
+                                    if (z < zBuffer[newX, newY])
                                     {
-                                        zBuffer[width + x, height - y] = z;
-                                        bitmap.SetPixel(width + x+(int)oldPoint0.X, height - (y + (int)oldPoint0.Y), face.Color);
+                                        zBuffer[newX, newY] = z;
+                                        bitmap.SetPixel(newX, newY, face.Color);
                                     }
                                 }
                             }
@@ -734,25 +730,30 @@ namespace Graph6
                         }
                     }
 
-                    Canvas.Image = bitmap;
-                    Canvas.Update();
-                    for (int q = 0; q < values.Count(); ++q)
-                    {
-                        values[q] = values[q].Difference(new Point(-200, -200));
-                    }
-                    brush.Color = face.Color;
-                    _graphics.FillPolygon(brush, values);
-                    _graphics.DrawRectangle(_pen, new Rectangle((int)minX + 200, (int)minY + 200, Math.Abs((int)(minX - maxX)), Math.Abs((int)(minY - maxY))));
-                    Thread.Sleep(1000);
+#if DEBUG
+                    //Canvas.Image = bitmap;
+                    //Canvas.Update();
+                    //for (int q = 0; q < values.Count(); ++q)
+                    //{
+                    //    values[q] = values[q].Difference(new Point(-200, -200));
+                    //}
+                    //brush.Color = face.Color;
+                    //_graphics.FillPolygon(brush, values);
+                    //_graphics.DrawRectangle(_pen, new Rectangle((int)minX + 200, (int)minY + 200, Math.Abs((int)(minX - maxX)), Math.Abs((int)(minY - maxY))));
+                    //Thread.Sleep(1000);
+#endif
                 }
-                Thread.Sleep(2500);
+#if DEBUG
+                //Thread.Sleep(2000);
+#endif
             }
-            
-            
-            _index++;
 
-            
-                
+
+            _index++;
+            Canvas.Image = bitmap;
+            Canvas.Update();
+
+
         }
 
         private void Form1_ResizeEnd(object sender, EventArgs e)

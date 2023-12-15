@@ -104,12 +104,20 @@ namespace Graph6
             }
         }
 
-
-        public PointF ToIsometric(Shape shape, MyPoint point)
+        public PointF ToScreen(Shape shape, MyPoint point)
         {
             var matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
-            matrix = matrix * shape.MatrixToWorld * ToCameraCoordinates;
-            return new(matrix[0, 0], matrix[0, 1]);
+            switch (_projection)
+            {
+                case Projection.Perspective:
+                    matrix = matrix * shape.MatrixToWorld * ToCameraCoordinates * projectionMatrix;
+                    return new(matrix[0, 0] / matrix[0, 3], matrix[0, 1] / matrix[0, 3]);
+
+                case Projection.Isometric:
+                    matrix = matrix * shape.MatrixToWorld * ToCameraCoordinates;
+                    return new(matrix[0, 0], matrix[0, 1]);
+            }
+            return new(); 
         }
 
         private void Perspective(Shape shape)
