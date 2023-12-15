@@ -13,7 +13,7 @@ namespace Graph6
 
             JObject jsonObject = JObject.Load(reader);
             var points = jsonObject["points"].ToObject<List<MyPoint>>();
-            var faces = jsonObject["faces"].ToObject<List<List<int>>>();
+            var faces = jsonObject["faces"].ToObject<List<Face>>();
             return new Shape(points, faces);
         }
 

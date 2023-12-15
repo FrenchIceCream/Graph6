@@ -91,7 +91,7 @@ namespace Graph6
                     var mat2 = new MyMatrix(1, 4, new float[] { myPointB.X, myPointB.Y, myPointB.Z, 1 });
                     mat1 = mat1 * shape.MatrixToWorld * this.ToCameraCoordinates;
                     mat2 = mat2 * shape.MatrixToWorld * this.ToCameraCoordinates;
-                    _graphics.DrawLine(_pen, mat1[0,0], mat1[0, 1], mat2[0, 0], mat2[0, 1]);
+                    _graphics.DrawLine(_pen, mat1[0, 0], mat1[0, 1], mat2[0, 0], mat2[0, 1]);
                     a = b;
                 }
                 var myPointA2 = shape.Points[a];
@@ -109,7 +109,7 @@ namespace Graph6
         {
             var matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
             matrix = matrix * shape.MatrixToWorld * ToCameraCoordinates;
-            return new(matrix[0,0], matrix[0, 1]);
+            return new(matrix[0, 0], matrix[0, 1]);
         }
 
         private void Perspective(Shape shape)

@@ -1,8 +1,12 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using org.mariuszgromada.math.mxparser;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Numerics;
+using System.Security.Cryptography.Pkcs;
 
 namespace Graph6
 {
@@ -29,8 +33,15 @@ namespace Graph6
             _graphics.TranslateTransform(Canvas.Width / 2, Canvas.Height / 2);
             _graphics.ScaleTransform(1, -1);
 
+
+            Canvas.MouseMove += OnMouseMove;
             _viewer = new Viewer(_graphics, Projection.Isometric);
             _currentShape = Shapes.Empty();
+        }
+
+        private void OnMouseMove(object? sender, MouseEventArgs e)
+        {
+            Text = $"Mouse Coordinates: X={Canvas.Width / 2 - e.X}, Y={Canvas.Height / 2 - e.Y}";
         }
 
         private void InitListsAndBoxes()
@@ -135,7 +146,7 @@ namespace Graph6
 
         private void Button_Rotate_Click(object sender, EventArgs e)
         {
-            if (_currentShape.IsEmpty)    
+            if (_currentShape.IsEmpty)
                 return;
 
             float degree = float.Parse(Angle.Text) * (float)(Math.PI / 180);
@@ -247,7 +258,7 @@ namespace Graph6
             MyMatrix transformMatrix = toCenter * mat * fromCenter;
 
             //shape.MatrixToWorld = shape.MatrixToWorld * transformMatrix;
-            
+
             for (int i = 0; i < shape.Points.Count; i++)
             {
                 MyPoint point = shape.Points[i];
@@ -550,77 +561,189 @@ namespace Graph6
             Shape shape = new Shape(_currentShape);
             _graphics.Clear(Color.White);
 
-            var mat = _currentShape.MatrixToWorld * _viewer.ToCameraCoordinates;
-
+            var matrix = _currentShape.MatrixToWorld * _viewer.ToCameraCoordinates;
+            var pen = new Pen(Color.Red);
             foreach (var face in shape.Faces)
             {
-                var pp1 = new MyMatrix(1, 4, new float[] { shape.Points[face[0]].X, shape.Points[face[0]].Y, shape.Points[face[0]].Z, 1 })/* * mat*/;
-                var pp2 = new MyMatrix(1, 4, new float[] { shape.Points[face[1]].X, shape.Points[face[1]].Y, shape.Points[face[1]].Z, 1 })/* * mat*/;
-                var pp3 = new MyMatrix(1, 4, new float[] { shape.Points[face[2]].X, shape.Points[face[2]].Y, shape.Points[face[2]].Z, 1 })/* * mat*/;
-
-                var p1 = new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
-                var p2 = new MyPoint(pp2[0, 0], pp2[0, 1], pp2[0, 2]);
-                var p3 = new MyPoint(pp1[0, 0], pp1[0, 1], pp1[0, 2]);
-
-                //since encoding acts weirdly when I commit to github, I'll leave a comment in English
-                //got it from some article on calculating a surface normal - it works given that polygon is a triangle
-                float nx = (p2.Y - p1.Y) * (p3.Z - p1.Z) - (p2.Z - p1.Z) * (p3.Y - p1.Y);
-                float ny = (p2.Z - p1.Z) * (p3.X - p1.X) - (p2.X - p1.X) * (p3.Z - p1.Z);
-                float nz = (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
-
-                var center = shape.GetCenter();
-                Vector3 vec = new Vector3(0 - center.X, 0 - center.Y, -200 - center.Z); //ВОТ ТУТ ПОМЕНЯЛ С CAMPOSITION
-                Vector3 normal = new Vector3(nx, ny, nz);
-                normal = Vector3.Normalize(normal);
-                //normal = new Vector3();
-
-                float c_x = (pp1[0,0] + pp2[0, 0] + pp3[0, 0]) / 3;
-                float c_y = (pp1[0, 1] + pp2[0, 1] + pp3[0, 1]) / 3; ;
-
-                if (face == shape.Faces[0])
+                var result = IsDrawable(face, matrix, shape);
+                if (result.Item4)
                 {
-                    _graphics.DrawLine(new Pen(Color.Blue), c_x, c_y, normal.X, normal.Y);
-                    _graphics.DrawRectangle(new Pen(Color.CadetBlue), normal.X, normal.Y, 4, 4);
-                    _graphics.DrawRectangle(new Pen(Color.Green), center.X, center.Y, 4, 4);
+                    var p1 = result.Item1;
+                    var p2 = result.Item2;
+                    var p3 = result.Item3;
+                    _graphics.DrawLine(pen, new Point((int)p1.X, (int)p1.Y), new Point((int)p2.X, (int)p2.Y));
+                    _graphics.DrawLine(pen, new Point((int)p2.X, (int)p2.Y), new Point((int)p3.X, (int)p3.Y));
+                    _graphics.DrawLine(pen, new Point((int)p1.X, (int)p1.Y), new Point((int)p3.X, (int)p3.Y));
                 }
-
-
-                //if ((normal - normal_check).Length() < (- normal + normal_check).Length())
-                //{
-                //    normal = -normal;
-                //}
-
-                var cross = Vector3.Cross(vec, normal);
-                var dot = Vector3.Dot(vec, normal);
-
-                var angle = Math.PI - Math.Atan2(cross.Length(), dot);
-                angle = angle * 360 / (2 * Math.PI);
-                //Debug.WriteLine((float)angle);
-
-                var pen = new Pen(Color.Red);
-                if (angle < 90)
-                {
-                    for (int i = 1; i < face.Count; ++i)
-                        _graphics.DrawLine(pen, new Point((int)shape.Points[face[i - 1]].X, (int)shape.Points[face[i - 1]].Y), new Point((int)shape.Points[face[i]].X, (int)shape.Points[face[i]].Y));
-
-                    _graphics.DrawLine(pen, new Point((int)shape.Points[face[face.Count - 1]].X, (int)shape.Points[face[face.Count - 1]].Y), new Point((int)shape.Points[face[0]].X, (int)shape.Points[face[0]].Y));
-                }
+                
             }
         }
 
+
+        private (MyPoint, MyPoint, MyPoint, bool) IsDrawable(Face face, MyMatrix matrix, Shape shape)
+        {
+            var pp1 = new MyMatrix(1, 4, new float[] { shape.Points[face[0]].X, shape.Points[face[0]].Y, shape.Points[face[0]].Z, 1 }) * matrix;
+            var pp2 = new MyMatrix(1, 4, new float[] { shape.Points[face[1]].X, shape.Points[face[1]].Y, shape.Points[face[1]].Z, 1 }) * matrix;
+            var pp3 = new MyMatrix(1, 4, new float[] { shape.Points[face[2]].X, shape.Points[face[2]].Y, shape.Points[face[2]].Z, 1 }) * matrix;
+
+            Debug.WriteLine("Old: " + shape.Points[face[0]].X + " " + shape.Points[face[0]].Y + " " + shape.Points[face[0]].Z);
+            Debug.WriteLine("New: " + pp1[0, 0] + " " + pp1[0, 1] + " " + pp1[0, 2]);
+
+            var p1 = new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
+            var p2 = new MyPoint(pp2[0, 0], pp2[0, 1], pp2[0, 2]);
+            var p3 = new MyPoint(pp1[0, 0], pp1[0, 1], pp1[0, 2]);
+
+            //since encoding acts weirdly when I commit to github, I'll leave a comment in English
+            //got it from some article on calculating a surface normal - it works given that polygon is a triangle
+            float nx = (p2.Y - p1.Y) * (p3.Z - p1.Z) - (p2.Z - p1.Z) * (p3.Y - p1.Y);
+            float ny = (p2.Z - p1.Z) * (p3.X - p1.X) - (p2.X - p1.X) * (p3.Z - p1.Z);
+            float nz = (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
+
+            var cam_pos = _viewer.Position;
+
+            var center = shape.GetCenter();
+            Vector3 vec = new Vector3(cam_pos.X - center.X, cam_pos.Y - center.Y, cam_pos.Z - center.Z);
+            Vector3 normal = new Vector3(nx, ny, nz);
+            normal = Vector3.Normalize(normal);
+
+            var cross = Vector3.Cross(vec, normal);
+            var dot = Vector3.Dot(vec, normal);
+
+            var angle = Math.PI - Math.Atan2(cross.Length(), dot);
+            angle = angle * 360 / (2 * Math.PI);
+            //Debug.WriteLine((float)angle);
+
+            return (p1, p2, p3, angle < 90);
+        }
+
+
+
+
+
+        private int _index = 1;
+
         private void HideCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            Shape shape = new Shape(_currentShape);
-            
-
-            foreach (var face in shape.Faces)
+            var brush = new SolidBrush(Color.Black);
+            var zBuffer = new double[Canvas.Width, Canvas.Height];
+            for (int x = 0; x < Canvas.Width; x++)
             {
-                var start = _viewer.ToIsometric(shape, shape.Points[face[0]]);
-                for (int i = 1; i < face.Count; i++)
+                for (int y = 0; y < Canvas.Height; y++)
                 {
-                    
+                    zBuffer[x, y] = double.MaxValue;
                 }
             }
+            Bitmap bitmap = new Bitmap(Canvas.Width, Canvas.Height);
+            var rectangles = new List<(Rectangle, Color)>();
+            var k = 0;
+            foreach ( var shape in _shapes)
+            {
+                var matrix = shape.MatrixToWorld * _viewer.ToCameraCoordinates;
+                for (int j = 0; j < shape.Faces.Count; ++j) //В данном случае face - треугольник
+                {
+                    var face = shape.Faces[j];
+                    var result = IsDrawable(face, matrix, shape);
+                    if (!result.Item4)
+                        continue;
+
+                    //k++;
+                    //if (k + 1 != _index)
+                    //    continue;
+
+                    var points = new List<(PointF, float)>();
+
+                    for (int i = 0; i < face.Count; ++i)
+                    {
+                        var point = shape.Points[face[i]];
+                        points.Add((_viewer.ToIsometric(shape, point), point.Z));
+                    }
+                    var p0 = points[0];
+                    var point0 = p0.Item1;
+                    var z0 = p0.Item2;
+
+                    var p1 = points[1];
+                    var point1 = p1.Item1;
+                    var z1 = p1.Item2;
+
+                    var p2 = points[2];
+                    var point2 = p2.Item1;
+                    var z2 = p2.Item2;
+
+
+                    var oldPoint0 = new PointF(point0.X, point0.Y);
+
+                    // Переносим треугольник в начала координат;
+                    point1 = point1.Difference(point0);
+                    point2 = point2.Difference(point0);
+                    point0 = new(0, 0);
+
+                    if (point2.Y == 0)
+                    {
+                        (point1, point2) = (point2, point1);
+                        (z1, z2) = (z2, z1);
+                        (p1, p2) = (p2, p1);
+                    }
+
+
+                    //Нужны будут для интерполирования по Z координате.
+                    float deltaZ0 = z1 - z0;
+                    float deltaZ1 = z2 - z0;
+
+                    var values = new PointF[3] { point0, point1, point2 };
+
+
+                    var minX = values.Min(value => value.X);
+                    var maxX = values.Max(value => value.X);
+
+                    var minY = values.Min(value => value.Y);
+                    var maxY = values.Max(value => value.Y);
+
+
+                    var width = Canvas.Width / 2;
+                    var height = Canvas.Height / 2;
+                    for (int y = (int)minY; y <= maxY; ++y)
+                    {
+                        for (int x = (int)minX; x <= maxX; ++x)
+                        {
+                            float w1 = ((y * point2.X - x * point2.Y) * 1.0f) / (point1.Y * point2.X - point1.X * point2.Y);
+                            if (w1 >= 0 && w1 <= 1)
+                            {
+                                float w2 = ((y - w1 * point1.Y) * 1.0f) / point2.Y;
+
+                                if (w2 >= 0 && (w1 + w2) <= 1)
+                                {
+                                    float z = z0 + (deltaZ0 * w1) + (deltaZ1 * w2);
+
+                                    if (z < zBuffer[width + x, height - y])
+                                    {
+                                        zBuffer[width + x, height - y] = z;
+                                        bitmap.SetPixel(width + x+(int)oldPoint0.X, height - (y + (int)oldPoint0.Y), face.Color);
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+                    Canvas.Image = bitmap;
+                    Canvas.Update();
+                    for (int q = 0; q < values.Count(); ++q)
+                    {
+                        values[q] = values[q].Difference(new Point(-200, -200));
+                    }
+                    brush.Color = face.Color;
+                    _graphics.FillPolygon(brush, values);
+                    _graphics.DrawRectangle(_pen, new Rectangle((int)minX + 200, (int)minY + 200, Math.Abs((int)(minX - maxX)), Math.Abs((int)(minY - maxY))));
+                    Thread.Sleep(1000);
+                }
+                Thread.Sleep(2500);
+            }
+            
+            
+            _index++;
+
+            
+                
         }
 
         private void Form1_ResizeEnd(object sender, EventArgs e)
@@ -714,6 +837,6 @@ namespace Graph6
             ViewShapes();
         }
 
-    
+
     }
 }

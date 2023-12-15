@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Runtime.CompilerServices;
 
 namespace Graph6
@@ -84,10 +85,6 @@ namespace Graph6
 
 
 
-
-
-
-
     public class Shape
     {
         public string Id { get; private set; }
@@ -130,6 +127,13 @@ namespace Graph6
             }
             return new MyPoint(x / Points.Count, y / Points.Count, z / Points.Count);
         }
+
+        public void CalculateNormals()
+        {
+
+        }
+
+
 
         private string GenerateUniqueId()
         {
@@ -208,6 +212,31 @@ namespace Graph6
         }
     }
 
+
+    public class BoundingBox
+    {
+        public PointF TopLeft { get; private set; }
+        public PointF TopRight { get; private set; }
+
+        public PointF BottomLeft { get; private set; }
+        public PointF BottomRight { get; private set; }
+       
+        public BoundingBox(params PointF[] values)
+        {
+            var minX = values.Min(value => value.X);
+            var minY = values.Min(value => value.Y);
+            var maxX = values.Max(value => value.X);
+            var maxY = values.Max(value => value.Y);
+            // Инициализация полей BoundingBox
+            TopLeft = new PointF { X = minX, Y = minY };
+            TopRight = new PointF { X = maxX, Y = minY };
+            BottomLeft = new PointF { X = minX, Y = maxY };
+            BottomRight = new PointF { X = maxX, Y = maxY };
+        }
+    }
+
+
+
     public static class Shapes
     {
         public static Cube Cube()
@@ -224,25 +253,26 @@ namespace Graph6
                 new MyPoint(20, 20, 60)
             };
 
+            var colors = Enumerable.Range(1, 6).Select(_ => Utilities.RandomColor()).ToArray();
+
             List<Face> faces = new List<Face>
             {
-                 new(new List<int>{ 0, 3, 1 }),
-                 new(new List<int>{ 3, 6, 1 }),
-                 new(new List<int>{ 1, 4, 0 }),
-                 new(new List<int>{ 4, 2, 0 }),
-                 new(new List<int>{ 2, 5, 0 }),
-                 new(new List<int>{ 5, 3, 0 }),
-                 new(new List<int>{ 1, 6, 4 }),
-                 new(new List<int>{ 6, 7, 4 }),
-                 new(new List<int>{ 7, 6, 5 }),
-                 new(new List<int>{ 6, 3, 5 }),
-                 new(new List<int>{ 7, 5, 2 }),
-                 new(new List<int>{ 4, 7, 2 }),
+                 new(new List<int>{ 0, 3, 1 }, colors[0]),
+                 new(new List<int>{ 3, 6, 1 }, colors[0]),
+                 new(new List<int>{ 1, 4, 0 }, colors[1]),
+                 new(new List<int>{ 4, 2, 0 }, colors[1]),
+                 new(new List<int>{ 2, 5, 0 }, colors[2]),
+                 new(new List<int>{ 5, 3, 0 }, colors[2]),
+                 new(new List<int>{ 1, 6, 4 }, colors[3]),
+                 new(new List<int>{ 6, 7, 4 }, colors[3]),
+                 new(new List<int>{ 7, 6, 5 }, colors[4]),
+                 new(new List<int>{ 6, 3, 5 }, colors[4]),
+                 new(new List<int>{ 7, 5, 2 }, colors[5]),
+                 new(new List<int>{ 4, 7, 2 }, colors[5]),
             };
 
             return new(points, faces);
         }
-        //cube made out of rectangles
         /*
         new List<int>{ 0, 1, 6, 3},
             new List<int>{ 0, 2, 4, 1},
