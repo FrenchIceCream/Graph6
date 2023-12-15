@@ -257,15 +257,16 @@ namespace Graph6
 
             MyMatrix transformMatrix = toCenter * mat * fromCenter;
 
-            //shape.MatrixToWorld = shape.MatrixToWorld * transformMatrix;
-
+            shape.MatrixToWorld = shape.MatrixToWorld * transformMatrix;
+            
+            /*
             for (int i = 0; i < shape.Points.Count; i++)
             {
                 MyPoint point = shape.Points[i];
                 MyMatrix point_matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
                 var res = point_matrix * transformMatrix;
                 shape.Points[i] = new MyPoint(res.matrix[0, 0], res.matrix[0, 1], res.matrix[0, 2]);
-            }
+            }*/
         }
 
         private void ParallelButton_Click(object sender, EventArgs e)
@@ -544,6 +545,15 @@ namespace Graph6
                 }
             }
 
+            for (int j = 1; j < c; j++)
+            {
+                var l1 = new List<int> { (sections - 1) * c + j, (sections - 1) * c + j - 1, j };
+                var l2 = new List<int> { (sections - 1) * c + j, j, j + 1 };
+                _currentShape.Faces.Add(new Face(l1));
+                if (!l1.SequenceEqual(l2))
+                    _currentShape.Faces.Add(new Face(l2));
+            }    
+
             //Pen p = new Pen(Color.Green, 4);
             //for (int j = 1; j < c; j++)
             //{
@@ -555,7 +565,6 @@ namespace Graph6
             //Debug.WriteLine(_currentShape.GetCenter());
         }
 
-        //TODO
         private void RemoveEdgesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             Shape shape = new Shape(_currentShape);
