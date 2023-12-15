@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
 using System.Security.Cryptography.Pkcs;
+using System.Windows.Forms.VisualStyles;
 
 namespace Graph6
 {
@@ -490,6 +491,29 @@ namespace Graph6
             int sections = int.Parse(NumOfSections.Text);
             float deg = (360 / sections) * (float)(Math.PI / 180);
 
+            var mat = GetSolidOfRevMatrix(deg);
+
+            int c = solid_shape.Points.Count();
+
+            for (int i = 0; i < sections; i++)
+            {
+                TurnShape(mat, ref solid_shape);
+
+                for (int j = 0; j < c; j++)
+                    _currentShape.Points.Add(solid_shape.Points[j]);
+            }
+
+            for (int i = 0; i < sections; i++)
+                for (int j = 0; j < c - 1; j++)
+                {
+                    _currentShape.Faces.Add(new Face(new List<int> { i * c + j, (i + 1) % (sections) * c + j, (i + 1) % (sections) * c + j + 1 }));
+                    _currentShape.Faces.Add(new Face(new List<int> { i * c + j, (i + 1) % (sections) * c + j + 1, i * c + j + 1 }));
+                }
+        }
+
+
+        private MyMatrix GetSolidOfRevMatrix(float deg)
+        {
             MyPoint A = new MyPoint(0, 0, 0);  //вокруг X
             MyPoint B = new MyPoint(10, 0, 0);
 
@@ -518,44 +542,9 @@ namespace Graph6
             l*(1 - (float)Math.Cos(deg))*m - n*(float)Math.Sin(deg), m*m + (float)Math.Cos(deg) * (1 - m*m), m*(1 - (float)Math.Cos(deg)) * n + l* (float)Math.Sin(deg), 0,
             l * (1 - (float)Math.Cos(deg))*n + m * (float)Math.Sin(deg), m * (1 - (float)Math.Cos(deg)) * n - l*(float)Math.Sin(deg), n * n + (float)Math.Cos(deg) * (1 - n * n), 0,
             0, 0, 0, 1});
-
-            int c = solid_shape.Points.Count();
-
-            for (int i = 1; i < sections; i++)
-            {
-                TurnShape(mat, ref solid_shape);
-                _currentShape.Points.Add(solid_shape.Points[0]);
-                for (int j = 1; j < c; j++)
-                {
-                    _currentShape.Points.Add(solid_shape.Points[j]);
-                    var l1 = new Face(new List<int> { i * c + j - 1, i * c + j, (i - 1) * c + j });
-                    var l2 = new Face(new List<int> { (i - 1) * c + j - 1, i * c + j - 1, (i - 1) * c + j });
-
-                    _currentShape.Faces.Add(l1);  //точка перед текущей  + текующая точка + точка на предыдущей итерации
-                    if (!l1.SequenceEqual(l2))
-                        _currentShape.Faces.Add(l2); //точка перед ней + точка перед текущей + точка на предыдущей итерации 
-                }
-            }
-
-            for (int j = 1; j < c; j++)
-            {
-                var l1 = new List<int> { (sections - 1) * c + j, (sections - 1) * c + j - 1, j };
-                var l2 = new List<int> { (sections - 1) * c + j, j, j + 1 };
-                _currentShape.Faces.Add(new Face(l1));
-                if (!l1.SequenceEqual(l2))
-                    _currentShape.Faces.Add(new Face(l2));
-            }
-
-            //Pen p = new Pen(Color.Green, 4);
-            //for (int j = 1; j < c; j++)
-            //{
-            //    _graphics.DrawLine(p, _currentShape.Points[j].X, _currentShape.Points[j].Y, _currentShape.Points[(sections - 1) * c + j - 1].X, _currentShape.Points[(sections - 1) * c + j - 1].Y);
-            //    _graphics.DrawLine(p,_currentShape.Points[(sections - 1) * c + j - 1].X, _currentShape.Points[(sections - 1) * c + j - 1].Y, _currentShape.Points[(sections - 1) * c + j].X, _currentShape.Points[(sections - 1) * c + j].Y);
-            //    _currentShape.Faces.Add(new List<int> { j, (sections - 1) * c + j - 1, (sections - 1) * c + j });
-            //}
-
-            //Debug.WriteLine(_currentShape.GetCenter());
+            return mat;
         }
+
 
         private void RemoveEdgesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
@@ -576,7 +565,6 @@ namespace Graph6
                     _graphics.DrawLine(pen, new Point((int)p2.X, (int)p2.Y), new Point((int)p3.X, (int)p3.Y));
                     _graphics.DrawLine(pen, new Point((int)p1.X, (int)p1.Y), new Point((int)p3.X, (int)p3.Y));
                 }
-
             }
         }
 
@@ -590,20 +578,20 @@ namespace Graph6
             //Debug.WriteLine("Old: " + shape.Points[face[0]].X + " " + shape.Points[face[0]].Y + " " + shape.Points[face[0]].Z);
             //Debug.WriteLine("New: " + pp1[0, 0] + " " + pp1[0, 1] + " " + pp1[0, 2]);
 
-            var p1 = new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
+            var p3= new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
             var p2 = new MyPoint(pp2[0, 0], pp2[0, 1], pp2[0, 2]);
-            var p3 = new MyPoint(pp1[0, 0], pp1[0, 1], pp1[0, 2]);
+            var p1 = new MyPoint(pp1[0, 0], pp1[0, 1], pp1[0, 2]);
 
             //since encoding acts weirdly when I commit to github, I'll leave a comment in English
-            //got it from some article on calculating a surface normal - it works given that polygon is a triangle
+            //got it from some article on calculating a surface normal - it works given that face is a triangle
             float nx = (p2.Y - p1.Y) * (p3.Z - p1.Z) - (p2.Z - p1.Z) * (p3.Y - p1.Y);
             float ny = (p2.Z - p1.Z) * (p3.X - p1.X) - (p2.X - p1.X) * (p3.Z - p1.Z);
             float nz = (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
 
-            var cam_pos = _viewer.Position;
+            //var cam_pos = _viewer.Position;
 
             var center = shape.GetCenter();
-            Vector3 vec = new Vector3(cam_pos.X - center.X, cam_pos.Y - center.Y, cam_pos.Z - center.Z);
+            Vector3 vec = new Vector3(0 - center.X, 0 - center.Y, -400 - center.Z);
             Vector3 normal = new Vector3(nx, ny, nz);
             normal = Vector3.Normalize(normal);
 
@@ -616,9 +604,6 @@ namespace Graph6
 
             return (p1, p2, p3, angle < 90);
         }
-
-
-
 
 
         private int _index = 1;
