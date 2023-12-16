@@ -1056,7 +1056,6 @@
             Margin = new Padding(3, 2, 3, 2);
             Name = "Form1";
             Text = "Графика. Лабораторная 8";
-            ResizeEnd += Form1_ResizeEnd;
             KeyDown += Form1_KeyPress;
             ((System.ComponentModel.ISupportInitialize)Canvas).EndInit();
             ResumeLayout(false);

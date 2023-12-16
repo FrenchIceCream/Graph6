@@ -13,6 +13,11 @@ namespace Graph6
         public float Y => _y;
         public float Z => _z;
 
+        public MyPoint()
+        {
+
+        }
+
         public MyPoint(float x, float y, float z)
         {
             _x = x;
@@ -420,7 +425,7 @@ namespace Graph6
             {
                 new(new List<int> { 1, 2, 0 }),
                 new(new List<int> { 0, 2, 3 }),
-                new(new List<int> { 3, 1, 0}),
+                new(new List<int> { 3, 1, 0 }),
                 new(new List<int> { 3, 2, 1 })
             };
             return new(points, faces);

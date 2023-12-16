@@ -1,7 +1,7 @@
 ﻿
-using System;
-using System.Drawing;
-using System.Xml.Serialization;
+using System.Diagnostics;
+using System.Numerics;
+using System.Windows.Forms;
 
 namespace Graph6
 {
@@ -12,12 +12,19 @@ namespace Graph6
         Axonometry,
     }
 
+    public enum RenderMode
+    { 
+        Sceleton,
+        Buffer,
+        Trimming,
+    }
+
     public class Viewer
     {
         private Projection _projection;
 
         private Pen _pen;
-
+        private PictureBox _canvas;
         private readonly MyMatrix projectionMatrix = new(4, 4, new float[] { 1, 0, 0, 0,
                                                                              0, 1, 0, 0,
                                                                              0, 0, 0, -1f/-200,
@@ -33,6 +40,8 @@ namespace Graph6
                                                                              0, 0, 1, 0,
                                                                              0, 0, 0, 1 });
         private Graphics _graphics;
+        private int _width;
+        private int _height;
 
         public Graphics Graphics
         {
@@ -40,12 +49,18 @@ namespace Graph6
             set => _graphics = value; //По-хорошему вынести бы в метод UpdateGraphics;
         }
 
-        public Viewer(Graphics graphics, Projection projection)
+        public RenderMode RenderMode { get; set; } = RenderMode.Sceleton;
+
+        public Viewer(PictureBox canvas, Projection projection)
         {
-            _graphics = graphics;
             _projection = projection;
             _pen = new Pen(Color.Red, 1);
-
+            _canvas = canvas;
+            _graphics = canvas.CreateGraphics();
+            _width = canvas.Width;
+            _height = canvas.Height;
+            _graphics.TranslateTransform(_width / 2 , _height / 2);
+            _graphics.ScaleTransform(1, -1);
             Position = new MyPoint(0, 0, -200);
             CameraVector = new MyPoint(0, 0, 1);
         }
@@ -58,90 +73,231 @@ namespace Graph6
         public void View(IList<Shape> shapes)
         {
             _graphics.Clear(Color.White);
-            switch (_projection)
+
+            switch (RenderMode) //TODO зарефакторить
             {
-                case Projection.Perspective:
-                    foreach (var shape in shapes)
+                case RenderMode.Sceleton:
+                    switch (_projection)
                     {
-                        Perspective(shape);
+                        case Projection.Perspective:
+                                Perspective(shapes);
+                            break;
+                        case Projection.Isometric:
+                                Isometric(shapes);
+                            break;
                     }
                     break;
-                case Projection.Isometric:
-                    foreach (var shape in shapes)
-                    {
-                        Isometric(shape);
-                    }
+                case RenderMode.Buffer:
+                    ZBuffer(shapes);
                     break;
-                case Projection.Axonometry:
+                case RenderMode.Trimming:
+                    RemoveEdges(shapes);
                     break;
             }
         }
 
-        private void Isometric(Shape shape)
+        private void Isometric(IList<Shape> shapes)
         {
-            foreach (var face in shape.Faces)
+            foreach (var shape in shapes)
             {
-                var a = face[0];
-                for (int i = 1; i < face.Count; i++)
+                foreach (var face in shape.Faces)
                 {
-                    var b = face[i];
-                    var myPointA = shape.Points[a];
-                    var myPointB = shape.Points[b];
-                    var mat1 = new MyMatrix(1, 4, new float[] { myPointA.X, myPointA.Y, myPointA.Z, 1 });
-                    var mat2 = new MyMatrix(1, 4, new float[] { myPointB.X, myPointB.Y, myPointB.Z, 1 });
-                    mat1 = mat1 * shape.MatrixToWorld * this.ToCameraCoordinates;
-                    mat2 = mat2 * shape.MatrixToWorld * this.ToCameraCoordinates;
-                    _graphics.DrawLine(_pen, mat1[0, 0], mat1[0, 1], mat2[0, 0], mat2[0, 1]);
-                    a = b;
+                    var a = face[0];
+                    for (int i = 1; i < face.Count; i++)
+                    {
+                        var b = face[i];
+                        var myPointA = shape.Points[a];
+                        var myPointB = shape.Points[b];
+                        var mat1 = new MyMatrix(1, 4, new float[] { myPointA.X, myPointA.Y, myPointA.Z, 1 });
+                        var mat2 = new MyMatrix(1, 4, new float[] { myPointB.X, myPointB.Y, myPointB.Z, 1 });
+                        mat1 = mat1 * shape.MatrixToWorld * this.ToCameraCoordinates;
+                        mat2 = mat2 * shape.MatrixToWorld * this.ToCameraCoordinates;
+                        _graphics.DrawLine(_pen, mat1[0, 0], mat1[0, 1], mat2[0, 0], mat2[0, 1]);
+                        a = b;
+                    }
+                    var myPointA2 = shape.Points[a];
+                    var myPointB2 = shape.Points[0];
+                    var mat11 = new MyMatrix(1, 4, new float[] { myPointA2.X, myPointA2.Y, myPointA2.Z, 1 });
+                    var mat21 = new MyMatrix(1, 4, new float[] { myPointB2.X, myPointB2.Y, myPointB2.Z, 1 });
+                    mat11 = mat11 * shape.MatrixToWorld * this.ToCameraCoordinates;
+                    mat21 = mat21 * shape.MatrixToWorld * this.ToCameraCoordinates;
+                    _graphics.DrawLine(_pen, mat11[0, 0], mat11[0, 1], mat21[0, 0], mat21[0, 1]);
                 }
-                var myPointA2 = shape.Points[a];
-                var myPointB2 = shape.Points[0];
-                var mat11 = new MyMatrix(1, 4, new float[] { myPointA2.X, myPointA2.Y, myPointA2.Z, 1 });
-                var mat21 = new MyMatrix(1, 4, new float[] { myPointB2.X, myPointB2.Y, myPointB2.Z, 1 });
-                mat11 = mat11 * shape.MatrixToWorld * this.ToCameraCoordinates;
-                mat21 = mat21 * shape.MatrixToWorld * this.ToCameraCoordinates;
-                _graphics.DrawLine(_pen, mat11[0, 0], mat11[0, 1], mat21[0, 0], mat21[0, 1]);
             }
         }
 
-        public PointF ToScreen(Shape shape, MyPoint point)
+
+        private void RemoveEdges(IList<Shape> shapes)
         {
-            var matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
-            switch (_projection)
+            foreach (var shape in shapes)
             {
-                case Projection.Perspective:
-                    matrix = matrix * shape.MatrixToWorld * ToCameraCoordinates * projectionMatrix;
-                    return new(matrix[0, 0] / matrix[0, 3], matrix[0, 1] / matrix[0, 3]);
-
-                case Projection.Isometric:
-                    matrix = matrix * shape.MatrixToWorld * ToCameraCoordinates;
-                    return new(matrix[0, 0], matrix[0, 1]);
-            }
-            return new(); 
-        }
-
-        private void Perspective(Shape shape)
-        {
-            foreach (var face in shape.Faces)
-            {
-                var a = face[0];
-                MyMatrix t = new MyMatrix(1, 4, new float[] { shape.Points[a].X, shape.Points[a].Y, shape.Points[a].Z, 1 }) * shape.MatrixToWorld * this.ToCameraCoordinates * projectionMatrix;
-                MyMatrix r = new MyMatrix(1, 4, new float[] { shape.Points[face.Last()].X, shape.Points[face.Last()].Y, shape.Points[face.Last()].Z, 1 }) * shape.MatrixToWorld * this.ToCameraCoordinates * projectionMatrix;
-
-                //if (Math.Abs(t[0, 3]) < float.Epsilon)
-                //{
-                //    t[0, 3] = 1;
-                //}
-                //if (Math.Abs(r[0, 3]) < float.Epsilon)
-                //{
-                //    r[0, 3] = 1;
-                //}
-                _graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
-                for (int i = 1; i < face.Count; i++)
+                var matrix = shape.MatrixToWorld * ToCameraCoordinates;
+                var pen = new Pen(Color.Red);
+                foreach (var face in shape.Faces)
                 {
-                    var b = face[i];
-                    t = new MyMatrix(1, 4, new float[] { shape.Points[a].X, shape.Points[a].Y, shape.Points[a].Z, 1 }) * shape.MatrixToWorld * this.ToCameraCoordinates * projectionMatrix;
-                    r = new MyMatrix(1, 4, new float[] { shape.Points[b].X, shape.Points[b].Y, shape.Points[b].Z, 1 }) * shape.MatrixToWorld * this.ToCameraCoordinates * projectionMatrix;
+                    var result = IsVisible(face, matrix, shape);
+                    if (result.Item4)
+                    {
+                        var p1 = result.Item1;
+                        var p2 = result.Item2;
+                        var p3 = result.Item3;
+                        _graphics.DrawLine(pen, new Point((int)p1.X, (int)p1.Y), new Point((int)p2.X, (int)p2.Y));
+                        _graphics.DrawLine(pen, new Point((int)p2.X, (int)p2.Y), new Point((int)p3.X, (int)p3.Y));
+                        _graphics.DrawLine(pen, new Point((int)p1.X, (int)p1.Y), new Point((int)p3.X, (int)p3.Y));
+                    }
+                }
+            }
+        }
+
+
+        private void ZBuffer(IList<Shape> shapes)
+        {
+            var _buffer = new double[_width, _height];
+            for (int x = 0; x < _width; x++)
+            {
+                for (int y = 0; y < _height; y++)
+                {
+                    _buffer[x, y] = double.MinValue;
+                }
+            }
+            Bitmap bitmap = new Bitmap(_width, _height);
+            int k = 0;
+
+            var debug = new List<(string, float, float, float)>();
+
+            foreach (var shape in shapes)
+            {
+                k++;
+                var matrix = shape.MatrixToWorld * ToCameraCoordinates;
+                for (int j = 0; j < shape.Faces.Count; ++j) //В данном случае face - треугольник
+                {
+                    var face = shape.Faces[j];
+                    var result = IsVisible(face, matrix, shape);
+                    if (!result.Item4)
+                        continue;
+
+                    //if (!face.SequenceEqual(new Face(new(new List<int> { 0, 2, 3 }))))
+                    //    continue;
+                    
+                    var point0 = result.Item1;
+                    var z0 = point0.Z;
+
+                    var point1 = result.Item2;
+                    var z1 = point1.Z;
+
+                    var point2 = result.Item3;
+                    var z2 = point2.Z;
+
+                    var oldPoint0 = new PointF(point0.X, point0.Y);
+
+                    // Переносим треугольник в начала координат;
+                    point1 -= point0;
+                    point2 -= point0;
+                    point0 = new(0, 0, 0);
+
+                    if (point2.Y == 0)
+                    {
+                        (point1, point2) = (point2, point1);
+                        (z1, z2) = (z2, z1);
+                    }
+
+
+                    //Нужны будут для интерполирования по Z координате.
+                    float deltaZ0 = z1 - z0;
+                    float deltaZ1 = z2 - z0;
+
+                    var values = new MyPoint[3] { point0, point1, point2 };
+
+                    var minX = values.Min(value => value.X);
+                    var maxX = values.Max(value => value.X);
+
+                    var minY = values.Min(value => value.Y);
+                    var maxY = values.Max(value => value.Y);
+
+
+                    var width = _width / 2;
+                    var height = _height / 2;
+
+                    for (int y = (int)minY; y <= maxY; ++y)
+                    {
+                        for (int x = (int)minX; x <= maxX; ++x)
+                        {
+                            float w1 = ((y * point2.X - x * point2.Y) * 1.0f) / (point1.Y * point2.X - point1.X * point2.Y);
+                            if (w1 >= 0 && w1 <= 1)
+                            {
+                                float w2 = ((y - w1 * point1.Y) * 1.0f) / point2.Y;
+
+                                if (w2 >= 0 && (w1 + w2) <= 1)
+                                {
+                                    float z = z0 + (deltaZ0 * w1) + (deltaZ1 * w2);
+
+                                    var newX = (width + (x + (int)oldPoint0.X)) % _width;
+                                    var newY = (height - (y + (int)oldPoint0.Y)) % _height;
+                                    debug.Add((shape.Id, x, y, z));
+                                    if (z > _buffer[newX, newY])
+                                    {
+                                        _buffer[newX, newY] = z;
+                                        bitmap.SetPixel(newX, newY, face.Color);
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            _canvas.Image = bitmap;
+            _canvas.Update();
+            _canvas.Invalidate();
+        }
+
+        private (MyPoint, MyPoint, MyPoint, bool) IsVisible(Face face, MyMatrix matrix, Shape shape)
+        {
+            var pp1 = new MyMatrix(1, 4, new float[] { shape.Points[face[0]].X, shape.Points[face[0]].Y, shape.Points[face[0]].Z, 1 }) * matrix;
+            var pp2 = new MyMatrix(1, 4, new float[] { shape.Points[face[1]].X, shape.Points[face[1]].Y, shape.Points[face[1]].Z, 1 }) * matrix;
+            var pp3 = new MyMatrix(1, 4, new float[] { shape.Points[face[2]].X, shape.Points[face[2]].Y, shape.Points[face[2]].Z, 1 }) * matrix;
+
+            //Debug.WriteLine("Old: " + shape.Points[face[0]].X + " " + shape.Points[face[0]].Y + " " + shape.Points[face[0]].Z);
+            //Debug.WriteLine("New: " + pp1[0, 0] + " " + pp1[0, 1] + " " + pp1[0, 2]);
+
+            var p1 = new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
+            var p2 = new MyPoint(pp2[0, 0], pp2[0, 1], pp2[0, 2]);
+            var p3 = new MyPoint(pp1[0, 0], pp1[0, 1], pp1[0, 2]);
+
+            //since encoding acts weirdly when I commit to github, I'll leave a comment in English
+            //got it from some article on calculating a surface normal - it works given that face is a triangle
+            float nx = (p2.Y - p1.Y) * (p3.Z - p1.Z) - (p2.Z - p1.Z) * (p3.Y - p1.Y);
+            float ny = (p2.Z - p1.Z) * (p3.X - p1.X) - (p2.X - p1.X) * (p3.Z - p1.Z);
+            float nz = (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
+
+            //var cam_pos = _viewer.Position;
+
+            var center = shape.GetCenter();
+            Vector3 vec = new Vector3(0 - center.X, 0 - center.Y, -400 - center.Z);
+            Vector3 normal = new Vector3(nx, ny, nz);
+            normal = Vector3.Normalize(normal);
+
+            var cross = Vector3.Cross(vec, normal);
+            var dot = Vector3.Dot(vec, normal);
+
+            var angle = Math.PI - Math.Atan2(cross.Length(), dot);
+            angle = angle * 360 / (2 * Math.PI);
+            //Debug.WriteLine((float)angle);
+
+            return (p1, p2, p3, angle < 90);
+        }
+
+        private void Perspective(IList<Shape> shapes)
+        {
+            foreach (var shape in shapes)
+            {
+                foreach (var face in shape.Faces)
+                {
+                    var a = face[0];
+                    MyMatrix t = new MyMatrix(1, 4, new float[] { shape.Points[a].X, shape.Points[a].Y, shape.Points[a].Z, 1 }) * shape.MatrixToWorld * this.ToCameraCoordinates * projectionMatrix;
+                    MyMatrix r = new MyMatrix(1, 4, new float[] { shape.Points[face.Last()].X, shape.Points[face.Last()].Y, shape.Points[face.Last()].Z, 1 }) * shape.MatrixToWorld * this.ToCameraCoordinates * projectionMatrix;
+
                     //if (Math.Abs(t[0, 3]) < float.Epsilon)
                     //{
                     //    t[0, 3] = 1;
@@ -151,7 +307,22 @@ namespace Graph6
                     //    r[0, 3] = 1;
                     //}
                     _graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
-                    a = b;
+                    for (int i = 1; i < face.Count; i++)
+                    {
+                        var b = face[i];
+                        t = new MyMatrix(1, 4, new float[] { shape.Points[a].X, shape.Points[a].Y, shape.Points[a].Z, 1 }) * shape.MatrixToWorld * this.ToCameraCoordinates * projectionMatrix;
+                        r = new MyMatrix(1, 4, new float[] { shape.Points[b].X, shape.Points[b].Y, shape.Points[b].Z, 1 }) * shape.MatrixToWorld * this.ToCameraCoordinates * projectionMatrix;
+                        //if (Math.Abs(t[0, 3]) < float.Epsilon)
+                        //{
+                        //    t[0, 3] = 1;
+                        //}
+                        //if (Math.Abs(r[0, 3]) < float.Epsilon)
+                        //{
+                        //    r[0, 3] = 1;
+                        //}
+                        _graphics.DrawLine(_pen, t[0, 0] / t[0, 3], t[0, 1] / t[0, 3], r[0, 0] / r[0, 3], r[0, 1] / r[0, 3]);
+                        a = b;
+                    }
                 }
             }
         }
