@@ -578,9 +578,9 @@ namespace Graph6
             //Debug.WriteLine("Old: " + shape.Points[face[0]].X + " " + shape.Points[face[0]].Y + " " + shape.Points[face[0]].Z);
             //Debug.WriteLine("New: " + pp1[0, 0] + " " + pp1[0, 1] + " " + pp1[0, 2]);
 
-            var p3= new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
+            var p1= new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
             var p2 = new MyPoint(pp2[0, 0], pp2[0, 1], pp2[0, 2]);
-            var p1 = new MyPoint(pp1[0, 0], pp1[0, 1], pp1[0, 2]);
+            var p3 = new MyPoint(pp1[0, 0], pp1[0, 1], pp1[0, 2]);
 
             //since encoding acts weirdly when I commit to github, I'll leave a comment in English
             //got it from some article on calculating a surface normal - it works given that face is a triangle
