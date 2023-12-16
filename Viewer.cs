@@ -121,10 +121,27 @@ namespace Graph6
                     var mat21 = new MyMatrix(1, 4, new float[] { myPointB2.X, myPointB2.Y, myPointB2.Z, 1 });
                     mat11 = mat11 * shape.MatrixToWorld * this.ToCameraCoordinates;
                     mat21 = mat21 * shape.MatrixToWorld * this.ToCameraCoordinates;
+
                     _graphics.DrawLine(_pen, mat11[0, 0], mat11[0, 1], mat21[0, 0], mat21[0, 1]);
                 }
             }
         }
+        
+        private MyPoint Transfer(MyMatrix transformation, MyPoint point)
+        {
+            var matrix = new MyMatrix(1, 4, new float[] { point.X, point.Y, point.Z, 1 });
+            if (_projection == Projection.Isometric)
+            {
+                matrix *= transformation;
+                return new(matrix[0, 0], matrix[0, 1], matrix[0, 2]);
+            }
+            else
+            {
+                matrix *= transformation * projectionMatrix;
+                return new(matrix[0, 0] / matrix[0, 3], matrix[0, 1] / matrix[0, 3], matrix[0, 2] / matrix[0, 3]);
+            }
+        }
+
 
 
         private void RemoveEdges(IList<Shape> shapes)
@@ -252,18 +269,18 @@ namespace Graph6
             _canvas.Invalidate();
         }
 
+
+
+
+
         private (MyPoint, MyPoint, MyPoint, bool) IsVisible(Face face, MyMatrix matrix, Shape shape)
         {
-            var pp1 = new MyMatrix(1, 4, new float[] { shape.Points[face[0]].X, shape.Points[face[0]].Y, shape.Points[face[0]].Z, 1 }) * matrix;
-            var pp2 = new MyMatrix(1, 4, new float[] { shape.Points[face[1]].X, shape.Points[face[1]].Y, shape.Points[face[1]].Z, 1 }) * matrix;
-            var pp3 = new MyMatrix(1, 4, new float[] { shape.Points[face[2]].X, shape.Points[face[2]].Y, shape.Points[face[2]].Z, 1 }) * matrix;
-
             //Debug.WriteLine("Old: " + shape.Points[face[0]].X + " " + shape.Points[face[0]].Y + " " + shape.Points[face[0]].Z);
             //Debug.WriteLine("New: " + pp1[0, 0] + " " + pp1[0, 1] + " " + pp1[0, 2]);
 
-            var p1 = new MyPoint(pp3[0, 0], pp3[0, 1], pp3[0, 2]);
-            var p2 = new MyPoint(pp2[0, 0], pp2[0, 1], pp2[0, 2]);
-            var p3 = new MyPoint(pp1[0, 0], pp1[0, 1], pp1[0, 2]);
+            var p1 = Transfer(matrix, shape.Points[face[2]]);
+            var p2 = Transfer(matrix, shape.Points[face[1]]);
+            var p3 = Transfer(matrix, shape.Points[face[0]]);
 
             //since encoding acts weirdly when I commit to github, I'll leave a comment in English
             //got it from some article on calculating a surface normal - it works given that face is a triangle
