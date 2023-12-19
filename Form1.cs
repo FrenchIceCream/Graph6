@@ -554,6 +554,7 @@ namespace Graph6
             else
             {
                 Hide_CheckBox.Checked = false;
+                TexturingCheckBox.Checked = false;
                 _viewer.RenderMode = RenderMode.Sceleton;
             }
             ViewShapes();
@@ -568,6 +569,23 @@ namespace Graph6
             else
             {
                 RemoveEdgesCheckBox.Checked = false;
+                TexturingCheckBox.Checked = false;
+                _viewer.RenderMode = RenderMode.Sceleton;
+            }
+            ViewShapes();
+        }
+
+
+        private void TexturingCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (TexturingCheckBox.Checked && _viewer.RenderMode == RenderMode.Sceleton)
+            {
+                _viewer.RenderMode = RenderMode.Texturing;
+            }
+            else
+            {
+                RemoveEdgesCheckBox.Checked = false;
+                Hide_CheckBox.Checked = false;
                 _viewer.RenderMode = RenderMode.Sceleton;
             }
             ViewShapes();
@@ -654,6 +672,23 @@ namespace Graph6
             ViewShapes();
         }
 
-
+        private void LoadImageButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Изображения (*.png;*.jpeg;*.jpg;*.bmp)|*.png;*.jpeg;*.jpg;*.bmp|Все файлы (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string imagePath = openFileDialog.FileName;
+                try
+                {
+                    _currentShape.Texture = new Bitmap(imagePath);
+                    ViewShapes();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка загрузки изображения: {ex.Message}");
+                }
+            }
+        }
     }
 }

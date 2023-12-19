@@ -107,6 +107,8 @@
             label22 = new Label();
             label23 = new Label();
             label24 = new Label();
+            TexturingCheckBox = new CheckBox();
+            button14 = new Button();
             ((System.ComponentModel.ISupportInitialize)Canvas).BeginInit();
             SuspendLayout();
             // 
@@ -697,7 +699,7 @@
             // Clear_Button
             // 
             Clear_Button.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Clear_Button.Location = new Point(1009, 200);
+            Clear_Button.Location = new Point(1008, 230);
             Clear_Button.Margin = new Padding(3, 2, 3, 2);
             Clear_Button.Name = "Clear_Button";
             Clear_Button.Size = new Size(130, 26);
@@ -969,11 +971,37 @@
             label24.Size = new Size(170, 2);
             label24.TabIndex = 82;
             // 
+            // TexturingCheckBox
+            // 
+            TexturingCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            TexturingCheckBox.Location = new Point(839, 448);
+            TexturingCheckBox.Margin = new Padding(3, 2, 3, 2);
+            TexturingCheckBox.Name = "TexturingCheckBox";
+            TexturingCheckBox.Size = new Size(130, 38);
+            TexturingCheckBox.TabIndex = 83;
+            TexturingCheckBox.Text = "Текстурирование";
+            TexturingCheckBox.UseVisualStyleBackColor = true;
+            TexturingCheckBox.CheckedChanged += TexturingCheckBox_CheckedChanged;
+            // 
+            // button14
+            // 
+            button14.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button14.Location = new Point(1010, 200);
+            button14.Margin = new Padding(3, 2, 3, 2);
+            button14.Name = "button14";
+            button14.Size = new Size(130, 26);
+            button14.TabIndex = 84;
+            button14.Text = "Загрузить текстуру";
+            button14.UseVisualStyleBackColor = true;
+            button14.Click += LoadImageButton_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1150, 499);
+            Controls.Add(button14);
+            Controls.Add(TexturingCheckBox);
             Controls.Add(label24);
             Controls.Add(label23);
             Controls.Add(label22);
@@ -1144,5 +1172,7 @@
         private Label label22;
         private Label label23;
         private Label label24;
+        private CheckBox TexturingCheckBox;
+        private Button button14;
     }
 }

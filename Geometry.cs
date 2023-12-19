@@ -9,9 +9,17 @@ namespace Graph6
         private readonly float _x;
         private readonly float _y;
         private readonly float _z;
+        private readonly float _u;
+        private readonly float _v;
+
+
         public float X => _x;
         public float Y => _y;
         public float Z => _z;
+
+        public float U => _u;
+        public float V => _v;
+
 
         public MyPoint()
         {
@@ -24,7 +32,6 @@ namespace Graph6
             _y = y;
             _z = z;
         }
-
         public static MyPoint operator +(MyPoint lhs, MyPoint rhs)
         {
             return new MyPoint(lhs.X + rhs.X, lhs.Y + rhs.Y, lhs.Z + rhs.Z);
@@ -63,15 +70,34 @@ namespace Graph6
     }
 
 
+    public class Textel
+    {
+        private readonly float _u;
+        private readonly float _v;
+
+        public float U => _u;
+        public float V => _v;
+
+        public Textel(float u, float v)
+        {
+            _u = u;
+            _v = v;
+        }
+    }
+
+
 
     public class Face
     {
         private readonly List<int> _indexes = new();
         private readonly Color _color;
+        private readonly List<Textel> _textels = new();
         public int this[int index] => _indexes[index];
+        public Textel Textel(int index) => _textels[index];
         public Color Color => _color;
         public int Count => _indexes.Count;
-        //TODO сделать текстурку.
+
+        public List<Textel> Textels => _textels;
 
         public Face(List<int> indexes)
         {
@@ -82,6 +108,18 @@ namespace Graph6
         {
             _color = color;
         }
+
+        public Face(List<int> indexes, List<Textel> textels) : this(indexes)
+        {
+            _textels = textels;
+        }
+
+        public Face(List<int> indexes, Color color, List<Textel> textels) : this(indexes)
+        {
+            _textels = textels;
+            _color = color;
+        }
+
         public bool SequenceEqual(Face face) => _indexes.SequenceEqual(face._indexes);
 
         public int Last() => _indexes[^1];
@@ -93,7 +131,7 @@ namespace Graph6
     public class Shape
     {
         public string Id { get; private set; }
-
+        public Bitmap Texture { get; set; }
         public List<MyPoint> Points { get; private set; } = new();
         public List<Face> Faces { get; private set; } = new();
         public List<float> Normals { get; private set; } = new();
@@ -111,6 +149,7 @@ namespace Graph6
             Points = point;
             Faces = faces;
         }
+
 
         public Shape(Shape anotherShape)
         {
@@ -225,7 +264,7 @@ namespace Graph6
 
         public PointF BottomLeft { get; private set; }
         public PointF BottomRight { get; private set; }
-       
+
         public BoundingBox(params PointF[] values)
         {
             var minX = values.Min(value => value.X);
@@ -248,32 +287,45 @@ namespace Graph6
         {
             List<MyPoint> points = new List<MyPoint>
             {
-                new MyPoint(-20, -20, 20),
-                new MyPoint(20, -20, 20),
-                new MyPoint(-20, 20, 20),
-                new MyPoint(-20, -20, 60),
-                new MyPoint(20, 20, 20),
-                new MyPoint(-20, 20, 60),
-                new MyPoint(20, -20, 60),
-                new MyPoint(20, 20, 60)
+                new MyPoint(-20, -20, 20), // 0
+                new MyPoint(20, -20, 20), // 1
+                new MyPoint(-20, 20, 20), // 2
+                new MyPoint(-20, -20, 60), // 3
+                new MyPoint(20, 20, 20), // 4
+                new MyPoint(-20, 20, 60), // 5
+                new MyPoint(20, -20, 60), // 6
+                new MyPoint(20, 20, 60) // 7
             };
 
             var colors = Enumerable.Range(1, 6).Select(_ => Utilities.RandomColor()).ToArray();
 
             List<Face> faces = new List<Face>
             {
-                 new(new List<int>{ 0, 3, 1 }, colors[0]),
-                 new(new List<int>{ 3, 6, 1 }, colors[0]),
-                 new(new List<int>{ 1, 4, 0 }, colors[1]),
-                 new(new List<int>{ 4, 2, 0 }, colors[1]),
-                 new(new List<int>{ 2, 5, 0 }, colors[2]),
-                 new(new List<int>{ 5, 3, 0 }, colors[2]),
-                 new(new List<int>{ 1, 6, 4 }, colors[3]),
-                 new(new List<int>{ 6, 7, 4 }, colors[3]),
-                 new(new List<int>{ 7, 6, 5 }, colors[4]),
-                 new(new List<int>{ 6, 3, 5 }, colors[4]),
-                 new(new List<int>{ 7, 5, 2 }, colors[5]),
-                 new(new List<int>{ 4, 7, 2 }, colors[5]),
+                 //Нижняя грань
+                 new(new List<int>{ 0, 3, 1 }, colors[0],new(){  new(0f, 0f), new(1f, 0f), new(0f, 1f) }),
+                 new(new List<int>{ 3, 6, 1 }, colors[0], new(){  new(1f, 0f), new(1f, 1f), new(0f, 1f) }),
+
+                 //Задняя грань
+                 new(new List<int>{ 1, 4, 0 }, colors[1],  new(){  new(0f, 0f), new(1f, 0f), new(0f, 1f) }),
+                 new(new List<int>{ 4, 2, 0 }, colors[1], new(){  new(1f, 0f), new(1f, 1f), new(0f, 1f) }),
+
+                 //Левая грань
+                 new(new List<int>{ 2, 5, 0 }, colors[2], new(){  new(0f, 0f), new(1f, 0f), new(0f, 1f) }),
+                 new(new List<int>{ 5, 3, 0 }, colors[2], new(){  new(1f, 0f), new(1f, 1f), new(0f, 1f) }),
+
+
+                 //Правая грань
+                 new(new List<int>{ 1, 6, 4 }, colors[3],  new(){  new(0f, 0f), new(1f, 0f), new(0f, 1f) } ),
+                 new(new List<int>{ 6, 7, 4 }, colors[3],  new(){  new(1f, 0f), new(1f, 1f), new(0f, 1f) } ),
+
+
+                 //Передняя грань
+                 new(new List<int>{ 6, 3, 5 }, colors[4], new(){ new(1f, 0f), new(0f, 0f), new(0f, 1f) }),
+                 new(new List<int>{ 7, 6, 5 }, colors[4], new(){ new(1f, 1f), new(1f, 0f), new(0f, 1f) }),
+
+                 //Вверхняя грань
+                 new(new List<int>{ 7, 5, 2 }, colors[5], new(){ new(1f, 0f), new(0f, 0f), new(0f, 1f) }),
+                 new(new List<int>{ 4, 7, 2 }, colors[5], new(){ new(1f, 1f), new(1f, 0f), new(0f, 1f) }),
             };
 
             return new(points, faces);
@@ -421,17 +473,25 @@ namespace Graph6
                 new MyPoint(0, 2 * h / 3, 20),
                 new MyPoint(0, 0, 25 * (float)Math.Sqrt(13)),
             };
+            var textels = new List<Textel>() { new(1f, 1f), new(0.5f, 0f), new(0f, 1f) };
+
+
             List<Face> faces = new List<Face>
             {
-                new(new List<int> { 1, 2, 0 }),
-                new(new List<int> { 0, 2, 3 }),
-                new(new List<int> { 3, 1, 0 }),
-                new(new List<int> { 3, 2, 1 })
+                //Задняя грань
+                new(new List<int> { 1, 2, 0 }, textels),
+                //Левая грань
+                new(new List<int> { 0, 2, 3 }, textels),
+                //Нижняя грань
+                new(new List<int> { 3, 1, 0 }, textels),
+                //Правая грань
+                new(new List<int> { 3, 2, 1 }, textels)
             };
             return new(points, faces);
         }
         public static Octahedron Octahedron()
         {
+
             List<MyPoint> points = new List<MyPoint>
             {
                 new MyPoint(0, 0, 30),
@@ -442,16 +502,18 @@ namespace Graph6
                 new MyPoint(0, 0, -30)
             };
 
+            var textels = new List<Textel>() { new(1f, 1f), new(0.5f, 0f), new(0f, 1f) };
+
             List<Face> faces = new List<Face>
             {
-                new(new List<int>{ 1, 4, 0 }),
-                new(new List<int>{ 0, 4, 3 }),
-                new(new List<int>{ 0, 2, 1 }),
-                new(new List<int>{ 2, 0, 3 }),
-                new(new List<int>{ 3, 4, 5 }),
-                new(new List<int>{ 1, 5, 4 }),
-                new(new List<int>{ 2, 5, 1 }),
-                new(new List<int>{ 2, 3, 5 }),
+                new(new List<int>{ 1, 4, 0 }, textels),
+                new(new List<int>{ 0, 4, 3 }, textels),
+                new(new List<int>{ 0, 2, 1 }, textels),
+                new(new List<int>{ 2, 0, 3 }, textels),
+                new(new List<int>{ 3, 4, 5 }, textels),
+                new(new List<int>{ 1, 5, 4 }, textels),
+                new(new List<int>{ 2, 5, 1 }, textels),
+                new(new List<int>{ 2, 3, 5 }, textels),
             };
             return new(points, faces);
         }
