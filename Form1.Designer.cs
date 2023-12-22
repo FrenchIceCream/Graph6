@@ -63,8 +63,6 @@
             Y1TextBox = new TextBox();
             Y0TextBox = new TextBox();
             label9 = new Label();
-            XDeltaTextBox = new TextBox();
-            YDeltaTextBox = new TextBox();
             label10 = new Label();
             label11 = new Label();
             label12 = new Label();
@@ -491,28 +489,6 @@
             label9.Size = new Size(17, 15);
             label9.TabIndex = 35;
             label9.Text = "Y:";
-            // 
-            // XDeltaTextBox
-            // 
-            XDeltaTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            XDeltaTextBox.Location = new Point(953, 250);
-            XDeltaTextBox.Margin = new Padding(3, 2, 3, 2);
-            XDeltaTextBox.Name = "XDeltaTextBox";
-            XDeltaTextBox.Size = new Size(39, 23);
-            XDeltaTextBox.TabIndex = 38;
-            XDeltaTextBox.Text = "0,3";
-            XDeltaTextBox.TextAlign = HorizontalAlignment.Center;
-            // 
-            // YDeltaTextBox
-            // 
-            YDeltaTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            YDeltaTextBox.Location = new Point(953, 276);
-            YDeltaTextBox.Margin = new Padding(3, 2, 3, 2);
-            YDeltaTextBox.Name = "YDeltaTextBox";
-            YDeltaTextBox.Size = new Size(39, 23);
-            YDeltaTextBox.TabIndex = 39;
-            YDeltaTextBox.Text = "0,3";
-            YDeltaTextBox.TextAlign = HorizontalAlignment.Center;
             // 
             // label10
             // 
@@ -1044,8 +1020,6 @@
             Controls.Add(label12);
             Controls.Add(label11);
             Controls.Add(label10);
-            Controls.Add(YDeltaTextBox);
-            Controls.Add(XDeltaTextBox);
             Controls.Add(Y1TextBox);
             Controls.Add(Y0TextBox);
             Controls.Add(label9);
@@ -1127,8 +1101,6 @@
         private TextBox Y1TextBox;
         private TextBox Y0TextBox;
         private Label label9;
-        private TextBox XDeltaTextBox;
-        private TextBox YDeltaTextBox;
         private Label label10;
         private Label label11;
         private Label label12;

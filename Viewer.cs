@@ -289,6 +289,56 @@ namespace Graph6
             }
         }
 
+        public void Wave(List<List<MyPoint>> allLines, int width, double minX, double deltaX, double minY, double deltaY, double height)
+        {
+            var matrix = /*new MyMatrix(4, 4, new float[] { 50, 0, 0, 0,
+                                                                             0, 50, 0, 0,
+                                                                             0, 0, 50, 0,
+                                                                             0, 0, 0, 1 })**/ ToCameraCoordinates;
+            _projection = Projection.Isometric;
+            List<double> maxes = new List<double>();
+            List<double> mines = new List<double>();
+            var pen = new Pen(Color.Blue,1.0f);
+            for(int i = 0;i< width; i++)
+            {
+                maxes.Add(double.MinValue);
+                mines.Add(double.MaxValue);
+            }
+
+            for(int i = 0; i < allLines[0].Count;i++)
+            {
+
+                bool isP = false;
+                MyPoint prevPoint = new MyPoint(0,0,0);
+
+                for(int j = 0; j < allLines.Count ;j++) {
+                    var p = Transfer(matrix, allLines[j][i]);
+
+                    if (!isP)
+                    {
+                        prevPoint = p;
+                        isP = true;
+                    }
+                    if(Math.Round((p.X - minX )/ deltaX * width*0.8) >= 0 && Math.Round((p.X - minX) / deltaX * width*0.8) < width)
+                    {
+                        if (maxes[(int)Math.Round((p.X - minX) / deltaX * width*0.8)] < p.Y)
+                        {
+                            maxes[(int)Math.Round((p.X - minX) / deltaX * width * 0.8)] = p.Y;
+                            _graphics.DrawLine(pen, (int)Math.Round(((p.X - minX) / deltaX * width - width / 2) * 0.8), (int)Math.Round(((p.Y - minY) / deltaY * height - height / 2)*0.8), (int)Math.Round(((prevPoint.X - minX) / deltaX * width - width / 2)*0.8), (int)Math.Round(((prevPoint.Y - minY) / deltaY * height - height / 2)*0.8));
+                            
+                        }
+                        if (mines[(int)Math.Round((p.X - minX) / deltaX * width * 0.8)] > p.Y)
+                        {
+                            mines[(int)Math.Round((p.X - minX) / deltaX * width * 0.8)] = p.Y;
+                            _graphics.DrawLine(pen, (int)Math.Round(((p.X - minX) / deltaX * width - width / 2) * 0.8), (int)Math.Round(((p.Y - minY) / deltaY * height - height / 2)*0.8), (int)Math.Round(((prevPoint.X - minX) / deltaX * width - width / 2)*0.8), (int)Math.Round(((prevPoint.Y - minY) / deltaY * height - height / 2)*0.8));
+                        }
+                    }
+                    prevPoint = p;
+                }
+            }
+        }
+
+
 
         private void ZBuffer(IList<Shape> shapes)
         { 
@@ -593,6 +643,7 @@ namespace Graph6
                         0, 1, 0, 0,
                         (float)Math.Sin(-degree), 0, (float)Math.Cos(-degree), 0,
                         0, 0, 0, 1}),
+
                         new MyMatrix(4, 4, new float[]
                         {(float)Math.Cos(degree), 0, -(float)Math.Sin(degree), 0,
                         0, 1, 0, 0,

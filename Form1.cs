@@ -353,6 +353,11 @@ namespace Graph6
             CalculateShapeByFunction();
         }
 
+        private double F(double x, double y)
+        {
+            return 5 * (Math.Cos(x * x + y * y + 1) / (x * x + y * y + 1) + 0.1);
+        }
+
         private void CalculateShapeByFunction()
         {
             double X0;
@@ -377,50 +382,33 @@ namespace Graph6
             {
                 return;
             }
-            if (!Double.TryParse(XDeltaTextBox.Text, out Xdelta))
-            {
-                return;
-            }
-            if (!Double.TryParse(YDeltaTextBox.Text, out Ydelta))
-            {
-                return;
-            }
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-            string formul = formulTextBox.Text;
 
-            Function f = new Function($"f(x,y)={formul}");
+            Xdelta = Math.Abs(X0 - X1) / Canvas.Width;
+            Ydelta = Math.Abs(Y0 - Y1) / 20;
 
-            List<MyPoint> Points = new();
 
-            List<Face> Faces = new();
+
+
+            List<List<MyPoint>> allLine = new();
+            List<MyPoint> line = new();
 
             double XT, YT;
             int i, j;
-            int itemsInRow = (int)((X1 - X0) / Xdelta);
-            for (i = 0, XT = X0; XT < X1; i++, XT += Xdelta)
+            for (i = 0, XT = X0; i < Canvas.Width; i++, XT += Xdelta)
             {
-                for (j = 0, YT = Y0; YT < Y1; j++, YT += Xdelta)
+                line = new();
+                for (j = 0, YT = Y0; j < 20; j++, YT += Ydelta)
                 {
 
-                    Expression expr = new Expression($"f({XT},{YT})", f);
-                    Points.Add(new MyPoint((float)XT, (float)YT, (float)expr.calculate() + 15));
-                    if (j != 0)
-                    {
-                        Faces.Add(new(new List<int> { Points.Count - 1, Points.Count - 2 }));
-                    }
-                    if (i != 0)
-                    {
-                        Faces.Add(new(new List<int> { Points.Count - 1, Points.Count - 2 - itemsInRow }));
-                    }
+                    line.Add(new MyPoint((float)XT, (float)YT, (float)F(XT,YT)));
                 }
+                allLine .Add(line);
 
             }
 
-            var function = new FunctionShape(Points, Faces);
-            SelectShape(function);
-
-            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ru-RU");
-            ViewShapes();
+            _shapes.Clear();
+            _graphics.Clear(Color.White);
+            _viewer.Wave(allLine, Canvas.Width,X0, Math.Abs(X0 - X1),Y0, Math.Abs(Y0 - Y1),Canvas.Height);
         }
 
         private void Button_SolidOfRevolution_Click(object sender, EventArgs e)
