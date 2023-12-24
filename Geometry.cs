@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Graph6
@@ -12,6 +13,8 @@ namespace Graph6
         private readonly float _u;
         private readonly float _v;
 
+        public Vector3 normal;
+        public float intensity;
 
         public float X => _x;
         public float Y => _y;
@@ -89,7 +92,7 @@ namespace Graph6
 
     public class Face
     {
-        private readonly List<int> _indexes = new();
+        public List<int> _indexes = new();
         private readonly Color _color;
         private readonly List<Textel> _textels = new();
         public int this[int index] => _indexes[index];
@@ -134,7 +137,6 @@ namespace Graph6
         public Bitmap Texture { get; set; }
         public List<MyPoint> Points { get; private set; } = new();
         public List<Face> Faces { get; private set; } = new();
-        public List<float> Normals { get; private set; } = new();
         public MyMatrix MatrixToWorld { get; set; } = new(4, 4, new float[] {
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -171,13 +173,6 @@ namespace Graph6
             }
             return new MyPoint(x / Points.Count, y / Points.Count, z / Points.Count);
         }
-
-        public void CalculateNormals()
-        {
-
-        }
-
-
 
         private string GenerateUniqueId()
         {

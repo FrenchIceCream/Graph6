@@ -1,8 +1,12 @@
 ﻿
 using System;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Numerics;
+using System.Security.Cryptography.Xml;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace Graph6
 {
@@ -47,6 +51,7 @@ namespace Graph6
         private int _width;
         private int _height;
 
+        public bool IsLit;
         public Graphics Graphics
         {
             get => _graphics;
@@ -54,6 +59,8 @@ namespace Graph6
         }
 
         public RenderMode RenderMode { get; set; } = RenderMode.Sceleton;
+
+        public Light _light;
 
         public Viewer(PictureBox canvas, Projection projection)
         {
@@ -68,6 +75,7 @@ namespace Graph6
             Position = new MyPoint(0, 0, -200);
             CameraVector = new MyPoint(0, 0, 1);
             _buffer = new double[_width, _height];
+            _light = new Light(0, 0, 0);
         }
 
         public void SetProjection(Projection projection)
@@ -86,6 +94,7 @@ namespace Graph6
                     _buffer[x, y] = double.MinValue;
                 }
             }
+
             switch (RenderMode) //TODO зарефакторить
             {
                 case RenderMode.Sceleton:
@@ -111,113 +120,6 @@ namespace Graph6
             }
         }
 
-        private void Texturing(IList<Shape> shapes)
-        {
-            Bitmap bitmap = new Bitmap(_width, _height);
-           
-
-            foreach (var shape in shapes)
-            {
-                if (shape.Texture == null)
-                    continue;
-                var matrix = shape.MatrixToWorld * ToCameraCoordinates;
-                for (int j = 0; j < shape.Faces.Count; ++j) //В данном случае face - треугольник
-                {
-                    var face = shape.Faces[j];
-                    var result = IsVisible(face, matrix, shape);
-                    if (!result.Item4 || face.Textels.Count == 0)
-                        continue;
-
-
-                    var point0 = result.Item1;
-                    var u0 = face.Textel(2).U;
-                    var v0 = face.Textel(2).V;
-                    var z0 = point0.Z;
-
-                    var point1 = result.Item2;
-                    var u1 = face.Textel(1).U;
-                    var v1 = face.Textel(1).V;
-                    var z1 = point1.Z;
-
-                    var point2 = result.Item3;
-                    var u2 = face.Textel(0).U;
-                    var v2 = face.Textel(0).V;
-                    var z2 = point2.Z;
-
-                    var oldPoint0 = new PointF(point0.X, point0.Y);
-
-                    // Переносим треугольник в начала координат;
-                    point1 -= point0;
-                    point2 -= point0;
-                    point0 = new(0, 0, 0);
-
-                    if (point2.Y == 0)
-                    {
-                        (point1, point2) = (point2, point1);
-                        (z1, z2) = (z2, z1);
-                        (u1, u2) = (u2, u1);
-                        (v1, v2) = (v2, v1);
-                    }
-
-                    //Разницапо U и V координатам:
-                    float deltaU0 = u1 - u0;
-                    float deltaU1 = u2 - u0;
-
-                    float deltaV0 = v1 - v0;
-                    float deltaV1 = v2 - v0;
-
-
-                    //Нужны будут для интерполирования по Z координате.
-                    float deltaZ0 = z1 - z0;
-                    float deltaZ1 = z2 - z0;
-
-                    var values = new MyPoint[3] { point0, point1, point2 };
-
-                    var minX = values.Min(value => value.X);
-                    var maxX = values.Max(value => value.X);
-
-                    var minY = values.Min(value => value.Y);
-                    var maxY = values.Max(value => value.Y);
-
-
-                    var width = _width / 2;
-                    var height = _height / 2;
-
-                    for (int y = (int)minY; y <= maxY; ++y)
-                    {
-                        for (int x = (int)minX; x <= maxX; ++x)
-                        {
-                            float w1 = ((y * point2.X - x * point2.Y) * 1.0f) / (point1.Y * point2.X - point1.X * point2.Y);
-                            if (w1 >= 0 && w1 <= 1)
-                            {
-                                float w2 = ((y - w1 * point1.Y) * 1.0f) / point2.Y;
-
-                                if (w2 >= 0 && (w1 + w2) <= 1)
-                                {
-                                    var texture = shape.Texture;
-                                    float z = z0 + (deltaZ0 * w1) + (deltaZ1 * w2);
-                                    var newX = (width + (x + (int)oldPoint0.X));
-                                    var newY = (height - (y + (int)oldPoint0.Y));
-                                    if (z > _buffer[newX, newY])
-                                    {
-                                        _buffer[newX, newY] = z;
-                                        var textureX = (int)(texture.Width * (u0 + (deltaU0 * w1) + (deltaU1 * w2))) % texture.Width;
-
-                                        var textureY = (int)(texture.Height * (v0 + (deltaV0 * w1) + (deltaV1 * w2))) % texture.Height;
-
-                                        var color = shape.Texture.GetPixel(textureX, textureY);
-                                        bitmap.SetPixel(newX, newY, color);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            _canvas.Image = bitmap;
-            _canvas.Update();
-            _canvas.Invalidate();
-        }
 
         private void Isometric(IList<Shape> shapes)
         {
@@ -262,30 +164,6 @@ namespace Graph6
             {
                 matrix *= transformation * projectionMatrix;
                 return new(matrix[0, 0] / matrix[0, 3], matrix[0, 1] / matrix[0, 3], matrix[0, 2] / matrix[0, 3]);
-            }
-        }
-
-
-
-        private void RemoveEdges(IList<Shape> shapes)
-        {
-            foreach (var shape in shapes)
-            {
-                var matrix = shape.MatrixToWorld * ToCameraCoordinates;
-                var pen = new Pen(Color.Red);
-                foreach (var face in shape.Faces)
-                {
-                    var result = IsVisible(face, matrix, shape);
-                    if (result.Item4)
-                    {
-                        var p1 = result.Item1;
-                        var p2 = result.Item2;
-                        var p3 = result.Item3;
-                        _graphics.DrawLine(pen, new Point((int)p1.X, (int)p1.Y), new Point((int)p2.X, (int)p2.Y));
-                        _graphics.DrawLine(pen, new Point((int)p2.X, (int)p2.Y), new Point((int)p3.X, (int)p3.Y));
-                        _graphics.DrawLine(pen, new Point((int)p1.X, (int)p1.Y), new Point((int)p3.X, (int)p3.Y));
-                    }
-                }
             }
         }
 
@@ -343,8 +221,10 @@ namespace Graph6
         private void ZBuffer(IList<Shape> shapes)
         { 
             Bitmap bitmap = new Bitmap(_width, _height);
+
             foreach (var shape in shapes)
             {
+                TurnOnLight(shape);
                 var matrix = shape.MatrixToWorld * ToCameraCoordinates;
                 for (int j = 0; j < shape.Faces.Count; ++j) //В данном случае face - треугольник
                 {
@@ -352,20 +232,23 @@ namespace Graph6
                     var result = IsVisible(face, matrix, shape);
                     if (!result.Item4)
                         continue;
-                    
-                    var point0 = result.Item1;
 
+
+                    var point0 = result.Item1;
                     var z0 = point0.Z;
+                    var i0 = point0.intensity;
 
                     var point1 = result.Item2;
                     var z1 = point1.Z;
+                    var i1 = point1.intensity;
 
                     var point2 = result.Item3;
                     var z2 = point2.Z;
+                    var i2 = point2.intensity;
 
                     var oldPoint0 = new PointF(point0.X, point0.Y);
 
-                    // Переносим треугольник в начала координат;
+                    // Переносим треугольник в начало координат;
                     point1 -= point0;
                     point2 -= point0;
                     point0 = new(0, 0, 0);
@@ -374,11 +257,15 @@ namespace Graph6
                     {
                         (point1, point2) = (point2, point1);
                         (z1, z2) = (z2, z1);
+                        (i1, i2) = (i2, i1);
                     }
 
                     //Нужны будут для интерполирования по Z координате.
                     float deltaZ0 = z1 - z0;
                     float deltaZ1 = z2 - z0;
+                    float deltaI0 = i1 - i0;
+                    float deltaI1 = i2 - i0;
+
 
                     var values = new MyPoint[3] { point0, point1, point2 };
 
@@ -403,16 +290,20 @@ namespace Graph6
 
                                 if (w2 >= 0 && (w1 + w2) <= 1)
                                 {
-
                                     // (x, y, z)
                                     float z = z0 + (deltaZ0 * w1) + (deltaZ1 * w2);
+                                    float intensity = i0 + (deltaI0 * w1) + (deltaI1 * w2);
+                                    //Debug.WriteLine(intensity);
                                     var newX = (width + (x + (int)oldPoint0.X));
                                     var newY = (height - (y + (int)oldPoint0.Y));
 
                                     if (z > _buffer[newX, newY])
                                     {
                                         _buffer[newX, newY] = z;
-                                        bitmap.SetPixel(newX, newY, face.Color);
+                                        var c = face.Color;
+                                        if (IsLit)
+                                            c = Color.FromArgb(255, (int)(face.Color.R * intensity), (int)(face.Color.G * intensity), (int)(face.Color.B * intensity));
+                                        bitmap.SetPixel(newX, newY, c);
                                     }
                                 }
                             }
@@ -425,31 +316,163 @@ namespace Graph6
             _canvas.Invalidate();
         }
 
+        private void Texturing(IList<Shape> shapes)
+        {
+            Bitmap bitmap = new Bitmap(_width, _height);
 
 
+            foreach (var shape in shapes)
+            {
+                TurnOnLight(shape);
+                if (shape.Texture == null)
+                    continue;
+                var matrix = shape.MatrixToWorld * ToCameraCoordinates;
+                for (int j = 0; j < shape.Faces.Count; ++j) //В данном случае face - треугольник
+                {
+                    var face = shape.Faces[j];
+                    var result = IsVisible(face, matrix, shape);
+                    if (!result.Item4 || face.Textels.Count == 0)
+                        continue;
 
 
+                    var point0 = result.Item1;
+                    var u0 = face.Textel(2).U;
+                    var v0 = face.Textel(2).V;
+                    var z0 = point0.Z;
+                    var i0 = point0.intensity;
+
+                    var point1 = result.Item2;
+                    var u1 = face.Textel(1).U;
+                    var v1 = face.Textel(1).V;
+                    var z1 = point1.Z;
+                    var i1 = point1.intensity;
+
+                    var point2 = result.Item3;
+                    var u2 = face.Textel(0).U;
+                    var v2 = face.Textel(0).V;
+                    var z2 = point2.Z;
+                    var i2 = point2.intensity;
+
+                    var oldPoint0 = new PointF(point0.X, point0.Y);
+
+                    // Переносим треугольник в начала координат;
+                    point1 -= point0;
+                    point2 -= point0;
+                    point0 = new(0, 0, 0);
+
+                    if (point2.Y == 0)
+                    {
+                        (point1, point2) = (point2, point1);
+                        (z1, z2) = (z2, z1);
+                        (u1, u2) = (u2, u1);
+                        (v1, v2) = (v2, v1);
+                        (i1, i2) = (i2, i1);
+                    }
+
+                    //Разницапо U и V координатам:
+                    float deltaU0 = u1 - u0;
+                    float deltaU1 = u2 - u0;
+
+                    float deltaV0 = v1 - v0;
+                    float deltaV1 = v2 - v0;
 
 
+                    //Нужны будут для интерполирования по Z координате.
+                    float deltaZ0 = z1 - z0;
+                    float deltaZ1 = z2 - z0;
+                    float deltaI0 = i1 - i0;
+                    float deltaI1 = i2 - i0;
+
+                    var values = new MyPoint[3] { point0, point1, point2 };
+
+                    var minX = values.Min(value => value.X);
+                    var maxX = values.Max(value => value.X);
+
+                    var minY = values.Min(value => value.Y);
+                    var maxY = values.Max(value => value.Y);
 
 
+                    var width = _width / 2;
+                    var height = _height / 2;
+
+                    for (int y = (int)minY; y <= maxY; ++y)
+                    {
+                        for (int x = (int)minX; x <= maxX; ++x)
+                        {
+                            float w1 = ((y * point2.X - x * point2.Y) * 1.0f) / (point1.Y * point2.X - point1.X * point2.Y);
+                            if (w1 >= 0 && w1 <= 1)
+                            {
+                                float w2 = ((y - w1 * point1.Y) * 1.0f) / point2.Y;
+
+                                if (w2 >= 0 && (w1 + w2) <= 1)
+                                {
+                                    var texture = shape.Texture;
+                                    float z = z0 + (deltaZ0 * w1) + (deltaZ1 * w2);
+                                    float intensity = i0 + (deltaI0 * w1) + (deltaI1 * w2);
+                                    var newX = (width + (x + (int)oldPoint0.X));
+                                    var newY = (height - (y + (int)oldPoint0.Y));
+                                    if (z > _buffer[newX, newY])
+                                    {
+                                        _buffer[newX, newY] = z;
+                                        var textureX = (int)(texture.Width * (u0 + (deltaU0 * w1) + (deltaU1 * w2))) % texture.Width;
+
+                                        var textureY = (int)(texture.Height * (v0 + (deltaV0 * w1) + (deltaV1 * w2))) % texture.Height;
+
+                                        var color = shape.Texture.GetPixel(textureX, textureY);
+
+                                        if (IsLit)
+                                            color = Color.FromArgb(255, (int)(color.R * intensity), (int)(color.G * intensity), (int)(color.B * intensity));
+
+                                        bitmap.SetPixel(newX, newY, color);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            _canvas.Image = bitmap;
+            _canvas.Update();
+            _canvas.Invalidate();
+        }
+
+        private void RemoveEdges(IList<Shape> shapes)
+        {
+            foreach (var shape in shapes)
+            {
+                var matrix = shape.MatrixToWorld * ToCameraCoordinates;
+                var pen = new Pen(Color.Red);
+                foreach (var face in shape.Faces)
+                {
+                    var result = IsVisible(face, matrix, shape);
+                    if (result.Item4)
+                    {
+                        var p1 = result.Item1;
+                        var p2 = result.Item2;
+                        var p3 = result.Item3;
+                        _graphics.DrawLine(pen, new Point((int)p1.X, (int)p1.Y), new Point((int)p2.X, (int)p2.Y));
+                        _graphics.DrawLine(pen, new Point((int)p2.X, (int)p2.Y), new Point((int)p3.X, (int)p3.Y));
+                        _graphics.DrawLine(pen, new Point((int)p1.X, (int)p1.Y), new Point((int)p3.X, (int)p3.Y));
+                    }
+                }
+            }
+        }
 
         private (MyPoint, MyPoint, MyPoint, bool) IsVisible(Face face, MyMatrix matrix, Shape shape)
         {
-            //Debug.WriteLine("Old: " + shape.Points[face[0]].X + " " + shape.Points[face[0]].Y + " " + shape.Points[face[0]].Z);
-            //Debug.WriteLine("New: " + pp1[0, 0] + " " + pp1[0, 1] + " " + pp1[0, 2]);
-
             var p1 = Transfer(matrix, shape.Points[face[2]]);
             var p2 = Transfer(matrix, shape.Points[face[1]]);
             var p3 = Transfer(matrix, shape.Points[face[0]]);
+
+            p1.intensity = shape.Points[face[2]].intensity;
+            p2.intensity = shape.Points[face[1]].intensity;
+            p3.intensity = shape.Points[face[0]].intensity;
 
             //since encoding acts weirdly when I commit to github, I'll leave a comment in English
             //got it from some article on calculating a surface normal - it works given that face is a triangle
             float nx = (p2.Y - p1.Y) * (p3.Z - p1.Z) - (p2.Z - p1.Z) * (p3.Y - p1.Y);
             float ny = (p2.Z - p1.Z) * (p3.X - p1.X) - (p2.X - p1.X) * (p3.Z - p1.Z);
             float nz = (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
-
-            //var cam_pos = _viewer.Position;
 
             var center = shape.GetCenter();
             Vector3 vec = new Vector3(0 - center.X, 0 - center.Y, -400 - center.Z);
@@ -464,6 +487,79 @@ namespace Graph6
             //Debug.WriteLine((float)angle);
 
             return (p1, p2, p3, angle < 90);
+        }
+
+
+        public void TurnOnLight(Shape shape)
+        {
+            foreach(var face in shape.Faces)
+            {
+                foreach (var point_id in face._indexes)
+                {
+                    List<Face> faces = shape.Faces.Where(x => x._indexes.Contains(point_id)).ToList();
+                    var point = shape.Points[point_id];
+
+                    point.normal = CalculateVertexNormal(shape, faces);
+                }
+            }
+
+            foreach (var face in shape.Faces)
+            {
+                foreach (var point_id in face._indexes)
+                {
+                    var point = shape.Points[point_id];
+                    point.intensity = GetIntensity(point);
+                }
+            }
+        }
+
+        private float GetIntensity(MyPoint p)
+        {
+            var normal = Vector3.Normalize(p.normal);
+            //TODO умножить на матрицу перехода??
+            var ray = Vector3.Normalize(new Vector3(p.X + _light.position.X, p.Y + _light.position.Y, p.Z + _light.position.Z));
+            float cos = Math.Max(GetLightness(normal, ray), 0.0f);
+
+            return (1 + cos) / 2;
+        }
+
+        private float GetLightness(Vector3 v1, Vector3 v2)
+        {
+            float mult = v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
+            float s1 = (float)Math.Sqrt(v1.X * v1.X + v1.Y * v1.Y + v1.Z * v1.Z); ;
+            float s2 = (float)Math.Sqrt(v2.X * v2.X + v2.Y * v2.Y + v2.Z * v2.Z); ;
+            return mult / (s1 * s2);
+        }
+
+        private Vector3 CalculateVertexNormal(Shape shape, List<Face> faces)
+        {
+            Vector3 res = Vector3.Zero;
+            var matrix = shape.MatrixToWorld * ToCameraCoordinates;
+            foreach (var f in faces)
+            {
+                var fnormal = CalculateFaceNormal(shape, f, matrix);
+                res.X += fnormal.X;
+                res.Y += fnormal.Y;
+                res.Z += fnormal.Z;
+            }
+            res.X /= faces.Count();
+            res.Y /= faces.Count();
+            res.Z /= faces.Count();
+            return res;
+        }
+
+        private Vector3 CalculateFaceNormal(Shape shape, Face face, MyMatrix matrix)
+        {
+            var p1 = Transfer(matrix, shape.Points[face[2]]);
+            var p2 = Transfer(matrix, shape.Points[face[1]]);
+            var p3 = Transfer(matrix, shape.Points[face[0]]);
+
+            float nx = (p2.Y - p1.Y) * (p3.Z - p1.Z) - (p2.Z - p1.Z) * (p3.Y - p1.Y);
+            float ny = (p2.Z - p1.Z) * (p3.X - p1.X) - (p2.X - p1.X) * (p3.Z - p1.Z);
+            float nz = (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
+
+            Vector3 normal = new Vector3(nx, ny, nz);
+            return Vector3.Normalize(normal);
         }
 
         private void Perspective(IList<Shape> shapes)

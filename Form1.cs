@@ -34,6 +34,7 @@ namespace Graph6
             _viewer = new Viewer(Canvas, Projection.Isometric);
             _graphics = _viewer.Graphics;
             _currentShape = Shapes.Empty();
+            _viewer._light = new Light(0, 250, 0);
         }
 
         private void InitListsAndBoxes()
@@ -400,15 +401,15 @@ namespace Graph6
                 for (j = 0, YT = Y0; j < 20; j++, YT += Ydelta)
                 {
 
-                    line.Add(new MyPoint((float)XT, (float)YT, (float)F(XT,YT)));
+                    line.Add(new MyPoint((float)XT, (float)YT, (float)F(XT, YT)));
                 }
-                allLine .Add(line);
+                allLine.Add(line);
 
             }
 
             _shapes.Clear();
             _graphics.Clear(Color.White);
-            _viewer.Wave(allLine, Canvas.Width,X0, Math.Abs(X0 - X1),Y0, Math.Abs(Y0 - Y1),Canvas.Height);
+            _viewer.Wave(allLine, Canvas.Width, X0, Math.Abs(X0 - X1), Y0, Math.Abs(Y0 - Y1), Canvas.Height);
         }
 
         private void Button_SolidOfRevolution_Click(object sender, EventArgs e)
@@ -677,6 +678,14 @@ namespace Graph6
                     MessageBox.Show($"Ошибка загрузки изображения: {ex.Message}");
                 }
             }
+        }
+
+        private void TurnOnLightButton_Click(object sender, EventArgs e)
+        {
+            _viewer.IsLit = !_viewer.IsLit;
+            ViewShapes();
+            if (_viewer.IsLit)
+                _graphics.DrawEllipse(new Pen(Color.Red, 5), new Rectangle(new Point((int)_viewer._light.position.X, (int)_viewer._light.position.Y), new Size(3, 3)));
         }
     }
 }
