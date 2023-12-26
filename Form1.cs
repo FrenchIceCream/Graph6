@@ -63,6 +63,10 @@ namespace Graph6
             Y2.Text = "20";
             Z2.Text = "10";
 
+            LightPosX.Text = "0";
+            LightPosY.Text = "250";
+            LightPosZ.Text = "0";
+
             NumOfSections.Text = "6";
         }
 
@@ -494,8 +498,8 @@ namespace Graph6
             for (int i = 0; i < sections; i++)
                 for (int j = 0; j < c - 1; j++)
                 {
-                    _currentShape.Faces.Add(new Face(new List<int> { i * c + j, (i + 1) % (sections) * c + j, (i + 1) % (sections) * c + j + 1 }));
-                    _currentShape.Faces.Add(new Face(new List<int> { i * c + j, (i + 1) % (sections) * c + j + 1, i * c + j + 1 }));
+                    _currentShape.Faces.Add(new Face(new List<int> { (i + 1) % (sections) * c + j + 1, (i + 1) % (sections) * c + j, i * c + j }));
+                    _currentShape.Faces.Add(new Face(new List<int> { i * c + j + 1, (i + 1) % (sections) * c + j + 1, i * c + j }));
                 }
         }
 
@@ -683,9 +687,16 @@ namespace Graph6
         private void TurnOnLightButton_Click(object sender, EventArgs e)
         {
             _viewer.IsLit = !_viewer.IsLit;
+            _viewer._light.position = new MyPoint(int.Parse(LightPosX.Text), int.Parse(LightPosY.Text), int.Parse(LightPosZ.Text));
             ViewShapes();
             if (_viewer.IsLit)
-                _graphics.DrawEllipse(new Pen(Color.Red, 5), new Rectangle(new Point((int)_viewer._light.position.X, (int)_viewer._light.position.Y), new Size(3, 3)));
+            {
+                Bitmap bitmap_og = new Bitmap(Canvas.Image);
+                for (int i = -2; i < 3; i++)
+                    for (int j = -2; j < 3; j++)
+                        bitmap_og.SetPixel(Canvas.Width / 2 + (int)_viewer._light.position.X + i, Canvas.Height / 2 - (int)_viewer._light.position.Y + j, Color.Red);
+                Canvas.Image = bitmap_og;
+            }
         }
     }
 }

@@ -108,6 +108,12 @@
             TexturingCheckBox = new CheckBox();
             button14 = new Button();
             TurnOnLightButton = new Button();
+            label25 = new Label();
+            label26 = new Label();
+            label27 = new Label();
+            LightPosZ = new TextBox();
+            LightPosY = new TextBox();
+            LightPosX = new TextBox();
             ((System.ComponentModel.ISupportInitialize)Canvas).BeginInit();
             SuspendLayout();
             // 
@@ -929,11 +935,74 @@
             TurnOnLightButton.UseVisualStyleBackColor = true;
             TurnOnLightButton.Click += TurnOnLightButton_Click;
             // 
+            // label25
+            // 
+            label25.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label25.AutoSize = true;
+            label25.Location = new Point(1152, 531);
+            label25.Name = "label25";
+            label25.Size = new Size(21, 20);
+            label25.TabIndex = 91;
+            label25.Text = "X:";
+            // 
+            // label26
+            // 
+            label26.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label26.AutoSize = true;
+            label26.Location = new Point(1262, 531);
+            label26.Name = "label26";
+            label26.Size = new Size(21, 20);
+            label26.TabIndex = 90;
+            label26.Text = "Z:";
+            // 
+            // label27
+            // 
+            label27.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label27.AutoSize = true;
+            label27.Location = new Point(1206, 530);
+            label27.Name = "label27";
+            label27.Size = new Size(20, 20);
+            label27.TabIndex = 89;
+            label27.Text = "Y:";
+            // 
+            // LightPosZ
+            // 
+            LightPosZ.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            LightPosZ.Location = new Point(1262, 552);
+            LightPosZ.Name = "LightPosZ";
+            LightPosZ.Size = new Size(39, 27);
+            LightPosZ.TabIndex = 88;
+            LightPosZ.TextAlign = HorizontalAlignment.Center;
+            // 
+            // LightPosY
+            // 
+            LightPosY.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            LightPosY.Location = new Point(1206, 552);
+            LightPosY.Name = "LightPosY";
+            LightPosY.Size = new Size(39, 27);
+            LightPosY.TabIndex = 87;
+            LightPosY.TextAlign = HorizontalAlignment.Center;
+            // 
+            // LightPosX
+            // 
+            LightPosX.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            LightPosX.Location = new Point(1152, 552);
+            LightPosX.Name = "LightPosX";
+            LightPosX.Size = new Size(39, 27);
+            LightPosX.TabIndex = 86;
+            LightPosX.TextAlign = HorizontalAlignment.Center;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1314, 665);
+            Controls.Add(label25);
+            Controls.Add(label26);
+            Controls.Add(label27);
+            Controls.Add(LightPosZ);
+            Controls.Add(LightPosY);
+            Controls.Add(LightPosX);
             Controls.Add(TurnOnLightButton);
             Controls.Add(button14);
             Controls.Add(TexturingCheckBox);
@@ -1105,5 +1174,11 @@
         private CheckBox TexturingCheckBox;
         private Button button14;
         private Button TurnOnLightButton;
+        private Label label25;
+        private Label label26;
+        private Label label27;
+        private TextBox LightPosZ;
+        private TextBox LightPosY;
+        private TextBox LightPosX;
     }
 }
